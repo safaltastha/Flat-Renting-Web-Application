@@ -6,6 +6,7 @@ const {Property}=require('../models')
 
 router.get('/',async(req,res)=>{
     const listOfProperty=await Property.findAll();
+    const list = await Property.
     res.json(listOfProperty);
     
 })
