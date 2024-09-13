@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import PropertyCard from '../components/PropertyCard';
 import axios from 'axios';
-// import { fetchProperties } from '../api/propertyApi'; // Function to fetch properties
+
 
 const PropertyListing = () => {
     const [properties, setProperties] = useState([]);
