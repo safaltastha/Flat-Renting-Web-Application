@@ -9,13 +9,27 @@ export default function Navbar() {
     <div className="border border-spacing-3 flex items-center justify-between px-4 h-20">
       {/* Logo */}
       <div className="py-1">
-        <img src="/logo/logo.jpg" alt="Logo" height="100" width="120" />
+        <img
+          src="/logo/logo.jpg"
+          alt="Logo"
+          height="170"
+          width="200"
+          className="flex lg:hidden"
+        />
+        {/* logo for large screen hidden |*/}
+        <img
+          src="/logo/logo.jpg"
+          alt="Logo"
+          height="150"
+          width="170"
+          className="hidden lg:flex"
+        />
       </div>
       {/* Hamburger Icon */}
       <div className="block lg:hidden text-xl">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="text-purple-600 focus:outline-none"
+          className="text-purple-600 focus:outline-none text-4xl"
         >
           <FaBars />
         </button>
@@ -32,7 +46,7 @@ export default function Navbar() {
         {isOpen && (
           <button
             onClick={() => setIsOpen(false)}
-            className="lg:hidden absolute top-6 right-2 text-xl text-purple-600"
+            className="lg:hidden absolute top-6 right-2 text-4xl text-purple-600"
           >
             <FaTimes />
           </button>
@@ -40,7 +54,7 @@ export default function Navbar() {
 
         <ul className="flex flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0">
           <li className="block lg:hidden py-1">
-            <img src="/logo/logo.jpg" alt="Logo" height="100" width="120" />
+            <img src="/logo/logo.jpg" alt="Logo" height="150" width="170" />
           </li>
           <li>
             <Link to="/" className="block px-4 py-2 hover:text-purple-500">
