@@ -93,7 +93,7 @@ const HeroSection = () => {
                 xl:w-[1536px] 
                 2xl:w-[1920px] md:object-cover"
           />
-          <div className="w-full  absolute top-[20%] left-[17%]  ">
+          <div className="w-[700px]  absolute top-[20%] left-[17%]  ">
             <div className="bg-gray-800 bg-opacity-40  rounded-lg shadow-lg  max-w-2xl p-5 h-[600px]">
               <div className="flex flex-col gap-8 my-12  ">
                 {/* Location Dropdown */}

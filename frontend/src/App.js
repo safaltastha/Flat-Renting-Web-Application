@@ -2,6 +2,7 @@
 import React from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import DetailedViewPage from "./components/DetailedViewPage";
+import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import LoginForm from "./pages/LoginForm";
@@ -21,6 +22,7 @@ const App = () => {
         {<Route path="/login" element={<LoginForm />} />}
         {/* Other routes */}
       </Routes>
+      <Footer />
     </Router>
   );
 };
