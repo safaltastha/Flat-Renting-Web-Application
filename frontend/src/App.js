@@ -5,6 +5,8 @@ import PropertyListing from './pages/PropertyListing';
 import RegistrationForm from './pages/RegisterForm';
 import LoginForm from './pages/LoginForm';
 import DetailedViewPage from './components/DetailedViewPage';
+import LandlordForm from './pages/LandlordForm';
+
 
 
 const App = () => {
@@ -17,6 +19,9 @@ const App = () => {
 
                 { <Route path="/register" element={<RegistrationForm/>} /> }
                 { <Route path="/login" element={<LoginForm/>} /> }
+
+                { <Route path="/postyourproperty" element={<LandlordForm/>} /> }
+               
                 {/* Other routes */}
             </Routes>
 
