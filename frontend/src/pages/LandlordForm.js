@@ -46,7 +46,7 @@ const LandlordForm = () => {
         <DescriptionAndRules/>
         <div className="p-4">
           <label className="block mb-2 font-medium text-[#9747FF]">
-            Facilities<span className="text-red-600 ml-1">*</span>
+            Facilities<span className="text-red-600 ml-1 text-[20px]">*</span>
           </label>
           <div>
             <label className="inline-flex items-center">
@@ -88,6 +88,28 @@ const LandlordForm = () => {
                 
               />
               <span className="mr-2 text-[#777777]">Pet Allowed</span>
+            </label>
+
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                name="furnished"
+                className="text-blue-600 form-checkbox"
+                
+                
+              />
+              <span className="mr-2 text-[#777777]">Furnished</span>
+            </label>
+
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                name="semiFurnished"
+                className="text-blue-600 form-checkbox"
+                
+                
+              />
+              <span className="mr-2 text-[#777777]">Semi Furnished</span>
             </label>
           </div>
         </div>

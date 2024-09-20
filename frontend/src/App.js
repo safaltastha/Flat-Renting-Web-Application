@@ -6,6 +6,8 @@ import RegistrationForm from './pages/RegisterForm';
 import LoginForm from './pages/LoginForm';
 import DetailedViewPage from './components/DetailedViewPage';
 import LandlordForm from './pages/LandlordForm';
+import SimpleSlider from './components/SimpleSlider';
+
 
 
 
@@ -21,6 +23,7 @@ const App = () => {
                 { <Route path="/login" element={<LoginForm/>} /> }
 
                 { <Route path="/postyourproperty" element={<LandlordForm/>} /> }
+                { <Route path="/carousel" element={<SimpleSlider/>} /> }
                
                 {/* Other routes */}
             </Routes>

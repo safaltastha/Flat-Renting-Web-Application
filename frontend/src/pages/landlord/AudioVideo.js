@@ -44,12 +44,13 @@ const AudioVideo = ({ onFilesChange }) => {
     <div>
       <div className="p-4">
         <label className="block mb-2 font-medium text-[#9747FF]">
-          Upload Images<span className="text-red-600 ml-1">*</span>
+          Upload Images<span className="text-red-600 ml-1 text-[20px]">*</span>
         </label>
         <input
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
+          required
           accept="image/*"
           multiple
           className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-white file:bg-[#3B82F6] file:rounded-md file:cursor-pointer hover:file:bg-[#1D4ED8]"
@@ -75,6 +76,7 @@ const AudioVideo = ({ onFilesChange }) => {
           ref={videoInputRef}
           onChange={handleVideoChange}
           accept="video/*"
+          required
           multiple
           className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-white file:bg-[#3B82F6] file:rounded-md file:cursor-pointer hover:file:bg-[#1D4ED8]"
         />
@@ -84,7 +86,8 @@ const AudioVideo = ({ onFilesChange }) => {
               key={index}
               controls
               src={videoPreview}
-              className="w-32 h-32 object-cover rounded-lg border border-gray-300" // Adjust size as needed
+              className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+              
             />
           ))}
         </div>

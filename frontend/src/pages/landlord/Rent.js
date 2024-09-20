@@ -10,7 +10,7 @@ const Rent = () => {
             {/* Monthly Rent */}
             <div>
               <label className="block mb-2 font-medium text-[#9747FF]">
-                Monthly Rent<span className="text-red-600 ml-1">*</span>
+                Monthly Rent<span className="text-red-600 ml-1 text-[20px]">*</span>
               </label>
               <input
                 type="number"
