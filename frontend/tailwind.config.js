@@ -15,9 +15,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'custom-gray': 'rgba(151, 154, 165, 0.21)', // Add a custom color with RGBA
+        "custom-gray": "rgba(151, 154, 165, 0.21)",
+        //  'primary':'#9747FF',
       },
     },
   },
   plugins: [],
-}
+};
