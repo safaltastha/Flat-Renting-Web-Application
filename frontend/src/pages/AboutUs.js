@@ -3,20 +3,17 @@ import React from 'react';
 const AboutUs = () => {
   return (
     <div className="bg-[#EEE5FF] min-h-screen flex items-center justify-center p-4">
-      <div class="container min-h-screen">
+      <div className="container max-w-3xl mx-auto min-h-screen p-4"> {/* Adjusted max-w and added mx-auto */}
         
-
         <h1 className="mt-20 text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-8 underline decoration-black decoration-4">
           About Us
         </h1>
 
-   
         <section className="mb-8">
           <p className="text-base sm:text-lg text-gray-800 ">
             We are passionate about what we do and are committed to making a difference. Our team is dedicated to providing exceptional services and creating innovative solutions that meet the evolving needs of our customers. We believe in the power of collaboration and strive to build lasting relationships based on trust and mutual respect.
           </p>
         </section>
-        
         
         <section className="mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-semibold underline decoration-black ">Our Mission</h2>
@@ -25,6 +22,7 @@ const AboutUs = () => {
             We are dedicated to innovation, excellence, and delivering value.
           </p>
         </section>
+        
         <section className="mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-semibold underline decoration-black ">Who We Are</h2>
           <p className="text-base sm:text-lg text-gray-800">
@@ -32,6 +30,7 @@ const AboutUs = () => {
             We believe in collaboration, continuous learning, and making a positive impact.
           </p>
         </section>
+        
         <section className="mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-semibold underline decoration-black ">Our Vision</h2>
           <p className="text-base sm:text-lg text-gray-800">
@@ -39,8 +38,9 @@ const AboutUs = () => {
             significant milestones and achievements, driven by our commitment to excellence.
           </p>
         </section>
+        
         <section>
-          <h2 className="text-xl sm:text-2xl font-semibold  underline decoration-black ">Contact Us</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold underline decoration-black ">Contact Us</h2>
           <p className="text-base sm:text-lg text-gray-800 mt-5">
             Our team is composed of highly skilled professionals who are passionate about their work. 
             We believe in collaboration, continuous learning, and making a positive impact.
