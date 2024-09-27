@@ -93,13 +93,13 @@ export default function Navbar() {
           <li>
             <Link
               to="/"
-              className="hidden lg:block px-4 py-2 text-white bg-purple-600 border-2 border-transparent rounded-md hover:bg-white hover:border-purple-500 hover:text-black"
+              className="hidden lg:block px-5 py-1 text-white bg-purple-600 border-2 border-transparent rounded-md hover:bg-white hover:border-purple-500 hover:text-black"
             >
               Login
             </Link>
             <Link
               to="/"
-              className="block lg:hidden px-4 py-2 hover:text-purple-500 text-black"
+              className="block lg:hidden px-5 py-1 hover:text-purple-500 text-black"
             >
               Login
             </Link>
@@ -107,13 +107,13 @@ export default function Navbar() {
           <li>
             <Link
               to="/"
-              className="hidden lg:block px-4 py-2 text-white bg-purple-600 border-2 border-transparent rounded-lg hover:bg-white hover:border-purple-500 hover:text-black"
+              className="hidden lg:block px-5 py-1 text-white bg-purple-600 border-2 border-transparent rounded-lg hover:bg-white hover:border-purple-500 hover:text-black"
             >
               Sign Up
             </Link>
             <Link
               to="/"
-              className="block lg:hidden px-4 py-2 hover:text-purple-500 text-black"
+              className="block lg:hidden px-5 py-1 hover:text-purple-500 text-black"
             >
               Sign Up
             </Link>
