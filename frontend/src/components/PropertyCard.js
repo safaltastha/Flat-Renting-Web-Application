@@ -1,16 +1,11 @@
 
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ImLocation2 } from "react-icons/im";
 
 const PropertyCard = ({ property, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
-  const navigate = useNavigate();
-  const handleViewDetails = () => {
-    navigate(`/properties/${property.id}`);
-  };
-
   return (
     <div
       className={` property-card bg-[#D9D9D9] border border-gray-300 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105 hover:transition-transform duration-300 ease-in-out cursor-pointer ${
@@ -19,7 +14,7 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
           : "border-gray-300 text-gray-700"
       }
       `}
-      // onClick={() => onClick(property.id)}
+      onClick={() => onClick(property.id)}
     >
       <div className="relative">
         {/* Image */}
@@ -59,13 +54,12 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
           </div>
         </div>
         <div className="mt-4">
-        <button
-        onClick={handleViewDetails}
-        className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
-      >
-        View Details
-      </button>
-
+          <Link
+            to={`/properties/${property.id}`}
+            className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
+          >
+            View Details
+          </Link>
         </div>
 
         <div

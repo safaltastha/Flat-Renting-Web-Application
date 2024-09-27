@@ -90,27 +90,9 @@ const LandlordForm = () => {
               <span className="mr-2 text-[#777777]">Pet Allowed</span>
             </label>
 
-            <label className="inline-flex items-center">
-              <input
-                type="checkbox"
-                name="furnished"
-                className="text-blue-600 form-checkbox"
-                
-                
-              />
-              <span className="mr-2 text-[#777777]">Furnished</span>
-            </label>
+            
 
-            <label className="inline-flex items-center">
-              <input
-                type="checkbox"
-                name="semiFurnished"
-                className="text-blue-600 form-checkbox"
-                
-                
-              />
-              <span className="mr-2 text-[#777777]">Semi Furnished</span>
-            </label>
+           
           </div>
         </div>
         <div>
@@ -134,7 +116,7 @@ const LandlordForm = () => {
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-[#A06FFF] text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 bg-[#A06FFF] text-white rounded-md hover:bg-[#473965]"
           >
             Submit
           </button>
