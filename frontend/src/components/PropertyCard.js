@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ImLocation2 } from "react-icons/im";
@@ -59,13 +57,12 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
           </div>
         </div>
         <div className="mt-4">
-        <button
-        onClick={handleViewDetails}
-        className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
-      >
-        View Details
-      </button>
-
+          <button
+            onClick={handleViewDetails}
+            className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
+          >
+            View Details
+          </button>
         </div>
 
         <div
