@@ -13,6 +13,7 @@ const PropertyListing = () => {
   
 
 
+ 
   useEffect(() => {
     const loadProperties = async () => {
       try {
@@ -38,6 +39,24 @@ const PropertyListing = () => {
   };
 
 
+  return (
+    <div className="p-5">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 ">
+        {properties.length > 0 ? (
+          properties.map((property) => (
+            <PropertyCard
+              key={property.id}
+              property={property}
+              isSelected={property.id === selectedCardId}
+              onClick={handleCardClick}
+            />
+          ))
+        ) : (
+          <div>No properties available</div>
+        )}
+      </div>
+    </div>
+  );
   return (
     <div className="p-5">
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 ">
