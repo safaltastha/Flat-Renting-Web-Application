@@ -1,74 +1,95 @@
-module.exports=(sequelize,DataTypes)=>{
+const { FOREIGNKEYS } = require("sequelize/lib/query-types");
+const Users = require("./Users");
 
-    const Property=sequelize.define("Property",{
-        category: {
-            type: DataTypes.ENUM('flat', 'room', 'apartment'),
-            allowNull: false,
-          },
-          // Location: city, street number
-          locationCity: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
-          locationStreetNumber: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          },
-          // Number of spaces, bedrooms, bathrooms, and kitchens
-          numOfSpaces: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-          },
-          numOfBedrooms: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-          },
-          numOfBathrooms: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-          },
-          numOfKitchens: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-          },
-          // Rent details
-          monthlyRent: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-          },
-          advancedRent: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: true, // Optional field
-          },
-          // Features included: electricity, parking, wifi, pet
-          features: {
-            type: DataTypes.JSON, // Store features as a JSON object
-            allowNull: true,
-          },
-          // Description
-          description: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-          },
-          // House rule
-          houseRule: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-          },
-          // Photo and video
-          photoUrl: {
-            type: DataTypes.STRING,
-            allowNull: true,
-          },
-          videoUrl: {
-            type: DataTypes.STRING,
-            allowNull: true,
-          },
-        }, {
-          timestamps: true, 
-           tableName: 'properties'
-        
-    })
+module.exports = (sequelize, DataTypes) => {
+  const Property = sequelize.define(
+    "Property",
+    {
+      category: {
+        type: DataTypes.ENUM("flat", "room", "apartment"),
+        allowNull: false,
+      },
+      locationCity: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      locationStreetNumber: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      numOfSpaces: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      numOfBedrooms: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      numOfLivingrooms: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      numOfBathrooms: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      numOfKitchens: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      monthlyRent: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+      },
+      advancedRent: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+      },
+      features: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      houseRule: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+//Photos and videos chai db ma save hunna hai
+      photo: {
+        type: DataTypes.JSON,
+        allowNull: false,
+        defaultValue: [],
+      },
 
-    return Property;
-}
+      video: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: [],
+      },
+      // userId: {
+      //   type: DataTypes.INTEGER,
+      //   references: {
+      //     model : Users,
+      //     key: 'id' 
+      //   },
+      //   allowNull: false,
+      // },
+    },
+    
+    {
+      timestamps: true,
+      tableName: "properties",
+    }
+  );
+
+  // Users.associte = (models)=> {
+  //   Users.hasMany(models.Property,{
+  //     foreignKey: 'userId' ,
+  //     onDelete:  "cascade"
+  //   })
+  // }
+  return Property;
+};

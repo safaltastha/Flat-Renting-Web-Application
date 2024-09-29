@@ -1,26 +1,23 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const { Users } = require("../models");
-const router=express.Router();
-
-
+const router = express.Router();
 
 // Registration route
 router.post("/register", async (req, res) => {
-  const { email, password, role } = req.body;
+  const { name, email, password, role } = req.body;
 
   try {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    
     const newUser = await Users.create({
+      name,
       email,
       password: hashedPassword,
-      role, 
+      role,
     });
 
-    
     res.json({ message: "Registration successful", user: newUser });
   } catch (error) {
     res.status(500).json({ message: "Error registering user", error });
@@ -28,7 +25,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { email, password} = req.body;
+  const { email, password } = req.body;
 
   const user = await Users.findOne({ where: { email: email } });
 
@@ -38,12 +35,9 @@ router.post("/login", async (req, res) => {
 
   if (!match) {
     return res.status(401).json({ error: "Incorrect email or password" });
-}
+  }
 
+  res.json("YOU LOGGED IN!!!");
+});
 
-    res.json("YOU LOGGED IN!!!");
-  });
-
-
-
-module.exports=router;
+module.exports = router;
