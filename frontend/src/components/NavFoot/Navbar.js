@@ -25,6 +25,7 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
+    navigate('/');
   };
 
   const handleSettings = () => {
@@ -32,7 +33,7 @@ export default function Navbar() {
   };
 
   const handleProfile = () => {
-    navigate("/dashboard");
+    navigate("/myprofile");
   };
 
   const toggleProperties = () => {

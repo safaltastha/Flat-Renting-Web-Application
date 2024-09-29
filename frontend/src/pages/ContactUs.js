@@ -73,16 +73,7 @@ const ContactUs = () => {
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
             </div>
-            <div className="flex flex-col">
-              <label className="block md:text-sm font-medium text-gray-700">
-                Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                placeholder="Email"
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
-              />
-            </div>
+            
             <div className="flex flex-col">
               <label className="block md:text-sm font-medium text-gray-700">
                 Phone Number <span className="text-red-500">*</span>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import PropertyCard from "../components/PropertyCard";
+import PropertyCard from "../components/Property/PropertyCard";
 import axios from "axios";
 
 const PropertyListing = () => {
@@ -49,7 +49,6 @@ const PropertyListing = () => {
       </div>
     </div>
   );
-  
 };
 
 export default PropertyListing;

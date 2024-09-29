@@ -18,6 +18,7 @@ const WhyChooseUs = () => {
                   width={120}
                   height={120}
                   className="flex md:hidden "
+                  alt="searchicon"
                 ></img>
                 <img
                   src="/whychooseus/advancesearchn.png"

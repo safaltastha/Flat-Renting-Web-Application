@@ -1,7 +1,7 @@
 import React from "react";
-import FeaturedProperties from "./Homepage/FeaturedProperty";
-import HeroSection from "./Homepage/HeroSection";
-import WhyChooseUs from "./Homepage/WhyChooseUs";
+import FeaturedProperties from "../components/Homepage/FeaturedProperty";
+import HeroSection from "../components/Homepage/HeroSection";
+import WhyChooseUs from "../components/Homepage/WhyChooseUs";
 
 const HomePage = () => {
   return (
