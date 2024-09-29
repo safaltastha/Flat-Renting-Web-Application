@@ -1,6 +1,13 @@
-import React from "react";
+import React,{useState} from "react";
 
-const LocationField = () => {
+const LocationField = ({ capitalizeWords }) => {
+  const [location, setLocation] = useState('');
+
+  const handleLocationChange = (e) => {
+    const capitalizedLocation = capitalizeWords(e.target.value);
+    setLocation(capitalizedLocation);
+  };
+
   return (
     <div>
       <div className="p-4">
@@ -13,6 +20,7 @@ const LocationField = () => {
             <input
               type="text"
               name="locationCity"
+              onChange={handleLocationChange}
               required
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               placeholder="Ex: Ranipauwa"
@@ -38,6 +46,7 @@ const LocationField = () => {
               <input
                 type="text"
                 name="locationStreetName"
+                onChange={handleLocationChange}
                 required
                 className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               />

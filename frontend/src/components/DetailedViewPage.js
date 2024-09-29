@@ -1,7 +1,4 @@
-
-
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { ImLocation2 } from "react-icons/im";
@@ -128,13 +125,14 @@ const DetailedViewPage = () => {
             </div>
 
             {/* Map */}
-            <div className="mt-12">
+            <div className="my-12">
               <p className="text-2xl font-semibold">Find the property on map</p>
-              <img
+              {/* <img
                 src="/images/map.jpeg"
                 alt="Map"
                 className="w-full h-[300px] object-cover rounded-md shadow-lg mt-4"
-              />
+              /> */}
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d28129.0477250726!2d83.98528161614638!3d28.203342149521294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3995937bbf0376ff%3A0xf6cf823b25802164!2sPokhara!5e0!3m2!1sen!2snp!4v1727537868376!5m2!1sen!2snp" width="600" height="300"  allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
           </div>
 

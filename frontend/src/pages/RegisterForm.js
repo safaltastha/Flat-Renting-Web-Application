@@ -4,6 +4,8 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { RiArrowDownSLine } from "react-icons/ri";
+import { Link } from "react-router-dom";
+
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -49,25 +51,21 @@ const RegisterForm = () => {
 
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
     const { name, email, password, role } = values;
-    
 
-    // Save the user data to localStorage
+    
     localStorage.setItem(
       "user",
       JSON.stringify({ name, email, password, role })
     );
 
     
-
-    // Reset form and navigate to login page
     resetForm();
     navigate("/login");
     setSubmitting(false);
   };
 
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
+    <div className="flex  items-center justify-center h-[90vh] max-h-screen py-8 p-4 bg-gray-100">
       <Formik
         initialValues={{
           name: "",
@@ -78,26 +76,28 @@ const RegisterForm = () => {
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+   
       >
         {({ isSubmitting }) => (
-          <Form className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-            <div className="flex justify-center items-center">
-              <h1 className="text-2xl font-bold text-[#A06FFF] mb-6">
+          <Form className="w-full max-w-screen-md bg-white p-6 rounded-lg shadow-md">
+          {/* <Form className=" w-4/5 md:w-full p-4  bg-white  rounded-lg shadow-md"> */}
+          
+              <h1 className="text-2xl text-center font-bold text-[#A06FFF] mb-6">
                 Register
               </h1>
-            </div>
+          
 
             <div className="mb-4">
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block md:text-sm font-medium text-gray-700"
               >
-                Name <span className="ml-1 text-red-600 text-[20px]">*</span>
+                Username <span className="ml-1 text-red-600 text-[20px]">*</span>
               </label>
               <Field
                 type="name"
                 name="name"
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
               <ErrorMessage
                 name="email"
@@ -109,14 +109,14 @@ const RegisterForm = () => {
             <div className="mb-4">
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block md:text-sm font-medium text-gray-700"
               >
                 Email <span className="ml-1 text-red-600 text-[20px]">*</span>
               </label>
               <Field
                 type="email"
                 name="email"
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
               <ErrorMessage
                 name="email"
@@ -128,7 +128,7 @@ const RegisterForm = () => {
             <div className="mb-4">
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block md:text-sm font-medium text-gray-700"
               >
                 Password{" "}
                 <span className="ml-1 text-red-600 text-[20px]">*</span>
@@ -136,7 +136,7 @@ const RegisterForm = () => {
               <Field
                 type="password"
                 name="password"
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
               <ErrorMessage
                 name="password"
@@ -148,7 +148,7 @@ const RegisterForm = () => {
             <div className="mb-4">
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
+                className="block md:text-sm font-medium text-gray-700"
               >
                 Confirm Password{" "}
                 <span className="ml-1 text-red-600 text-[20px]">*</span>
@@ -156,7 +156,7 @@ const RegisterForm = () => {
               <Field
                 type="password"
                 name="confirmPassword"
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
               <ErrorMessage
                 name="confirmPassword"
@@ -168,7 +168,7 @@ const RegisterForm = () => {
             <div className="mb-4">
               <label
                 htmlFor="role"
-                className="block text-sm font-medium text-gray-700"
+                className="block md:text-sm font-medium text-gray-700"
               >
                 Role <span className="ml-1 text-red-600 text-[20px]">*</span>
               </label>
@@ -176,7 +176,7 @@ const RegisterForm = () => {
                 <Field
                   as="select"
                   name="role"
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-500 appearance-none"
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none  appearance-none"
                   style={{
                     backgroundColor: "white", // Consistent background color
                   }}
@@ -201,10 +201,18 @@ const RegisterForm = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-[#A06FFF] text-white font-bold py-2 px-4 rounded hover:bg-[#473965] transition duration-200"
+               
+                className="block w-full py-2 px-4 text-white bg-purple-600 border-2 border-transparent rounded-lg hover:bg-white hover:border-purple-500 hover:text-black"
               >
                 Register
               </button>
+            </div>
+
+            <div className="flex justify-center items-center mt-3">
+              Already have an account?{" "} 
+              <Link to="/login" className="text-[#A06FFF] ml-1 font-medium hover:underline">
+                Login
+              </Link>
             </div>
           </Form>
         )}

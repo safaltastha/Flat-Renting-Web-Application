@@ -14,6 +14,10 @@ const LandlordForm = () => {
   const [videos, setVideos] = useState([]);
   const navigate = useNavigate();
 
+  const capitalizeWords = (value) => {
+    return value.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
   const handleFilesChange = (imageFiles, videoFiles) => {
     setImages(imageFiles);
     setVideos(videoFiles);
@@ -22,6 +26,8 @@ const LandlordForm = () => {
  
 
   const handleSubmit = async (event) => {
+
+  
     event.preventDefault();
 
     if (images.length === 0 || videos.length === 0) {
@@ -39,11 +45,11 @@ const LandlordForm = () => {
   return (
     <div className="max-w-4xl mx-auto p-8 bg-custom-gray shadow-lg rounded-lg my-12">
       <form className="space-y-6" method="post" onSubmit={handleSubmit}>
-      <LocationField/>
+      <LocationField capitalizeWords={capitalizeWords}/>
         <GeneralCategory/>
         
         <Rent/>
-        <DescriptionAndRules/>
+        <DescriptionAndRules capitalizeWords={capitalizeWords}/>
         <div className="p-4">
           <label className="block mb-2 font-medium text-[#9747FF]">
             Facilities<span className="text-red-600 ml-1 text-[20px]">*</span>
@@ -110,7 +116,7 @@ const LandlordForm = () => {
           <button
             type="button"
             onClick={handleCancel}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+            className="px-4 py-2 bg-gray-400 text-white rounded-md"
           >
             Cancel
           </button>

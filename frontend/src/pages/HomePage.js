@@ -1,5 +1,5 @@
 import React from "react";
-import FeaturedProperties from "./FeaturedProperties";
+import FeaturedProperties from "./Homepage/FeaturedProperty";
 import HeroSection from "./Homepage/HeroSection";
 import WhyChooseUs from "./Homepage/WhyChooseUs";
 

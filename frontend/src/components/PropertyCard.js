@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ImLocation2 } from "react-icons/im";
@@ -14,12 +12,12 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
           : "border-gray-300 text-gray-700"
       }
       `}
-      onClick={() => onClick(property.id)}
+      onClick={onClick}
     >
       <div className="relative">
         {/* Image */}
         <img
-          src={property.image ? property.image : "/images/room.jpg"}
+          src={property.image ? property.image : "/images/room3.jpg"}
           alt={`${property.category} - ${property.locationCity}`}
           className="w-full h-48 object-cover"
         />

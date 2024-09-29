@@ -1,6 +1,13 @@
-import React from 'react'
+import React,{useState} from 'react'
 
-const DescriptionAndRules = () => {
+const DescriptionAndRules = ({ capitalizeWords }) => {
+  const [description, setDescription] = useState('');
+
+  const handleDescription = (e) => {
+    const capitalizedDescription = capitalizeWords(e.target.value);
+    setDescription(capitalizedDescription);
+  };
+
   return (
     <div>
         <div className="p-4">
@@ -16,6 +23,7 @@ const DescriptionAndRules = () => {
               </label>
               <textarea
                 name="description"
+                onChange={handleDescription}
                 className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
                 rows="6"
               ></textarea>
@@ -28,6 +36,7 @@ const DescriptionAndRules = () => {
               </label>
               <textarea
                 name="rules"
+                onChange={handleDescription}
                 className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
                 rows="6"
               ></textarea>

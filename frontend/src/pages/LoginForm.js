@@ -2,7 +2,8 @@ import React from "react";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
+import { Link } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate(); // Initialize the navigate function
@@ -57,8 +58,9 @@ function Login() {
         localStorage.setItem("loggedInUser", storedUser.email);
         
 
+        navigate("/"); 
+        window.location.reload();
         resetForm();
-        navigate("/"); // Redirect to the dashboard page
       } else {
         alert("Invalid email or password");
       }
@@ -96,7 +98,7 @@ function Login() {
               <Field
                 type="email"
                 name="email"
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
               <ErrorMessage
                 name="email"
@@ -116,7 +118,7 @@ function Login() {
               <Field
                 type="password"
                 name="password"
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
               <ErrorMessage
                 name="password"
@@ -129,10 +131,17 @@ function Login() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-[#A06FFF] text-white font-bold py-2 px-4 rounded hover:bg-[#473965] transition duration-200"
+              className="hidden lg:block w-full py-2 px-4 text-white bg-purple-600 border-2 border-transparent rounded-lg hover:bg-white hover:border-purple-500 hover:text-black"
               >
                 {isSubmitting ? "Logging in..." : "Login"}
               </button>
+            </div>
+
+            <div className="flex justify-center items-center mt-3">
+              Don't have an account?{" "} 
+              <Link to="/signup" className="text-[#A06FFF] ml-1 font-medium hover:underline">
+                Register
+              </Link>
             </div>
           </Form>
         )}
