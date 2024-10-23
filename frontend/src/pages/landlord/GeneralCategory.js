@@ -1,7 +1,11 @@
 import React from "react";
 import { RiArrowDownSLine } from "react-icons/ri";
 
-const GeneralCategory = () => {
+const GeneralCategory = ({ onChange }) => {
+  const handleInputChange = (e) => {
+    onChange(e.target.name, e.target.value);
+  };
+
   return (
     <div>
       <div className="p-4">
@@ -17,11 +21,8 @@ const GeneralCategory = () => {
               <select
                 name="category"
                 required
+                onChange={handleInputChange}
                 className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500 appearance-none"
-                style={{
-                  backgroundImage: "none", // Ensure no default arrow
-                  backgroundColor: "white", // Consistent background color
-                }}
               >
                 <option value="" className=""></option>
                 <option value="flat">Flat</option>
@@ -34,36 +35,36 @@ const GeneralCategory = () => {
             </div>
           </div>
 
-          {/* Number of Spaces */}
           <div className="flex-1">
             <label className="block mb-2 font-medium text-[#9747FF]">
-              Number of Spaces<span className="text-red-600 ml-1 text-[20px]">*</span>
+              Number of Spaces
+              <span className="text-red-600 ml-1 text-[20px]">*</span>
             </label>
             <input
               type="number"
               name="numOfSpaces"
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               required
             />
           </div>
         </div>
 
-        {/* Number of Bedrooms, Living Rooms, Bathrooms, Kitchens */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-          {/* Number of Bedrooms */}
           <div>
             <label className="block mb-2 font-medium text-[#9747FF]">
               Number of Bedrooms
+              <span className="text-red-600 ml-1 text-[20px]">*</span>
             </label>
             <input
               type="number"
               name="numOfBedrooms"
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               required
             />
           </div>
 
-          {/* Number of Living Rooms */}
           <div>
             <label className="block mb-2 font-medium text-[#9747FF]">
               Number of Living Rooms
@@ -71,11 +72,11 @@ const GeneralCategory = () => {
             <input
               type="number"
               name="numOfLivingRooms"
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />
           </div>
 
-          {/* Number of Bathrooms */}
           <div>
             <label className="block mb-2 font-medium text-[#9747FF]">
               Number of Bathrooms
@@ -83,29 +84,33 @@ const GeneralCategory = () => {
             <input
               type="number"
               name="numOfBathrooms"
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />
           </div>
 
-          {/* Number of Kitchens */}
           <div>
             <label className="block mb-2 font-medium text-[#9747FF]">
-              Number of Kitchens
+              Number of Kitchens{" "}
+              <span className="text-red-600 ml-1 text-[20px]">*</span>
             </label>
             <input
               type="number"
               name="numOfKitchens"
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />
           </div>
 
           <div className="flex-1">
             <label className="block mb-2 font-medium text-[#9747FF]">
-              Which Floor?<span className="text-red-600 ml-1 text-[20px]">*</span>
+              Which Floor?
+              <span className="text-red-600 ml-1 text-[20px]">*</span>
             </label>
             <input
               type="text"
-              name="numOfSpaces"
+              name="floor"
+              onChange={handleInputChange}
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               required
             />

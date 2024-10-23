@@ -57,8 +57,8 @@ const FeaturedProperties = () => {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
-    nextArrow: <NextArrow />, // Using the custom right arrow
-    prevArrow: <PrevArrow />, // Using the custom left arrow
+    nextArrow: <NextArrow />, 
+    prevArrow: <PrevArrow />, 
     responsive: [
       {
         breakpoint: 1024, // Tablet and medium screens

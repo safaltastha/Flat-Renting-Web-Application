@@ -17,7 +17,7 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
       <div className="relative">
         {/* Image */}
         <img
-          src={property.image ? property.image : "/images/room3.jpg"}
+          src={property.image ? property.image : "/images/room.jpg"}
           alt={`${property.category} - ${property.locationCity}`}
           className="w-full h-48 object-cover"
         />
@@ -37,7 +37,7 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
               </p>
             </div>
             <p className="text-sm font-medium text-gray-700">
-              ${property.monthlyRent} / month
+              NRs {property.monthlyRent} / month
             </p>
           </div>
           <div>

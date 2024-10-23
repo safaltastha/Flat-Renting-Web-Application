@@ -1,28 +1,28 @@
 const Users = require("./Users");
 
 module.exports = (sequelize, DataTypes) => {
-  const Property = sequelize.define(
-    "Property",
+  const Test = sequelize.define(
+    "Test",
     {
       category: {
         type: DataTypes.ENUM("flat", "room", "apartment"),
-        allowNull: false,
+        allowNull: true,
       },
       locationCity: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       locationStreetNumber: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       numOfSpaces: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       numOfBedrooms: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       numOfLivingrooms: {
         type: DataTypes.INTEGER,
@@ -34,11 +34,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       numOfKitchens: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       monthlyRent: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
+        allowNull: true,
       },
       advancedRent: {
         type: DataTypes.DECIMAL(10, 2),
@@ -50,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       description: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       houseRule: {
         type: DataTypes.TEXT,
@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
 
       photo: {
         type: DataTypes.JSON,
-        allowNull: true,
+        allowNull: false,
         defaultValue: [],
       },
 
@@ -68,28 +68,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: [],
       },
-      userId: {
-        type: DataTypes.INTEGER,
-        references: {
-          model: Users,
-          key: "id",
-        },
-        allowNull: false,
-      },
+      
     },
     {
       timestamps: true,
-      tableName: "properties",
+      tableName: "tests",
     }
   );
 
-  Property.associate = (models) => {
-    
-    Property.belongsTo(models.Users, {
-      foreignKey: "userId",
-      onDelete: "CASCADE",
-    });
-  };
+  
 
-  return Property;
+  return Test;
 };

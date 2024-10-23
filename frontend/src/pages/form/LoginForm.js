@@ -1,14 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom"; 
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import Cookies from "js-cookie"; // Import js-cookie
 
 function Login() {
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
+  const [rememberMe, setRememberMe] = useState(false);
 
-  // Validation schema for form fields
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Invalid email address")
@@ -22,55 +22,41 @@ function Login() {
       .required("Password is required"),
   });
 
-  // Function to handle form submission
-  // const handleSubmit = (values, { setSubmitting, resetForm }) => {
-  //   const data = { email: values.email, password: values.password };
-  //   axios
-  //     .post("http://localhost:3001/auth/login", data)
-  //     .then((response) => {
-  //       console.log(response.data);
-        
-  //       resetForm();
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    console.log("Submitting form with values:", values);
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/auth/login",
+        values,
+        {
+          withCredentials: true,
+        }
+      );
 
-       
-  //       navigate("/");
-  //     })
-  //     .catch((error) => {
-  //       console.error("Login error", error);
-        
-  //     })
-  //     .finally(() => {
-  //       setSubmitting(false); // Stop submission state
-  //     });
-  // };
-
-
-  const handleSubmit = (values, { setSubmitting, resetForm }) => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-
-    if (storedUser) {
-      
-      if (
-        values.email === storedUser.email &&
-        values.password === storedUser.password
-      ) {
-       
-        localStorage.setItem("loggedInUser", storedUser.email);
-        
-
-        navigate("/"); 
-        window.location.reload();
+      if (response.data) {
+        if (rememberMe) {
+          // Cookies.set("token", response.data.token, {
+          //   expires: 1 / 24,
+          //   path: "/",
+          // });
+          localStorage.setItem('token', response.data.token)
+        } else {
+          Cookies.set("token", response.data.token, { path: "/" }); // Session cookie
+        }
+        console.log("Token set in cookie:", Cookies.get("token"));
+        navigate("/");
         resetForm();
-      } else {
-        alert("Invalid email or password");
       }
-    } else {
-      alert("No user found. Please register.");
+    } catch (error) {
+      if (error.response) {
+        alert(error.response.data.error);
+      } else {
+        alert("An error occurred. Please try again.");
+      }
     }
 
     setSubmitting(false);
   };
-
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
@@ -80,14 +66,13 @@ function Login() {
           password: "",
         }}
         validationSchema={validationSchema}
-        onSubmit={handleSubmit} 
+        onSubmit={handleSubmit}
       >
         {({ isSubmitting }) => (
           <Form className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
             <div className="flex justify-center items-center">
               <h1 className="text-2xl font-bold text-[#A06FFF] mb-6">Login</h1>
             </div>
-
             <div className="mb-4">
               <label
                 htmlFor="email"
@@ -106,7 +91,6 @@ function Login() {
                 className="text-red-500 text-sm mt-1"
               />
             </div>
-
             <div className="mb-4">
               <label
                 htmlFor="password"
@@ -126,20 +110,38 @@ function Login() {
                 className="text-red-500 text-sm mt-1"
               />
             </div>
-
+            <div className="flex items-center justify-between mb-4">
+              <label className="flex items-center text-sm">
+                <Field
+                  type="checkbox"
+                  name="rememberMe"
+                  className="mr-2"
+                  onClick={() => setRememberMe(!rememberMe)}
+                />
+                Remember Me
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-sm text-[#A06FFF] hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
             <div>
               <button
                 type="submit"
                 disabled={isSubmitting}
-              className="hidden lg:block w-full py-2 px-4 text-white bg-purple-600 border-2 border-transparent rounded-lg hover:bg-white hover:border-purple-500 hover:text-black"
+                className="hidden lg:block w-full py-2 px-4 text-white bg-purple-600 border-2 border-transparent rounded-lg hover:bg-white hover:border-purple-500 hover:text-black"
               >
                 {isSubmitting ? "Logging in..." : "Login"}
               </button>
             </div>
-
             <div className="flex justify-center items-center mt-3">
-              Don't have an account?{" "} 
-              <Link to="/signup" className="text-[#A06FFF] ml-1 font-medium hover:underline">
+              Don't have an account?{" "}
+              <Link
+                to="/signup"
+                className="text-[#A06FFF] ml-1 font-medium hover:underline"
+              >
                 Register
               </Link>
             </div>

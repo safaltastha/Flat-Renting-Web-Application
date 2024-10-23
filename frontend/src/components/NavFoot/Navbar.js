@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiSettings } from "react-icons/ci";
 import { BiChevronDown } from "react-icons/bi";
-import { AiOutlineUser } from "react-icons/ai";
+import { AiOutlineUser, AiOutlineRight } from "react-icons/ai";
 import { IoIosLogOut } from "react-icons/io";
-import { AiOutlineRight } from "react-icons/ai"; // Import the right arrow icon
 import { FaPlus } from "react-icons/fa6";
+import Cookies from "js-cookie"; 
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,18 +16,35 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showProperties, setShowProperties] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const propertiesRef = useRef(null)
+
+  const res = Cookies.get("token")
+
+  console.log(res,  "es")
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
+    console.log("Navbar component mounted");
+    const token = Cookies.get("token");
+    console.log("Token retrieved:", token);
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        console.log(decodedToken); // Decode the token
+        setUser(decodedToken); // Set user state to decoded token
+      } catch (error) {
+        console.error("Invalid token:", error);
+        setUser(null);
+      }
+    } else {
+      setUser(null);
     }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    Cookies.remove("token");
     setUser(null);
-    navigate('/');
+    navigate("/login");
   };
 
   const handleSettings = () => {
@@ -36,8 +55,26 @@ export default function Navbar() {
     navigate("/myprofile");
   };
 
-  const toggleProperties = () => {
-    setShowProperties(!showProperties);
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const handlePostPropertyClick = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.get("http://localhost:3001/auth/role", {
+        withCredentials: true,
+      });
+
+      if (response.data.role === "landlord") {
+        navigate("/postyourproperty");
+      } else {
+        alert("Please Login as landlord to post your property");
+      }
+    } catch (error) {
+      alert("An error occurred while checking your role. Please try again.");
+    }
   };
 
   return (
@@ -74,11 +111,10 @@ export default function Navbar() {
       <div
         className={`text-xl lg:flex lg:items-center lg:space-x-8 ${
           isOpen
-            ? "flex flex-col absolute top-20 left-0 right-0 bg-white shadow-md z-10 w-1/2" // Half-width menu
+            ? "flex flex-col absolute top-20 left-0 right-0 bg-white shadow-md z-10 w-1/2"
             : "hidden"
-        } lg:relative lg:flex-row space-y-4`}
+        }`}
       >
-        {/* Close Icon for small screens */}
         {isOpen && (
           <button
             onClick={() => setIsOpen(false)}
@@ -90,29 +126,36 @@ export default function Navbar() {
 
         <ul className="flex flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0">
           <li>
-            <Link to="/" className="block px-4 py-2 hover:text-purple-500">
+            <Link
+              to="/"
+              className={`block px-4 py-2 hover:text-purple-500 ${
+                location.pathname === "/" ? "underline" : ""
+              }`}
+            >
               Home
             </Link>
           </li>
-          <li className="relative">
+
+          {/* Properties Dropdown */}
+          <li className="relative" ref={propertiesRef}>
             <span
-              onClick={toggleProperties}
-              className="block px-4 py-2 cursor-pointer hover:text-purple-500 flex justify-between items-center"
+              onClick={() => setShowProperties(!showProperties)}
+              className="px-4 py-2 cursor-pointer hover:text-purple-500 flex justify-between items-center"
             >
               Properties
               <AiOutlineRight
                 className={`ml-2 ${
                   showProperties ? "transform rotate-90" : ""
-                }`}
+                } lg:hidden`}
               />
             </span>
 
             {showProperties && (
               <ul
-                className={`bg-custom-gray lg:bg-white text-black rounded-lg mt-2 w-full z-10 shadow-lg ${
-                  isOpen ? "relative" : "absolute lg:absolute"
-                }`} // Absolute for lg and above, relative for small screens
-                style={{ top: isOpen ? "unset" : "100%", left: 0 }} // Top adjustment for dropdown placement
+                className={`bg-white text-black rounded-lg mt-2 w-full lg:w-52 z-10 shadow-lg ${
+                  isOpen ? "relative" : "absolute"
+                }`}
+                style={{ top: isOpen ? "unset" : "100%", left: 0 }}
               >
                 <li className="p-2 hover:bg-gray-200">
                   <Link to="/properties/flat">Flat</Link>
@@ -133,73 +176,74 @@ export default function Navbar() {
           <li>
             <Link
               to="/contactus"
-              className="block px-4 py-2 hover:text-purple-500"
+              className={`block px-4 py-2 hover:text-purple-500 ${
+                location.pathname === "/contactus" ? "underline" : ""
+              }`}
             >
               Contact
             </Link>
           </li>
           <li>
-            <Link to="/" className="block px-4 py-2 hover:text-purple-500">
+            <Link
+              to="/aboutus"
+              className={`block px-4 py-2 hover:text-purple-500 ${
+                location.pathname === "/aboutus" ? "underline" : ""
+              }`}
+            >
               About Us
             </Link>
           </li>
-          <li className="">
-            <Link
-              to="/postyourproperty"
-              className=" px-4 py-1 text-black lg:border-2 lg:border-purple-500 lg:hover:bg-purple-600 lg:hover:text-white transition-colors duration-200 rounded-md flex  items-center gap-1"
+          <li>
+            <a
+              href="/postyourproperty"
+              onClick={handlePostPropertyClick}
+              className="px-4 py-1 text-black lg:border-2 lg:border-purple-500 lg:hover:bg-purple-600 lg:hover:text-white transition-colors duration-200 rounded-md flex items-center gap-1"
             >
-              {" "}
               <span className="text-sm">
-                <FaPlus />
+                <FaPlus size={18} />
               </span>
               Post Your Property
-            </Link>
+            </a>
           </li>
 
-          {/* Check if user is logged in */}
+          {/* User Profile Dropdown */}
           {user ? (
-            <>
-              <li
-                className="block cursor-pointer relative"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
-                {/* Default User Image */}
-                <img
-                  src="/profile/profile.jpg"
-                  alt="User"
-                  className="w-8 h-8 rounded-full inline-block mt-2 "
-                />
-                <BiChevronDown className="inline-block ml-1 mt-2 " />
-                {/* Dropdown Menu */}
-                {dropdownOpen && (
-                  <div className="absolute right-0 mt-5 w-48 text-[16px] bg-white border border-gray-300 rounded shadow-lg z-10">
-                    <div className="flex flex-col">
-                      <button
-                        onClick={handleProfile}
-                        className="w-full text-left px-4 pb-2 pt-1 hover:bg-gray-100 flex items-center"
-                      >
-                        <AiOutlineUser className="mr-2" />
-                        My Profile
-                      </button>
-                      <button
-                        onClick={handleSettings}
-                        className="w-full text-left px-3 pb-2 flex items-center hover:bg-gray-100"
-                      >
-                        <CiSettings className="mr-2" />
-                        Settings
-                      </button>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 pb-2 hover:bg-gray-100 flex items-center"
-                      >
-                        <IoIosLogOut className="mr-2" />
-                        Logout
-                      </button>
-                    </div>
+            <li className="relative" onClick={toggleDropdown}>
+              {/* Use static user photo here */}
+              <img
+                src="/profile/profile.jpg"
+                alt="User"
+                className="w-8 h-8 rounded-full inline-block mt-2 cursor-pointer"
+              />
+              <BiChevronDown className="inline-block ml-1 mt-2" />
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-5 w-48 text-[16px] bg-white border border-gray-300 rounded shadow-lg z-10">
+                  <div className="flex flex-col">
+                    <button
+                      onClick={handleProfile}
+                      className="w-full text-left px-4 pb-2 pt-1 hover:bg-gray-100 flex items-center"
+                    >
+                      <AiOutlineUser className="mr-2" />
+                      My Profile
+                    </button>
+                    <button
+                      onClick={handleSettings}
+                      className="w-full text-left px-3 pb-2 flex items-center hover:bg-gray-100"
+                    >
+                      <CiSettings className="mr-2" />
+                      Settings
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 pb-2 hover:bg-gray-100 flex items-center"
+                    >
+                      <IoIosLogOut className="mr-2" />
+                      Logout
+                    </button>
                   </div>
-                )}
-              </li>
-            </>
+                </div>
+              )}
+            </li>
           ) : (
             <>
               <li>
