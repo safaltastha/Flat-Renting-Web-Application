@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 
-
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .matches(
@@ -14,11 +13,11 @@ const validationSchema = Yup.object().shape({
       "Invalid email address"
     )
     .required("Email is required"),
-  name: Yup.string()
+    name: Yup.string()
+    .matches(/^[a-z0-9]+$/, "Name must be lowercase letters and numbers only, with no spaces")
     .min(3, "Name must be at least 3 characters long")
     .max(50, "Name must not exceed 50 characters")
     .required("Name is required"),
-
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
@@ -37,35 +36,28 @@ const validationSchema = Yup.object().shape({
 const RegisterForm = () => {
   const navigate = useNavigate();
 
-  // const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-  //   try {
-  //     await axios.post("http://localhost:3001/auth/register", values);
-  //     resetForm();
-  //     navigate("/login");
-  //   } catch (error) {
-  //     alert("Failed to register user: " + error.message);
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
-
-  const handleSubmit = (values, { setSubmitting, resetForm }) => {
-    const { name, email, password, role } = values;
-
-    
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ name, email, password, role })
-    );
-
-    
-    resetForm();
-    navigate("/login");
-    setSubmitting(false);
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/auth/register",
+        values
+      );
+      // Assuming successful registration, navigate to login
+      resetForm();
+      navigate("/login");
+    } catch (error) {
+      // Handle the error appropriately
+      alert(
+        "Failed to register user: " +
+          (error.response?.data?.message || error.message)
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="flex  items-center justify-center h-[90vh] max-h-screen py-8 p-4 bg-gray-100">
+    <div className="flex items-center justify-center h-[90vh] max-h-screen py-8 p-4 bg-gray-100">
       <Formik
         initialValues={{
           name: "",
@@ -76,31 +68,29 @@ const RegisterForm = () => {
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
-   
       >
         {({ isSubmitting }) => (
           <Form className="w-full max-w-screen-md bg-white p-6 rounded-lg shadow-md">
-          {/* <Form className=" w-4/5 md:w-full p-4  bg-white  rounded-lg shadow-md"> */}
-          
-              <h1 className="text-2xl text-center font-bold text-[#A06FFF] mb-6">
-                Register
-              </h1>
-          
+            <h1 className="text-2xl text-center font-bold text-[#A06FFF] mb-6">
+              Register
+            </h1>
 
             <div className="mb-4">
               <label
-                htmlFor="email"
+                htmlFor="name"
                 className="block md:text-sm font-medium text-gray-700"
               >
-                Username <span className="ml-1 text-red-600 text-[20px]">*</span>
+                Username{" "}
+                <span className="ml-1 text-red-600 text-[20px]">*</span>
               </label>
               <Field
-                type="name"
+                type="text"
                 name="name"
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
+                placeholder="johndoe"
               />
               <ErrorMessage
-                name="email"
+                name="name"
                 component="div"
                 className="text-red-500 text-sm mt-1"
               />
@@ -117,6 +107,7 @@ const RegisterForm = () => {
                 type="email"
                 name="email"
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
+                placeholder="john@gmail.com"
               />
               <ErrorMessage
                 name="email"
@@ -176,10 +167,7 @@ const RegisterForm = () => {
                 <Field
                   as="select"
                   name="role"
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none  appearance-none"
-                  style={{
-                    backgroundColor: "white", // Consistent background color
-                  }}
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none appearance-none"
                 >
                   <option value="" label="Select role" />
                   <option value="tenant" label="Tenant" />
@@ -201,7 +189,6 @@ const RegisterForm = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-               
                 className="block w-full py-2 px-4 text-white bg-purple-600 border-2 border-transparent rounded-lg hover:bg-white hover:border-purple-500 hover:text-black"
               >
                 Register
@@ -209,8 +196,11 @@ const RegisterForm = () => {
             </div>
 
             <div className="flex justify-center items-center mt-3">
-              Already have an account?{" "} 
-              <Link to="/login" className="text-[#A06FFF] ml-1 font-medium hover:underline">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-[#A06FFF] ml-1 font-medium hover:underline"
+              >
                 Login
               </Link>
             </div>

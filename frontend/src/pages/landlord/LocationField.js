@@ -1,12 +1,12 @@
 import React,{useState} from "react";
 
-const LocationField = ({ capitalizeWords }) => {
-  const [location, setLocation] = useState('');
+const LocationField = ({ onChange }) => {
+ 
 
   const handleLocationChange = (e) => {
-    const capitalizedLocation = capitalizeWords(e.target.value);
-    setLocation(capitalizedLocation);
+    onChange(e.target.name, e.target.value);
   };
+
 
   return (
     <div>
@@ -34,6 +34,8 @@ const LocationField = ({ capitalizeWords }) => {
               <input
                 type="text"
                 name="locationStreetNumber"
+                onChange={handleLocationChange}
+
                 required
                 className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               />
@@ -52,7 +54,7 @@ const LocationField = ({ capitalizeWords }) => {
               />
             </div>
 
-            <div>
+            {/* <div>
               <label className="block mb-2 font-medium text-[#9747FF]">
                 Locate Your Property on Map
               </label>
@@ -61,7 +63,7 @@ const LocationField = ({ capitalizeWords }) => {
                 name="locationCityinMap"
                 className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               />
-            </div>
+            </div> */}
         </div>
       </div>
     </div>

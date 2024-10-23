@@ -5,15 +5,16 @@ import DetailedViewPage from "./components/Property/DetailedViewPage";
 import Footer from "./components/NavFoot/Footer";
 import Navbar from "./components/NavFoot/Navbar";
 import HomePage from "./pages/HomePage";
-import LoginForm from "./pages/LoginForm";
+import LoginForm from "./pages/form/LoginForm";
 import PropertyListing from "./pages/PropertyListing";
-import RegistrationForm from "./pages/RegisterForm";
-import LandlordForm from "./pages/LandlordForm";
+import RegistrationForm from "./pages/form/RegisterForm";
+import LandlordForm from "./pages/form/LandlordForm";
 import ChangePaasword from "./components/ChangePassword";
 import Layout from "./components/Layout";
-import ContactUs from "./pages/ContactUs";
+import ContactUs from "./pages/form/ContactForm";
 import BookNowWithVehicleForm from "./components/BookNow";
 import Dashboard from "./pages/Dashboard";
+import Flat from "./components/Flat";
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="/contactus" element={<ContactUs />} />
           <Route path="/booknow" element={<BookNowWithVehicleForm />} />
           <Route path="/myprofile" element={<Dashboard />} />
+          <Route path="/properties/flat" element={<Flat />} />
         </Route>
         {/* Add other routes here */}
       </Routes>

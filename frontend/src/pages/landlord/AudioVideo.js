@@ -5,8 +5,6 @@ const AudioVideo = ({ onFilesChange }) => {
   const [videoPreviews, setVideoPreviews] = useState([]);
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
-  const fileInputRef = useRef(null);
-  const videoInputRef = useRef(null);
 
   useEffect(() => {
     if (onFilesChange) {
@@ -15,42 +13,41 @@ const AudioVideo = ({ onFilesChange }) => {
   }, [images, videos, onFilesChange]);
 
   const handleFileChange = (e) => {
-    const files = e.target.files;
-    const fileArray = Array.from(files);
+    const files = Array.from(e.target.files);
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+    const videoFiles = files.filter((file) => file.type.startsWith("video/"));
 
-    const imageFiles = fileArray.filter((file) =>
-      file.type.startsWith("image/")
-    );
+    // Create object URLs for the image files
     const imagePreviews = imageFiles.map((file) => URL.createObjectURL(file));
-
     setImages((prevImages) => [...prevImages, ...imageFiles]);
     setImagePreviews((prevPreviews) => [...prevPreviews, ...imagePreviews]);
-  };
 
-  const handleVideoChange = (e) => {
-    const files = e.target.files;
-    const fileArray = Array.from(files);
-
-    const videoFiles = fileArray.filter((file) =>
-      file.type.startsWith("video/")
-    );
+    // Create object URLs for the video files
     const videoURLs = videoFiles.map((file) => URL.createObjectURL(file));
-
     setVideos((prevVideos) => [...prevVideos, ...videoFiles]);
     setVideoPreviews((prevPreviews) => [...prevPreviews, ...videoURLs]);
   };
 
+  useEffect(() => {
+    return () => {
+      // Clean up the object URLs when the component is unmounted
+      imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+      videoPreviews.forEach((preview) => URL.revokeObjectURL(preview));
+    };
+  }, [imagePreviews, videoPreviews]);
+
   return (
     <div>
+      {/* Image Upload Section */}
       <div className="p-4">
         <label className="block mb-2 font-medium text-[#9747FF]">
-          Upload Images<span className="text-red-600 ml-1 text-[20px]">*</span>
+          Upload Images
+          <span className="text-red-600 ml-1 text-[20px]">*</span>
         </label>
         <input
           type="file"
-          ref={fileInputRef}
+          name="image"
           onChange={handleFileChange}
-          required
           accept="image/*"
           multiple
           className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-white file:bg-[#3B82F6] file:rounded-md file:cursor-pointer hover:file:bg-[#1D4ED8]"
@@ -61,22 +58,22 @@ const AudioVideo = ({ onFilesChange }) => {
               key={index}
               src={preview}
               alt={`Image preview ${index}`}
-              className="w-32 h-32 object-cover rounded-lg border border-gray-300" // Adjust size as needed
+              className="w-32 h-32 object-cover rounded-lg border border-gray-300"
             />
           ))}
         </div>
       </div>
 
+      {/* Video Upload Section */}
       <div className="p-4">
         <label className="block mb-2 font-medium text-[#9747FF]">
           Upload Videos
         </label>
         <input
           type="file"
-          ref={videoInputRef}
-          onChange={handleVideoChange}
+          name="video"
+          onChange={handleFileChange}
           accept="video/*"
-          required
           multiple
           className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-white file:bg-[#3B82F6] file:rounded-md file:cursor-pointer hover:file:bg-[#1D4ED8]"
         />
@@ -87,7 +84,6 @@ const AudioVideo = ({ onFilesChange }) => {
               controls
               src={videoPreview}
               className="w-32 h-32 object-cover rounded-lg border border-gray-300"
-              
             />
           ))}
         </div>
