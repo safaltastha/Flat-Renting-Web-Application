@@ -72,7 +72,7 @@ const HeroSection = () => {
                   <option value="5k-10k">5k-10k</option>
                   <option value="10k-15k">10k-15k</option>
                   <option value="15k-20k">15k-20k</option>
-                  <option value="20k-25k">Above 25k</option>
+                  <option value="20k-25k">20k-25k</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                   <RiArrowDownSLine className="w-5 h-5 text-gray-500" />
@@ -170,7 +170,7 @@ const HeroSection = () => {
                       <option value="5k-10k">5k-10k</option>
                       <option value="10k-15k">10k-15k</option>
                       <option value="15k-20k">15k-20k</option>
-                      <option value="20k-25k">Above 25k</option>
+                      <option value="20k-25k">20k-25k</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                       <RiArrowDownSLine className="w-5 h-5 text-gray-500" />
