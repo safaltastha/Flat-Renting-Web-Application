@@ -65,23 +65,23 @@ const LandlordForm = () => {
     }
 
     // Create a FormData object to handle the file uploads
-    const testData = new FormData();
-    testData.append("category", formData.category);
-    testData.append("locationCity", formData.locationCity);
-    testData.append("locationStreetNumber", formData.locationStreetNumber);
-    testData.append("numOfSpaces", formData.numOfSpaces);
-    testData.append("numOfBedrooms", formData.numOfBedrooms);
-    testData.append("monthlyRent", formData.monthlyRent);
-    testData.append("description", formData.description);
-    testData.append("houseRule", formData.houseRule);
-    testData.append("features", JSON.stringify(formData.facilities)); // Append facilities as JSON string
+    const propertyData = new FormData();
+    propertyData.append("category", formData.category);
+    propertyData.append("locationCity", formData.locationCity);
+    propertyData.append("locationStreetNumber", formData.locationStreetNumber);
+    propertyData.append("numOfSpaces", formData.numOfSpaces);
+    propertyData.append("numOfBedrooms", formData.numOfBedrooms);
+    propertyData.append("monthlyRent", formData.monthlyRent);
+    propertyData.append("description", formData.description);
+    propertyData.append("houseRule", formData.houseRule);
+    propertyData.append("features", JSON.stringify(formData.facilities)); // Append facilities as JSON string
 
     // Append images and videos to FormData
     images.forEach((image) => {
-      testData.append("photo", image);
+      propertyData.append("photo", image);
     });
     videos.forEach((video) => {
-      testData.append("video", video);
+      propertyData.append("video", video);
     });
 
     const token = Cookies.get("token");
@@ -90,7 +90,7 @@ const LandlordForm = () => {
     try {
       const response = await axios.postForm(
         "http://localhost:3001/properties",
-        testData,
+        propertyData,
         {
           headers: {
             "Content-Type": "multipart/form-data",

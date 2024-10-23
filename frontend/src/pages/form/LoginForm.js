@@ -23,7 +23,7 @@ function Login() {
   });
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    console.log("Submitting form with values:", values);
+    // console.log("Submitting form with values:", values);
     try {
       const response = await axios.post(
         "http://localhost:3001/auth/login",
@@ -43,7 +43,7 @@ function Login() {
         } else {
           Cookies.set("token", response.data.token, { path: "/" }); // Session cookie
         }
-        console.log("Token set in cookie:", Cookies.get("token"));
+        // console.log("Token set in cookie:", Cookies.get("token"));
         navigate("/");
         resetForm();
       }
