@@ -42,7 +42,7 @@ const RegisterForm = () => {
         "http://localhost:3001/auth/register",
         values
       );
-      // Assuming successful registration, navigate to login
+     
       resetForm();
       navigate("/login");
     } catch (error) {
