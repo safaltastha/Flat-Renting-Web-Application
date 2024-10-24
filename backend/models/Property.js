@@ -77,12 +77,9 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-  };
-
-  Property.associate = (models) => {
     Property.hasMany(models.Media, {
       foreignKey: "propertyId",
-      as: "media",
+      as: "media", // Optional: can help in naming when accessing in queries
       onDelete: "CASCADE",
     });
   };
