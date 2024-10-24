@@ -57,17 +57,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
 
-      photo: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: [],
-      },
-
-      video: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: [],
-      },
       userId: {
         type: DataTypes.INTEGER,
         references: {
@@ -84,9 +73,16 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Property.associate = (models) => {
-    
     Property.belongsTo(models.Users, {
       foreignKey: "userId",
+      onDelete: "CASCADE",
+    });
+  };
+
+  Property.associate = (models) => {
+    Property.hasMany(models.Media, {
+      foreignKey: "propertyId",
+      as: "media",
       onDelete: "CASCADE",
     });
   };
