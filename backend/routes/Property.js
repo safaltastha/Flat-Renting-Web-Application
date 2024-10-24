@@ -62,8 +62,8 @@ router.post(
           imagePaths.map((filePath) =>
             Media.create({
               propertyId: newProperty.id,
-              filePath,
-              mediaType: 0, // 0 for image
+              file_path: filePath,
+              file_type: "image", // Change mediaType to file_type and set value to "image"
             })
           )
         );
@@ -80,8 +80,8 @@ router.post(
           videoPaths.map((filePath) =>
             Media.create({
               propertyId: newProperty.id,
-              filePath,
-              mediaType: 1, // 1 for video
+              file_path: filePath,
+              file_type: "video", // Change mediaType to file_type and set value to "video"
             })
           )
         );
@@ -106,13 +106,20 @@ router.get("/", async (req, res) => {
           model: Users,
           attributes: ["id", "name", "email"],
         },
+        {
+          model: Media,
+          as: "media", // This should match the alias you used in the Property model
+          attributes: ["file_path", "file_type"],
+        },
       ],
     });
     res.json(properties);
   } catch (error) {
+    console.error("Database Error:", error); // Log the error for debugging
     res.status(500).json({ message: "Error retrieving properties", error });
   }
 });
+
 
 // Get a property by ID
 router.get("/:id", async (req, res) => {
