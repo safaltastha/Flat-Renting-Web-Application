@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       locationStreetNumber: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       numOfSpaces: {
@@ -55,6 +55,14 @@ module.exports = (sequelize, DataTypes) => {
       houseRule: {
         type: DataTypes.TEXT,
         allowNull: true,
+      },
+      floor: {
+        type: DataTypes.ENUM("first", "second", "third", "fourth", "fifth"),
+        allowNull: false,
+      },
+      StreetName: {
+        type: DataTypes.TEXT,
+        allowNull: false,
       },
 
       userId: {

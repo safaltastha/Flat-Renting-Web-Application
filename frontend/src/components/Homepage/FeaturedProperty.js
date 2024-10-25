@@ -4,7 +4,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import axios from "axios";
-import PropertyCard from "../Property/PropertyCard"; // Import PropertyCard
+import PropertyCard from "../Property/PropertyCard";
+import Cookies from "js-cookie";
 
 const FeaturedProperties = () => {
   const [properties, setProperties] = useState([]);
@@ -39,7 +40,14 @@ const FeaturedProperties = () => {
   useEffect(() => {
     const loadFeaturedProperties = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/properties");
+        const token = Cookies.get("token");
+        const response = await axios.get("http://localhost:3001/properties", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
+        console.log(response.data);
         setProperties(response.data);
       } catch (error) {
         setError(error);
@@ -57,8 +65,8 @@ const FeaturedProperties = () => {
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
-    nextArrow: <NextArrow />, 
-    prevArrow: <PrevArrow />, 
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
     responsive: [
       {
         breakpoint: 1024, // Tablet and medium screens
