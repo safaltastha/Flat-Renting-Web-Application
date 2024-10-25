@@ -5,9 +5,12 @@ const cookieParser = require("cookie-parser");
 const PropertyRouter = require("./routes/Property");
 const UserRouter = require("./routes/Users");
 const testRouter = require("./routes/Test");
+const path = require("path"); 
 
 app.use(express.json());
 app.use(cookieParser());
+
+
 
 // CORS configuration
 app.use(
@@ -18,6 +21,10 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.use('/uploads/images', express.static(path.join(__dirname, 'uploads/images')));
+app.use('/uploads/videos', express.static(path.join(__dirname, 'uploads/videos')));
+
 
 // Routes
 const db = require("./models");

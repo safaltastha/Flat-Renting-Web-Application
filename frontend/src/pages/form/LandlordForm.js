@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // Import axios
-import GeneralCategory from "../landlord/GeneralCategory";
-import LocationField from "../landlord/LocationField";
-import Rent from "../landlord/Rent";
-import DescriptionAndRules from "../landlord/DescriptionAndRules";
-import AudioVideo from "../landlord/AudioVideo";
+import axios from "axios";
+import GeneralCategory from "../../components/landlord/GeneralCategory";
+import LocationField from "../../components/landlord/LocationField";
+import Rent from "../../components/landlord/Rent";
+import DescriptionAndRules from "../../components/landlord/DescriptionAndRules";
+import AudioVideo from "../../components/landlord/AudioVideo";
 import Cookies from "js-cookie";
 
 const LandlordForm = () => {
@@ -17,15 +17,19 @@ const LandlordForm = () => {
     locationStreetNumber: "",
     numOfSpaces: "",
     numOfBedrooms: "",
+    numOfKitchens: "",
+    numOfLivingRooms: "",
     monthlyRent: "",
+    advancedRent: "",
     description: "",
     houseRule: "",
-    facilities: {
+    features: {
       electricity: false,
       parking: false,
       wifi: false,
       petAllowed: false,
     },
+    floor: "",
   });
   const navigate = useNavigate();
 
@@ -49,8 +53,8 @@ const LandlordForm = () => {
     const { name, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      facilities: {
-        ...prev.facilities,
+      features: {
+        ...prev.features,
         [name]: checked, // Update the specific facility's value
       },
     }));
@@ -64,21 +68,32 @@ const LandlordForm = () => {
       return;
     }
 
-    // Create a FormData object to handle the file uploads
+    const featuresData = {
+      wifi: formData.features.wifi,
+      parking: formData.features.parking,
+      electricity: formData.features.electricity,
+      petAllowed: formData.features.petAllowed,
+    };
+
     const propertyData = new FormData();
     propertyData.append("category", formData.category);
     propertyData.append("locationCity", formData.locationCity);
     propertyData.append("locationStreetNumber", formData.locationStreetNumber);
     propertyData.append("numOfSpaces", formData.numOfSpaces);
     propertyData.append("numOfBedrooms", formData.numOfBedrooms);
+    propertyData.append("numOfLivingrooms", formData.numOfLivingRooms);
+    propertyData.append("numOfKitchens", formData.numOfKitchens);
     propertyData.append("monthlyRent", formData.monthlyRent);
+    propertyData.append("advancedRent", formData.advancedRent);
     propertyData.append("description", formData.description);
     propertyData.append("houseRule", formData.houseRule);
-    propertyData.append("features", JSON.stringify(formData.facilities)); // Append facilities as JSON string
+    propertyData.append("features", JSON.stringify(featuresData));
+    propertyData.append("floor", formData.floor);
+    propertyData.append("StreetName", formData.StreetName);
 
     // Append images and videos to FormData
     images.forEach((image) => {
-      propertyData.append("photo", image);
+      propertyData.append("image", image);
     });
     videos.forEach((video) => {
       propertyData.append("video", video);
@@ -88,7 +103,7 @@ const LandlordForm = () => {
     console.log("Token before submission:", token);
 
     try {
-      const response = await axios.postForm(
+      const response = await axios.post(
         "http://localhost:3001/properties",
         propertyData,
         {
@@ -142,6 +157,7 @@ const LandlordForm = () => {
                 name="electricity"
                 className="text-blue-600 form-checkbox"
                 onChange={handleCheckboxChange}
+                checked={formData.features.electricity || false}
               />
               <span className="mr-2 text-[#777777]">Electricity</span>
             </label>
@@ -151,6 +167,7 @@ const LandlordForm = () => {
                 name="parking"
                 className="text-blue-600 form-checkbox"
                 onChange={handleCheckboxChange}
+                checked={formData.features.parking || false}
               />
               <span className="mr-2 text-[#777777]">Parking</span>
             </label>
@@ -160,6 +177,7 @@ const LandlordForm = () => {
                 name="wifi"
                 className="text-blue-600 form-checkbox"
                 onChange={handleCheckboxChange}
+                checked={formData.features.wifi || false}
               />
               <span className="mr-2 text-[#777777]">WiFi</span>
             </label>
@@ -169,6 +187,7 @@ const LandlordForm = () => {
                 name="petAllowed"
                 className="text-blue-600 form-checkbox"
                 onChange={handleCheckboxChange}
+                checked={formData.features.petAllowed || false}
               />
               <span className="mr-2 text-[#777777]">Pet Allowed</span>
             </label>

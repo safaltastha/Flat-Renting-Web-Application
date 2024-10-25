@@ -6,6 +6,7 @@ import { ImPhone } from "react-icons/im";
 import { ImMail } from "react-icons/im";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const DetailedViewPage = () => {
   const navigate = useNavigate();
@@ -27,10 +28,16 @@ const DetailedViewPage = () => {
   useEffect(() => {
     const fetchProperty = async () => {
       try {
+        const token = Cookies.get("token");
         const response = await axios.get(
-          `http://localhost:3001/properties/${id}`
+          `http://localhost:3001/properties/${id}`,
+          {
+            withCredentials: true,
+          }
         );
+
         setProperty(response.data);
+        console.log(response.data);
       } catch (err) {
         setError(err);
       } finally {
@@ -65,8 +72,8 @@ const DetailedViewPage = () => {
             <div className="space-y-6 bg-white p-6 rounded-lg shadow-lg mt-4">
               <div className="flex items-center space-x-2 mt-2">
                 <ImLocation2 className="text-gray-600" size={18} />
-                <span>{property.streetNumber} street,</span>
-                <span>{property.streetName}</span>
+                <span>{property.locationStreetNumber} street,</span>
+                <span>{property.StreetName},</span>
                 <span>{property.locationCity}</span>
               </div>
               <p className="text-xl font-semibold text-gray-800">
@@ -87,7 +94,7 @@ const DetailedViewPage = () => {
                 </p>
                 <p className="text-lg">
                   <strong>Living Rooms:</strong>{" "}
-                  {property.numOfLivingRooms || "No Living room"}
+                  {property.numOfLivingrooms || "No Living room"}
                 </p>
                 <p className="text-lg">
                   <strong>Kitchen:</strong> {property.numOfKitchens}
@@ -104,8 +111,8 @@ const DetailedViewPage = () => {
                 </p>
                 <p className="text-lg">
                   <strong>Facilities:</strong>{" "}
-                  {property.facilities && Array.isArray(property.facilities)
-                    ? property.facilities.join(", ")
+                  {property.features && Array.isArray(property.features)
+                    ? property.features.join(", ")
                     : "No facilities listed"}
                 </p>
                 <p className="text-lg">
@@ -132,7 +139,14 @@ const DetailedViewPage = () => {
                 alt="Map"
                 className="w-full h-[300px] object-cover rounded-md shadow-lg mt-4"
               /> */}
-              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d28129.0477250726!2d83.98528161614638!3d28.203342149521294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3995937bbf0376ff%3A0xf6cf823b25802164!2sPokhara!5e0!3m2!1sen!2snp!4v1727537868376!5m2!1sen!2snp" width="600" height="300"  allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d28129.0477250726!2d83.98528161614638!3d28.203342149521294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3995937bbf0376ff%3A0xf6cf823b25802164!2sPokhara!5e0!3m2!1sen!2snp!4v1727537868376!5m2!1sen!2snp"
+                width="600"
+                height="300"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
             </div>
           </div>
 

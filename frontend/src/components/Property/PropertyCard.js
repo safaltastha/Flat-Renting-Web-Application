@@ -4,20 +4,25 @@ import { ImLocation2 } from "react-icons/im";
 
 const PropertyCard = ({ property, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
+
+  // Extract the first image path from the media array
+  const propertyImage =
+    property.media?.find((mediaItem) => mediaItem.file_type === "image")
+      ?.file_path || "/images/room.jpg";
+
   return (
     <div
-      className={` property-card bg-[#D9D9D9] border border-gray-300 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105 hover:transition-transform duration-300 ease-in-out cursor-pointer ${
+      className={`property-card bg-[#D9D9D9] border border-gray-300 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105 hover:transition-transform duration-300 ease-in-out cursor-pointer ${
         isSelected
           ? "border-blue-500 text-blue-500"
           : "border-gray-300 text-gray-700"
-      }
-      `}
+      }`}
       onClick={onClick}
     >
       <div className="relative">
         {/* Image */}
         <img
-          src={property.image ? property.image : "/images/room.jpg"}
+          src={propertyImage}
           alt={`${property.category} - ${property.locationCity}`}
           className="w-full h-48 object-cover"
         />
@@ -31,7 +36,7 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <div className="flex items-center mb-2 space-x-1">
-              <ImLocation2 className="text-gray-600 " size={18} />
+              <ImLocation2 className="text-gray-600" size={18} />
               <p className="text-gray-700 font-medium text-sm">
                 {property.locationCity}
               </p>

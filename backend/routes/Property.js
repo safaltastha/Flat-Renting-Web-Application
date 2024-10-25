@@ -14,6 +14,7 @@ router.post(
     { name: "video", maxCount: 5 },
   ]),
   async (req, res) => {
+    // Destructure properties from req.body
     const {
       category,
       locationCity,
@@ -25,12 +26,23 @@ router.post(
       numOfKitchens,
       monthlyRent,
       advancedRent,
-      features,
+      features, 
       description,
       houseRule,
+      floor,
+      StreetName,
     } = req.body;
 
     try {
+      
+      let parsedFeatures;
+      try {
+        parsedFeatures = JSON.parse(features);
+      } catch (parseError) {
+        return res.status(400).json({ message: "Invalid features format", error: parseError.message });
+      }
+
+      
       const propertyData = {
         category,
         locationCity,
@@ -42,13 +54,15 @@ router.post(
         numOfKitchens,
         monthlyRent,
         advancedRent,
-        features: JSON.parse(features),
+        features: parsedFeatures, 
         description,
         houseRule,
+        floor,
+        StreetName,
         userId: req.user.id,
       };
 
-      // Create the property
+      
       const newProperty = await Property.create(propertyData);
 
       // Handle image uploads
@@ -98,7 +112,7 @@ router.post(
 );
 
 // Get all properties
-router.get("/", async (req, res) => {
+router.get("/", authenticateJWT, async (req, res) => {
   try {
     const properties = await Property.findAll({
       include: [
@@ -108,21 +122,32 @@ router.get("/", async (req, res) => {
         },
         {
           model: Media,
-          as: "media", // This should match the alias you used in the Property model
+          as: "media",
           attributes: ["file_path", "file_type"],
         },
       ],
     });
+
+    // Add the correct URL prefix to file_path
+    properties.forEach((property) => {
+      property.media.forEach((mediaItem) => {
+        if (mediaItem.file_type === "image") {
+          mediaItem.file_path = `http://localhost:3001/uploads/images/${mediaItem.file_path}`;
+        } else if (mediaItem.file_type === "video") {
+          mediaItem.file_path = `http://localhost:3001/uploads/videos/${mediaItem.file_path}`;
+        }
+      });
+    });
+
     res.json(properties);
   } catch (error) {
-    console.error("Database Error:", error); // Log the error for debugging
+    console.error("Database Error:", error);
     res.status(500).json({ message: "Error retrieving properties", error });
   }
 });
 
-
 // Get a property by ID
-router.get("/:id", async (req, res) => {
+router.get("/:id", authenticateJWT, async (req, res) => {
   const { id } = req.params;
   try {
     const property = await Property.findByPk(id, {
@@ -201,7 +226,7 @@ router.delete("/:id", authenticateJWT, async (req, res) => {
 });
 
 //  Search on category, location, priceRange
-router.get("/search", async (req, res) => {
+router.get("/search", authenticateJWT, async (req, res) => {
   const { category, location, priceRange } = req.query;
 
   // Build the query conditions
