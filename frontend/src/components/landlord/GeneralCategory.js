@@ -1,10 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
 import { RiArrowDownSLine } from "react-icons/ri";
 import FloorSelection from "./FloorSelection";
 
 const GeneralCategory = ({ onChange }) => {
+  // Using a single state object to manage counts
+  const [roomCounts, setRoomCounts] = useState({
+    numOfBedrooms: 0,
+    numOfLivingRooms: 0,
+    numOfKitchens: 0,
+  });
+
   const handleInputChange = (e) => {
     onChange(e.target.name, e.target.value);
+  };
+
+  const handleRoomChange = (e) => {
+    const { name, value } = e.target;
+    setRoomCounts((prevCounts) => ({
+      ...prevCounts,
+      [name]: value,
+    }));
+    onChange(name, value); // Update the parent state
+  };
+
+  const renderLengthAndWidthFields = (num, type) => {
+    const lengthAndWidthFields = [];
+    for (let i = 0; i < num; i++) {
+      lengthAndWidthFields.push(
+        <div key={i} className="flex space-x-4 mb-4">
+          <div className="flex-1">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Length of {type} {i + 1}
+            </label>
+            <input
+              type="number"
+              name={`${type}Length_${i + 1}`}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              required
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Width of {type} {i + 1}
+            </label>
+            <input
+              type="number"
+              name={`${type}Width_${i + 1}`}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              required
+            />
+          </div>
+        </div>
+      );
+    }
+    return lengthAndWidthFields;
   };
 
   return (
@@ -60,10 +111,12 @@ const GeneralCategory = ({ onChange }) => {
             <input
               type="number"
               name="numOfBedrooms"
-              onChange={handleInputChange}
+              value={roomCounts.numOfBedrooms}
+              onChange={handleRoomChange}
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
               required
             />
+            {roomCounts.numOfBedrooms > 0 && renderLengthAndWidthFields(roomCounts.numOfBedrooms, "Bedroom")}
           </div>
 
           <div>
@@ -73,9 +126,11 @@ const GeneralCategory = ({ onChange }) => {
             <input
               type="number"
               name="numOfLivingRooms"
-              onChange={handleInputChange}
+              value={roomCounts.numOfLivingRooms}
+              onChange={handleRoomChange}
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
             />
+            {roomCounts.numOfLivingRooms > 0 && renderLengthAndWidthFields(roomCounts.numOfLivingRooms, "Living Room")}
           </div>
 
           <div>
@@ -98,9 +153,12 @@ const GeneralCategory = ({ onChange }) => {
             <input
               type="number"
               name="numOfKitchens"
-              onChange={handleInputChange}
+              value={roomCounts.numOfKitchens}
+              onChange={handleRoomChange}
               className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              required
             />
+            {roomCounts.numOfKitchens > 0 && renderLengthAndWidthFields(roomCounts.numOfKitchens, "Kitchen")}
           </div>
 
           <FloorSelection />

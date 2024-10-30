@@ -47,7 +47,7 @@ const FeaturedProperties = () => {
           },
           withCredentials: true,
         });
-        console.log(response.data);
+        console.log(response.data,  'res' );
         setProperties(response.data);
       } catch (error) {
         setError(error);
@@ -86,6 +86,8 @@ const FeaturedProperties = () => {
   if (loading) return <div>Loading...</div>;
   if (error)
     return <div>Error loading featured properties: {error.message}</div>;
+
+   console.log(properties,  'asdf' )
 
   return (
     <div className="container max-w-[1600px] py-8 relative">
