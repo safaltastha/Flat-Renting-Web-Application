@@ -2,6 +2,12 @@ module.exports = (sequelize, DataTypes) => {
   const Users = sequelize.define(
     "Users",
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false,
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -20,8 +26,17 @@ module.exports = (sequelize, DataTypes) => {
       },
       role: {
         type: DataTypes.ENUM("tenant", "landlord", "vehicleSupplier", "admin"),
-        defaultValue: "tenant",
         allowNull: false,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
       },
     },
     {
@@ -33,6 +48,12 @@ module.exports = (sequelize, DataTypes) => {
     // A user can have multiple properties
     Users.hasMany(models.Property, {
       foreignKey: "userId",
+      onDelete: "CASCADE",
+    });
+
+    // A user can have multiple vehicles
+    Users.hasMany(models.Vehicle, {
+      foreignKey: 'userId', // Foreign key in Vehicle model
       onDelete: "CASCADE",
     });
   };

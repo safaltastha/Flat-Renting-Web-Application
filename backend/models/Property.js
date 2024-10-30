@@ -4,6 +4,13 @@ module.exports = (sequelize, DataTypes) => {
   const Property = sequelize.define(
     "Property",
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false,
+      },
+
       category: {
         type: DataTypes.ENUM("flat", "room", "apartment"),
         allowNull: false,
@@ -14,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       locationStreetNumber: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      StreetName: {
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       numOfSpaces: {
@@ -36,6 +47,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+
+      floor: {
+        type: DataTypes.ENUM("first", "second", "third", "fourth", "fifth"),
+        allowNull: false,
+      },
       monthlyRent: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
@@ -55,14 +71,6 @@ module.exports = (sequelize, DataTypes) => {
       houseRule: {
         type: DataTypes.TEXT,
         allowNull: true,
-      },
-      floor: {
-        type: DataTypes.ENUM("first", "second", "third", "fourth", "fifth"),
-        allowNull: false,
-      },
-      StreetName: {
-        type: DataTypes.TEXT,
-        allowNull: false,
       },
 
       userId: {
@@ -88,6 +96,11 @@ module.exports = (sequelize, DataTypes) => {
     Property.hasMany(models.Media, {
       foreignKey: "propertyId",
       as: "media", // Optional: can help in naming when accessing in queries
+      onDelete: "CASCADE",
+    });
+    Property.hasMany(models.Room, {
+      foreignKey: "propertyId",
+      as: "rooms",
       onDelete: "CASCADE",
     });
   };

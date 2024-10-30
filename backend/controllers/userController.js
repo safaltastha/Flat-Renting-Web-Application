@@ -36,7 +36,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// Login handler
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -68,6 +67,71 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Error logging in", error });
   }
 };
+
+// Get all users
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await Users.findAll();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving users", error });
+  }
+};
+
+// Get user by ID
+exports.getUserById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await Users.findByPk(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving user", error });
+  }
+};
+
+// Update user
+exports.updateUser = async (req, res) => {
+  const { id } = req.params;
+  const { name, email, password, role } = req.body;
+
+  try {
+    const user = await Users.findByPk(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (password) {
+      user.password = await bcrypt.hash(password, 10);
+    }
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.role = role || user.role;
+
+    await user.save();
+    res.json({ message: "User updated successfully", user });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user", error });
+  }
+};
+
+// Delete user
+exports.deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await Users.findByPk(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    await user.destroy();
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting user", error });
+  }
+};
+
+
+// Login handler
+
 
 // Logout handler
 exports.logout = (req, res) => {
