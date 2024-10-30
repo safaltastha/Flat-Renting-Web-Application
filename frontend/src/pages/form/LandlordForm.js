@@ -63,8 +63,8 @@ const LandlordForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (images.length === 0 || videos.length === 0) {
-      alert("Please upload at least one image and one video.");
+    if (images.length === 0 ) {
+      alert("Please upload at least one image .");
       return;
     }
 

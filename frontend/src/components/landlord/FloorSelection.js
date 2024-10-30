@@ -17,7 +17,7 @@ const FloorSelection = ({ handleInputChange }) => {
           onChange={handleInputChange}
           className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500 appearance-none"
         >
-          <option value="" disabled selected>Select Floor</option>
+          <option value="" disabled >Select Floor</option>
           {floorOptions.map((floor) => (
             <option key={floor} value={floor}>
               {floor.charAt(0).toUpperCase() + floor.slice(1)}

@@ -5,10 +5,12 @@ import { ImLocation2 } from "react-icons/im";
 const PropertyCard = ({ property, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
 
+  
+
   // Extract the first image path from the media array
   const propertyImage =
-    property.media?.find((mediaItem) => mediaItem.file_type === "image")
-      ?.file_path || "/images/room.jpg";
+  property.media?.find((mediaItem) => mediaItem.file_type === "image")?.file_path.replace(/\\/g, '/');
+
 
   return (
     <div

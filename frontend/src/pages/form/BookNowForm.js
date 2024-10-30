@@ -215,20 +215,7 @@ const BookNowWithVehicleForm = () => {
           />
         </div>
 
-        <div className="mt-5">
-          <label htmlFor="email" className="block text-gray-600">
-            Email<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="border w-full mt-1 px-3 py-2 rounded-md bg-gray-50"
-            placeholder="abc12@gmail.com"
-          />
-        </div>
+        
 
         <div className="mt-5">
           <label htmlFor="phone-number" className="block text-gray-600">

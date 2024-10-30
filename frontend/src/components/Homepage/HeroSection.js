@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { RiArrowDownSLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const HeroSection = () => {
   // State variables for dropdown selections
@@ -8,13 +11,44 @@ const HeroSection = () => {
   const [priceRange, setPriceRange] = useState("");
 
   const [inputLocation, setInputLocation] = useState("");
+  const navigate = useNavigate();
 
   // Handle search button click
-  const handleSearch = () => {
+  const handleSearch = async () => {
+    const sanitizedLocation = inputLocation.trim().replace(/\s+/g, "");
+
     console.log("Selected Category:", category);
     console.log("Selected Location:", inputLocation);
     console.log("Selected Price Range:", priceRange);
-    // Implement search logic here
+
+    const params = new URLSearchParams();
+    if (category) params.append("category", category);
+    if (inputLocation) params.append("locationCity", inputLocation);
+    if (priceRange) params.append("priceRange", priceRange);
+
+    try {
+      const token = Cookies.get("token");
+      const response = await axios.get(
+        "http://localhost:3001/properties/search",
+        {
+          params: {
+            category,
+            locationCity: sanitizedLocation,
+            priceRange,
+          },
+          withCredentials: true,
+        }
+      );
+
+     
+      const properties = response.data; 
+      console.log("Fetched Properties:", properties);
+
+      // Navigate to PropertyListing and pass fetched properties in state
+      navigate("/properties", { state: { properties } });
+    } catch (error) {
+      console.error("Error during search:", error);
+    }
   };
 
   return (
@@ -69,10 +103,10 @@ const HeroSection = () => {
                   <option value="" disabled>
                     Select Price Range
                   </option>
-                  <option value="5k-10k">5k-10k</option>
-                  <option value="10k-15k">10k-15k</option>
-                  <option value="15k-20k">15k-20k</option>
-                  <option value="20k-25k">Above 25k</option>
+                  <option value="5000-10000">5k-10k</option>
+                  <option value="10000-15000">10k-15k</option>
+                  <option value="15000-20000">15k-20k</option>
+                  <option value="20000-25000">Above 25k</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                   <RiArrowDownSLine className="w-5 h-5 text-gray-500" />
@@ -167,10 +201,10 @@ const HeroSection = () => {
                       <option value="" disabled>
                         Select Price Range
                       </option>
-                      <option value="5k-10k">5k-10k</option>
-                      <option value="10k-15k">10k-15k</option>
-                      <option value="15k-20k">15k-20k</option>
-                      <option value="20k-25k">Above 25k</option>
+                      <option value="5000-10000">5k-10k</option>
+                      <option value="10000-15000">10k-15k</option>
+                      <option value="15000-20000">15k-20k</option>
+                      <option value="20000-25000">Above 25k</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                       <RiArrowDownSLine className="w-5 h-5 text-gray-500" />
