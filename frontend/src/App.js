@@ -12,9 +12,10 @@ import LandlordForm from "./pages/form/LandlordForm";
 import ChangePaasword from "./components/ChangePassword";
 import Layout from "./components/Layout";
 import ContactUs from "./pages/form/ContactForm";
-import BookNowWithVehicleForm from "./components/BookNow";
+import BookNowWithVehicleForm from "./pages/form/BookNowForm";
 import Dashboard from "./pages/Dashboard";
 import Flat from "./components/Flat";
+import Test from "./components/Test";
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
           <Route path="/booknow" element={<BookNowWithVehicleForm />} />
           <Route path="/myprofile" element={<Dashboard />} />
           <Route path="/properties/flat" element={<Flat />} />
+          <Route path="/test" element={<Test/>} />
         </Route>
         {/* Add other routes here */}
       </Routes>
