@@ -31,6 +31,10 @@ const validationSchema = Yup.object().shape({
   role: Yup.string()
     .oneOf(["tenant", "landlord", "vehicle supplier"], "Invalid role")
     .required("Role is required"),
+    phoneNumber: Yup.string()
+    .required('Phone number is required')
+    .matches(/^\+977 ?\d{10}$/, 'Phone number must be in the format +977XXXXXXXXXX'),
+
 });
 
 const RegisterForm = () => {
@@ -57,7 +61,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-[90vh] max-h-screen py-8 p-4 bg-gray-100">
+    <div className="flex items-center justify-center h-[100vh] max-h-screen py-8 p-4 bg-gray-100">
       <Formik
         initialValues={{
           name: "",
@@ -65,6 +69,8 @@ const RegisterForm = () => {
           password: "",
           confirmPassword: "",
           role: "",
+          phoneNumber:"",
+          userPhoto:"",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -151,6 +157,27 @@ const RegisterForm = () => {
               />
               <ErrorMessage
                 name="confirmPassword"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="phoneNumber"
+                className="block md:text-sm font-medium text-gray-700"
+              >
+                Phone Number{" "}
+                <span className="ml-1 text-red-600 text-[20px]">*</span>
+              </label>
+              <Field
+                type="text"
+                name="phoneNumber"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
+                placeholder="+977 9800000000"
+              />
+              <ErrorMessage
+                name="phoneNumber"
                 component="div"
                 className="text-red-500 text-sm mt-1"
               />
