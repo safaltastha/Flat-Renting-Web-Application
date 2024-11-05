@@ -72,6 +72,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      status: {
+        type: DataTypes.ENUM("available", "booked"),
+        defaultValue: "available", // Set default status to 'available'
+        allowNull: false,
+      },
 
       userId: {
         type: DataTypes.INTEGER,
@@ -101,6 +106,11 @@ module.exports = (sequelize, DataTypes) => {
     Property.hasMany(models.Room, {
       foreignKey: "propertyId",
       as: "rooms",
+      onDelete: "CASCADE",
+    });
+    Property.hasMany(models.Booking, {
+      foreignKey: "propertyId",
+      as: "bookings",
       onDelete: "CASCADE",
     });
   };

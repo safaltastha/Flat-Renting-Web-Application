@@ -28,6 +28,23 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("tenant", "landlord", "vehicleSupplier", "admin"),
         allowNull: false,
       },
+      phoneNumber: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          is: {
+            args: /^\+977 ?\d{10}$/,
+            msg: "Phone number must be in the format +977XXXXXXXXXX",
+          },
+        },
+      },
+
+      userPhoto: {
+        type: DataTypes.STRING,
+        allowNull: true, // Optional, can be left empty initially
+        defaultValue: null, // Default to null if no profile photo is provided
+      },
+
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -53,7 +70,48 @@ module.exports = (sequelize, DataTypes) => {
 
     // A user can have multiple vehicles
     Users.hasMany(models.Vehicle, {
-      foreignKey: 'userId', // Foreign key in Vehicle model
+      foreignKey: "userId", // Foreign key in Vehicle model
+      as: "vehicles",
+      onDelete: "CASCADE",
+    });
+
+    Users.hasMany(models.Booking, {
+      foreignKey: "userId",
+      as: "tenantBookings", // Alias for bookings made by this tenant
+      onDelete: "CASCADE",
+    });
+
+    // A user can have multiple bookings as a landlord
+    Users.hasMany(models.Property, {
+      foreignKey: "userId", // Foreign key in Property model
+      as: "landlordProperties", // Alias for properties posted by this landlord
+      onDelete: "CASCADE",
+    });
+
+    // Define the association with Booking (if a landlord wants to see their bookings)
+    Users.hasMany(models.Booking, {
+      foreignKey: "propertyId", // If a landlord is associated with bookings
+      as: "landlordBookings", // Alias for bookings of properties they posted
+      onDelete: "CASCADE",
+    });
+
+    Users.hasMany(models.BookTest, {
+      foreignKey: "userId",
+      as: "tenantBookTests", // Alias for BookTests made by this tenant
+      onDelete: "CASCADE",
+    });
+
+    // A user can have multiple BookTests as a landlord
+    Users.hasMany(models.Test, {
+      foreignKey: "userId", // Foreign key in Property model
+      as: "landlordBookProperties", // Alias for properties posted by this landlord
+      onDelete: "CASCADE",
+    });
+
+    // Define the association with BookTest (if a landlord wants to see their BookTests)
+    Users.hasMany(models.BookTest, {
+      foreignKey: "userId", // If a landlord is associated with BookTests
+      as: "landlordBookTests", // Alias for bookings of properties they posted
       onDelete: "CASCADE",
     });
   };

@@ -68,6 +68,17 @@ module.exports = (sequelize, DataTypes) => {
         as: "media", // Optional: can help in naming when accessing in queries
         onDelete: "CASCADE",
       });
+
+      Vehicle.hasMany(models.Booking, {
+        foreignKey: "vehicleId",
+        as: "bookings", 
+        onDelete: "CASCADE",
+      });
+      Vehicle.hasMany(models.BookTest, {
+        foreignKey: "vehicleId",
+        as: "booktests", 
+        onDelete: "CASCADE",
+      });
   };
 
   return Vehicle;

@@ -6,6 +6,9 @@ const PropertyRouter = require("./routes/Property");
 const UserRouter = require("./routes/Users");
 const vehicleRouter = require("./routes/Vehicle");
 const path = require("path");
+const bookTestRouter = require("./routes/BookTest");
+const bookingRouter = require("./routes/Booking");
+const TestRouter = require("./routes/Test");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -44,14 +47,15 @@ app.use(
   express.static(path.join(__dirname, "uploads/vehicles/videos"))
 );
 
-
 // Routes
 const db = require("./models");
 
 app.use("/properties", PropertyRouter);
 app.use("/auth", UserRouter);
 app.use("/vehicle", vehicleRouter);
-
+app.use("/booking", bookingRouter);
+app.use("/bookTest", bookTestRouter);
+app.use("/test", TestRouter);
 db.sequelize.sync().then(() => {
   app.listen(3001, () => {
     console.log("Server Running on port 3001");
