@@ -8,67 +8,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("flat", "room", "apartment"),
         allowNull: true,
       },
-      locationCity: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      locationStreetNumber: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      numOfSpaces: {
+      userId: {
         type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      numOfBedrooms: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      numOfLivingrooms: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      numOfBathrooms: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      numOfKitchens: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      monthlyRent: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: true,
-      },
-      advancedRent: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: true,
-      },
-      features: {
-        type: DataTypes.JSON,
-        allowNull: true,
-      },
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-      houseRule: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-
-      photo: {
-        type: DataTypes.JSON,
+        references: {
+          model: Users,
+          key: "id",
+        },
         allowNull: false,
-        defaultValue: [],
       },
-
-      video: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: [],
-      },
-      
     },
     {
       timestamps: true,
@@ -76,7 +23,20 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  
+  Test.associate = (models) => {
+    // Define the association with Users
+    Test.belongsTo(models.Users, {
+      foreignKey: "userId",
+      onDelete: "CASCADE",
+    });
+
+    // Define the association with BookTest
+    Test.hasMany(models.BookTest, {
+      foreignKey: "testId",
+      as: "booktests",
+      onDelete: "CASCADE",
+    });
+  };
 
   return Test;
 };
