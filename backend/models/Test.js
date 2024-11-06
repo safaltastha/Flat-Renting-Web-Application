@@ -36,6 +36,14 @@ module.exports = (sequelize, DataTypes) => {
       as: "booktests",
       onDelete: "CASCADE",
     });
+
+    Test.hasMany(models.Rating, {
+      foreignKey: 'target_id',
+      as: 'test',
+      constraints: false,
+
+      scope: { rating_type: 'test' },
+    });
   };
 
   return Test;

@@ -36,7 +36,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ENUM("property", "vehicle"),
         allowNull: false,
       },
-      
     },
     {
       timestamps: true,
@@ -49,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "propertyId",
       onDelete: "CASCADE",
     });
-    
+
     Media.belongsTo(models.Vehicle, {
       foreignKey: "vehicleId",
       onDelete: "CASCADE",

@@ -1,9 +1,9 @@
 // controllers/bookingController.js
-const { BookTest, Test, Users, Vehicle } = require("../models");
+const { Booking, Property, Users, Vehicle } = require("../models");
 
 // Create a new booking
 exports.createTest = async (req, res) => {
-  const { userId, testId, vehicleId } = req.body;
+  const { userId, propertyId, vehicleId } = req.body;
 
   try {
     // Ensure the property is available before booking
