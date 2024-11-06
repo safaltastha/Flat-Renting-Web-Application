@@ -113,6 +113,18 @@ module.exports = (sequelize, DataTypes) => {
       as: "bookings",
       onDelete: "CASCADE",
     });
+
+    Property.hasMany(models.Rating, {
+      foreignKey: "target_id",
+      as: "property",
+      constraints: false,
+
+      scope: { rating_type: "property" },
+    });
+
+    
+Property.hasMany(models.PropertyRating, { foreignKey: 'property_id', as: 'ratings' });
+
   };
 
   return Property;
