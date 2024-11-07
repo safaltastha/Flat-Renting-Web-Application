@@ -16,6 +16,7 @@ import BookNowWithVehicleForm from "./pages/form/BookNowForm";
 import Dashboard from "./pages/Dashboard";
 import Flat from "./components/Flat";
 import Test from "./components/Test";
+import VehicleForm from "./pages/form/VehicleForm";
 
 const App = () => {
   return (
@@ -34,6 +35,7 @@ const App = () => {
           <Route path="/myprofile" element={<Dashboard />} />
           <Route path="/properties/flat" element={<Flat />} />
           <Route path="/test" element={<Test/>} />
+          <Route path="/vehicle-form" element={<VehicleForm/>} />
         </Route>
         {/* Add other routes here */}
       </Routes>
