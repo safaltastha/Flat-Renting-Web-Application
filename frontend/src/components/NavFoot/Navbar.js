@@ -6,7 +6,7 @@ import { BiChevronDown } from "react-icons/bi";
 import { AiOutlineUser, AiOutlineRight } from "react-icons/ai";
 import { IoIosLogOut } from "react-icons/io";
 import { FaPlus } from "react-icons/fa6";
-import Cookies from "js-cookie"; 
+import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
@@ -17,11 +17,11 @@ export default function Navbar() {
   const [showProperties, setShowProperties] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const propertiesRef = useRef(null)
+  const propertiesRef = useRef(null);
 
-  const res = Cookies.get("token")
+  const res = Cookies.get("token");
 
-  console.log(res,  "es")
+  console.log(res, "es");
 
   useEffect(() => {
     console.log("Navbar component mounted");
@@ -128,8 +128,10 @@ export default function Navbar() {
           <li>
             <Link
               to="/"
-              className={`block px-4 py-2 hover:text-purple-500 ${
-                location.pathname === "/" ? "underline" : ""
+              className={`block px-4 py-2 text-purple-500 hover:text-purple-500 ${
+                location.pathname === "/"
+                  ? "underline decoration-2 decoration-purple-500"
+                  : ""
               }`}
             >
               Home

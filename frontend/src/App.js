@@ -15,6 +15,7 @@ import ContactUs from "./pages/form/ContactForm";
 import BookNowWithVehicleForm from "./components/BookNow";
 import Dashboard from "./pages/Dashboard";
 import Flat from "./components/Flat";
+import AboutUs from "./pages/AboutUs";
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
           <Route path="/postyourproperty" element={<LandlordForm />} />
           <Route path="/changepassword" element={<ChangePaasword />} />
           <Route path="/contactus" element={<ContactUs />} />
+          <Route path="/aboutus" element={<AboutUs />} />
           <Route path="/booknow" element={<BookNowWithVehicleForm />} />
           <Route path="/myprofile" element={<Dashboard />} />
           <Route path="/properties/flat" element={<Flat />} />
