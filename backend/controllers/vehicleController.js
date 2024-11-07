@@ -15,6 +15,8 @@ exports.createVehicle = async (req, res) => {
     vehicleFeatures,
     vehicleLocation,
   } = req.body;
+  console.log(req.body);  // Log the request body to verify data is passed correctly
+
 
   try {
     // Convert availableStart and availableEnd to Date objects
