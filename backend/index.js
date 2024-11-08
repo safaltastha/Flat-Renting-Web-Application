@@ -13,6 +13,7 @@ const RatingRouter = require("./routes/Rating");
 const propertyRatingRouter = require("./routes/PropertyRating");
 const vehicleRatingRouter = require("./routes/VehicleRating");
 const userRatingRouter = require("./routes/UserRating");
+const contactRouter = require("./routes/Contact");
 
 
 app.use(express.json());
@@ -25,6 +26,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    
   })
 );
 
@@ -65,6 +67,7 @@ app.use("/rating", RatingRouter);
 app.use("/property-ratings", propertyRatingRouter);
 app.use("/vehicle-ratings", vehicleRatingRouter);
 app.use("/user-ratings", userRatingRouter);
+app.use("/contact",contactRouter);
 
 db.sequelize.sync().then(() => {
   app.listen(3001, () => {

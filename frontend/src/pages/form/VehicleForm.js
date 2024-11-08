@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { TextField } from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import axios from "axios";
+import AudioVideo from "../../components/landlord/AudioVideo";
+import Availability from "../../components/Availability";
 
 const VehicleForm = () => {
   const [formData, setFormData] = useState({
@@ -78,7 +78,10 @@ const VehicleForm = () => {
         navigate("/");
       }
     } catch (error) {
-      console.error("Error posting vehicle:", error.response?.data || error.message);
+      console.error(
+        "Error posting vehicle:",
+        error.response?.data || error.message
+      );
       alert("Failed to post vehicle. Please try again.");
     }
   };
@@ -105,11 +108,7 @@ const VehicleForm = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({
-          errors,
-          touched,
-          isSubmitting,
-        }) => (
+        {({ errors, touched, isSubmitting }) => (
           <Form className="space-y-6">
             {/* Vehicle Details Section */}
             <h2 className="text-lg font-medium  ">Vehicle Details</h2>
@@ -183,56 +182,11 @@ const VehicleForm = () => {
               </div>
             </div>
 
-            {/* Availability Section */}
-            <div className=" ">
-              <h2 className="text-lg font-medium mb-2 ">Availability</h2>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Available Start Field */}
-                <div className="flex flex-col">
-                  <label className="block mb-2 font-medium text-[#9747FF]">
-                    Available Start
-                    <span className="text-red-600 ml-1 text-[20px]">*</span>
-                  </label>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DateTimePicker
-                      value={formData.availableStart}
-                      onChange={(value) => handleDateChange('availableStart', value)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          className="w-full px-3 py-2 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          error={Boolean(errors.availableStart)}
-                          helperText={errors.availableStart}
-                        />
-                      )}
-                    />
-                  </LocalizationProvider>
-                </div>
-
-                {/* Available End Field */}
-                <div className="flex flex-col">
-                  <label className="block mb-2 font-medium text-[#9747FF]">
-                    Available End
-                    <span className="text-red-600 ml-1 text-[20px]">*</span>
-                  </label>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DateTimePicker
-                      value={formData.availableEnd}
-                      onChange={(value) => handleDateChange('availableEnd', value)}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          className="w-full px-3 py-2 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          error={Boolean(errors.availableEnd)}
-                          helperText={errors.availableEnd}
-                        />
-                      )}
-                    />
-                  </LocalizationProvider>
-                </div>
-              </div>
-            </div>
+            <Availability
+              formData={formData}
+              handleDateChange={handleDateChange}
+              errors={errors}
+            />
 
             <h2 className="text-lg font-medium  ">
               Pricing, Features & Location
@@ -259,8 +213,6 @@ const VehicleForm = () => {
                 />
               </div>
 
-              
-
               {/* Vehicle Location */}
               <div className="flex flex-col">
                 <label className="block mb-2 font-medium text-[#9747FF]">
@@ -285,37 +237,39 @@ const VehicleForm = () => {
 
             {/* Vehicle Features */}
             <div className="flex flex-col">
-                <label className="block mb-2 font-medium text-[#9747FF]">
-                  Vehicle Features
-                </label>
-                <textarea
-                  name="vehicleFeatures"
-                  value={formData.vehicleFeatures}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500 resize-none"
-                  rows="3"
-                  placeholder="Add vehicle features"
-                />
-                <ErrorMessage
-                  name="vehicleFeatures"
-                  component="div"
-                  className="text-red-600 text-sm mt-1"
-                />
-              </div>
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Vehicle Features
+              </label>
+              <textarea
+                name="vehicleFeatures"
+                value={formData.vehicleFeatures}
+                onChange={handleChange}
+                className="w-full px-3 py-2 bg-white border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500 resize-none"
+                rows="3"
+                placeholder="Add vehicle features"
+              />
+              <ErrorMessage
+                name="vehicleFeatures"
+                component="div"
+                className="text-red-600 text-sm mt-1"
+              />
+            </div>
+
+            <AudioVideo />
 
             {/* Submit and Cancel Buttons */}
             <div className=" mt-6">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-gray-600"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="ml-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300"
+                className="ml-4 px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-500 disabled:bg-gray-300"
               >
                 Submit
               </button>
