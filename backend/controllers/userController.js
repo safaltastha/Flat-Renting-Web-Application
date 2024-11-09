@@ -81,7 +81,6 @@ exports.getAllUsers = async (req, res) => {
 
 // Get user by ID
 
-
 // Function to calculate average rating for a user
 const calculateAverageRating = async (userId) => {
   const ratings = await UserRating.findAll({
@@ -89,10 +88,14 @@ const calculateAverageRating = async (userId) => {
   });
 
   const totalRatings = ratings.length;
-  const sumRatings = ratings.reduce((acc, rating) => acc + rating.rating_value, 0);
+  const sumRatings = ratings.reduce(
+    (acc, rating) => acc + rating.rating_value,
+    0
+  );
 
   // Calculate average rating
-  const averageRating = totalRatings > 0 ? (sumRatings / totalRatings).toFixed(2) : 0;
+  const averageRating =
+    totalRatings > 0 ? (sumRatings / totalRatings).toFixed(2) : 0;
 
   return averageRating;
 };
@@ -119,12 +122,10 @@ exports.getUserById = async (req, res) => {
       user,
       averageRating, // Include average rating in the response
     });
-
   } catch (error) {
     res.status(500).json({ message: "Error retrieving user", error });
   }
 };
-
 
 // Update user
 exports.updateUser = async (req, res) => {

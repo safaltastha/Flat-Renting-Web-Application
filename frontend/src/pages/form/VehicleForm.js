@@ -25,23 +25,20 @@ const VehicleForm = () => {
   const validationSchema = Yup.object({
     type: Yup.string().required("Vehicle Type is required"),
     capacity: Yup.number()
-      .typeError("Capacity must be a number")
-      .required("Vehicle Capacity is required"),
-    registrationNumber: Yup.string().required(
-      "Registration Number is required"
-    ),
+      .typeError("Capacity must be a number"),
+    registrationNumber: Yup.string(),
     availableStart: Yup.date().required("Available Start time is required"),
     availableEnd: Yup.date().required("Available End time is required"),
     pricingPerHour: Yup.number()
       .typeError("Pricing must be a valid number")
-      .required("Pricing is required")
+      //.required("Pricing is required")
       .positive("Pricing must be a positive number")
       .min(1, "Pricing must be greater than or equal to 1"),
     vehicleFeatures: Yup.string()
       .nullable()
       .max(500, "Features description is too long")
       .optional(),
-    vehicleLocation: Yup.string().required("Vehicle location is required"),
+    vehicleLocation: Yup.string(),
   });
 
   const navigate = useNavigate();
@@ -59,6 +56,7 @@ const VehicleForm = () => {
         vehicleData.append(key, value);
       }
     });
+    console.log(formData, 'asdfasd')
 
     const token = Cookies.get("token");
     try {

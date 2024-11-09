@@ -23,6 +23,10 @@ const GeneralCategory = ({ onChange }) => {
     onChange(name, value); // Update the parent state
   };
 
+  const handleFloorSelect = (e) => {
+    onChange(e.target.name, e.target.value);
+  }
+
   const renderLengthAndWidthFields = (num, type) => {
     const lengthAndWidthFields = [];
     for (let i = 0; i < num; i++) {
@@ -161,7 +165,7 @@ const GeneralCategory = ({ onChange }) => {
             {roomCounts.numOfKitchens > 0 && renderLengthAndWidthFields(roomCounts.numOfKitchens, "Kitchen")}
           </div>
 
-          <FloorSelection />
+          <FloorSelection handleInputChange={handleFloorSelect} />
         </div>
       </div>
     </div>

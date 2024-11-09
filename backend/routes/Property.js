@@ -6,25 +6,22 @@ const { authenticateJWT } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/multerConfig");
 const { searchProperties } = require("../controllers/searchController");
 const Room = require("../models/Room");
+const fs = require("fs");
 
 //Post properties
 router.post(
   "/",
   authenticateJWT,
-  upload.fields([
-    { name: "propertyImage", maxCount: 10 },
-    { name: "propertyVideo", maxCount: 5 },
-  ]),
-  async (req, res) => {
-    const { entityType } = req.body; // Ensure entityType is included in the request body
+upload.fields([
+  { name: "propertyImage", maxCount: 10 }, //vehicleImage
+  { name: "propertyVideo", maxCount: 5 },
+]),
 
-    if (!entityType || entityType !== "property") {
-      return res.status(400).json({
-        message: "Invalid or missing entity type. Expected 'property'.",
-      });
-    }
-    // Destructure properties from req.body
+  async (req, res) => {
+    console.log(req.files, "Files uploaded");
+
     const {
+      entityType,
       category,
       locationCity,
       locationStreetNumber,
@@ -40,7 +37,15 @@ router.post(
       houseRule,
       floor,
       StreetName,
-    } = req.body;
+    } = req.body; // Ensure entityType is included in the request body
+
+ 
+
+    if (!entityType || entityType !== "property") { //vehicle
+      return res.status(400).json({
+        message: "Invalid or missing entity type. Expected 'property'.",
+      });
+    }
 
     try {
       let parsedFeatures;
@@ -70,9 +75,15 @@ router.post(
         floor,
         StreetName,
         userId: req.user.id,
+        entityType,
       };
 
       const newProperty = await Property.create(propertyData);
+
+      const imagesDirectory = path.join(__dirname, "uploads/properties/images");
+      if (!fs.existsSync(imagesDirectory)) {
+        fs.mkdirSync(imagesDirectory, { recursive: true });
+      }
 
       // Handle image uploads
       if (req.files["propertyImage"]) {
@@ -86,9 +97,11 @@ router.post(
             Media.create({
               propertyId: newProperty.id,
               file_path: filePath,
-              file_type: "propertyImage",
-              entityType: "property", // Specify entity type as property
-              vehicleId: null, // No vehicle ID for property media
+              file_type: "image",
+              entityType: "property",
+              vehicleId: null,
+            }).catch((err) => {
+              console.log("Error saving image to Media:", err);
             })
           )
         );
@@ -106,9 +119,11 @@ router.post(
             Media.create({
               propertyId: newProperty.id,
               file_path: filePath,
-              file_type: "propertyVideo",
-              entityType: "property", // Specify entity type as property
-              vehicleId: null, // No vehicle ID for property media
+              file_type: "video",
+              entityType: "property",
+              vehicleId: null,
+            }).catch((err) => {
+              console.log("Error saving video to Media:", err);
             })
           )
         );
@@ -120,6 +135,7 @@ router.post(
       });
     } catch (error) {
       res.status(500).json({ message: "Error creating property", error });
+      console.log(error, "érqw3434");
     }
   }
 );

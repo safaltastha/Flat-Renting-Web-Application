@@ -6,7 +6,7 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
 
   
-
+console.log(property, '35lh')
   // Extract the first image path from the media array
   const propertyImage =
   property.media?.find((mediaItem) => mediaItem.file_type === "image")?.file_path.replace(/\\/g, '/');

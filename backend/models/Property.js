@@ -1,4 +1,5 @@
 const Users = require("./Users");
+const Room = require("./Room");
 
 module.exports = (sequelize, DataTypes) => {
   const Property = sequelize.define(
@@ -122,9 +123,10 @@ module.exports = (sequelize, DataTypes) => {
       scope: { rating_type: "property" },
     });
 
-    
-Property.hasMany(models.PropertyRating, { foreignKey: 'property_id', as: 'ratings' });
-
+    Property.hasMany(models.PropertyRating, {
+      foreignKey: "property_id",
+      as: "ratings",
+    });
   };
 
   return Property;

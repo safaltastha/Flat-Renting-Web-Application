@@ -29,13 +29,10 @@ const HeroSection = () => {
     try {
       const token = Cookies.get("token");
       const response = await axios.get(
-        "http://localhost:3001/properties/search",
+        `http://localhost:3001/properties/search?category=${category}&locationCity=${sanitizedLocation}&priceRange${priceRange}`,
+        
         {
-          params: {
-            category,
-            locationCity: sanitizedLocation,
-            priceRange,
-          },
+        
           withCredentials: true,
         }
       );

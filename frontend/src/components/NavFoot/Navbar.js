@@ -21,7 +21,7 @@ export default function Navbar() {
 
   const res = Cookies.get("token")
 
-  console.log(res,  "es")
+  console.log(res,  "esto ho")
 
   useEffect(() => {
     console.log("Navbar component mounted");
