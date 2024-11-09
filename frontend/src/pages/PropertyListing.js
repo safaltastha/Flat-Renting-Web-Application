@@ -7,6 +7,7 @@ const PropertyListing = () => {
   const location = useLocation();
 
   const properties = location.state?.properties || [];
+  console.log(properties, 'image')
 
   return (
     <div>

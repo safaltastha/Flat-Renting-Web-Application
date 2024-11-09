@@ -1,7 +1,7 @@
-const { Property } = require("../models");
+const { Property, Users, Media } = require("../models");
 const { Op } = require("sequelize"); // Import Sequelize operators
 
-// Controller to search properties based on query parameters
+// Controller to search properties based on query parameters and include media
 const searchProperties = async (req, res) => {
   console.log("Search Properties function called");
   try {
@@ -25,8 +25,40 @@ const searchProperties = async (req, res) => {
       }
     }
 
-    // Query database for matching properties
-    const properties = await Property.findAll({ where: whereClause });
+    // Query database for matching properties and include media and user data
+    const properties = await Property.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: Users,
+          attributes: ["id", "name", "email"],
+        },
+        {
+          model: Media,
+          as: "media",
+          attributes: ["file_path", "file_type"],
+          where: { entityType: "property" },
+          required: false,
+        },
+      ],
+    });
+
+    const baseUrl = "http://localhost:3001"; // Base URL for files
+
+    // Format media file paths for response
+    properties.forEach((property) => {
+      if (property.media) {
+        property.media.forEach((mediaItem) => {
+          const filePath = mediaItem.file_path.replace(/\\/g, "/"); // Ensure path formatting is consistent
+          if (mediaItem.file_type === "image") {
+            mediaItem.file_path = `${baseUrl}/${filePath}`;
+          } else if (mediaItem.file_type === "video") {
+            mediaItem.file_path = `${baseUrl}/${filePath}`;
+          }
+        });
+      }
+    });
+
     res.status(200).json(properties);
   } catch (error) {
     console.error("Error fetching properties:", error);

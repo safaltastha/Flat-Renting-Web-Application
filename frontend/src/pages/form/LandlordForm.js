@@ -23,6 +23,7 @@ const LandlordForm = () => {
     advancedRent: "",
     description: "",
     houseRule: "",
+    numOfBathrooms: "",
     features: {
       electricity: false,
       parking: false,
@@ -63,7 +64,7 @@ const LandlordForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (images.length === 0 ) {
+    if (images.length === 0) {
       alert("Please upload at least one image .");
       return;
     }
@@ -90,17 +91,24 @@ const LandlordForm = () => {
     propertyData.append("features", JSON.stringify(featuresData));
     propertyData.append("floor", formData.floor);
     propertyData.append("StreetName", formData.StreetName);
+    propertyData.append("entityType", "property");
+    propertyData.append("numOfBathrooms", formData.numOfBathrooms);
 
     // Append images and videos to FormData
     images.forEach((image) => {
-      propertyData.append("image", image);
+      propertyData.append("propertyImage", image);
     });
     videos.forEach((video) => {
-      propertyData.append("video", video);
+      propertyData.append("propertyVideo", video);
     });
 
     const token = Cookies.get("token");
     console.log("Token before submission:", token);
+
+    console.log("Property Data contents:");
+    propertyData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
 
     try {
       const response = await axios.post(
@@ -116,8 +124,8 @@ const LandlordForm = () => {
         }
       );
       if (response.status === 201) {
-        alert("Property posted successfully!");
         navigate("/");
+        alert("Property posted successfully!");
       }
     } catch (error) {
       console.error(
