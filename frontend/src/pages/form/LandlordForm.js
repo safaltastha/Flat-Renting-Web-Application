@@ -202,7 +202,6 @@ const LandlordForm = () => {
           </div>
         </div>
         <div>
-          <h2 className="text-lg font-medium mb-2">Photos and Videos</h2>
           <AudioVideo onFilesChange={handleFilesChange} />
         </div>
 

@@ -6,6 +6,20 @@ const AudioVideo = ({ onFilesChange }) => {
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
 
+  const removeImage = (index) => {
+    setImagePreviews((prevPreviews) =>
+      prevPreviews.filter((_, i) => i !== index)
+    );
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  };
+
+  const removeVideo = (index) => {
+    setVideoPreviews((prevPreviews) =>
+      prevPreviews.filter((_, i) => i !== index)
+    );
+    setVideos((prevVideos) => prevVideos.filter((_, i) => i !== index));
+  };
+
   useEffect(() => {
     if (onFilesChange) {
       onFilesChange(images, videos);
@@ -38,7 +52,7 @@ const AudioVideo = ({ onFilesChange }) => {
 
   return (
     <div>
-      <h2 className="font-medium text-lg mb-6">Images and Videos</h2>
+      <h2 className="font-medium text-lg mt-9">Images and Videos</h2>
       <div className="">
         {/* Image Upload Section */}
         <div className="mb-2">
@@ -56,12 +70,19 @@ const AudioVideo = ({ onFilesChange }) => {
           />
           <div className="mt-4 flex flex-wrap gap-4">
             {imagePreviews.map((preview, index) => (
-              <img
-                key={index}
-                src={preview}
-                alt={`Image preview ${index}`}
-                className="w-32 h-32 object-cover rounded-lg border border-gray-300"
-              />
+              <div key={index} className="relative">
+                <img
+                  src={preview}
+                  alt={`Image preview ${index}`}
+                  className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                />
+                <button
+                  onClick={() => removeImage(index)}
+                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 cursor-pointer"
+                >
+                  &times;
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -81,12 +102,19 @@ const AudioVideo = ({ onFilesChange }) => {
           />
           <div className="mt-4 flex flex-wrap gap-4">
             {videoPreviews.map((videoPreview, index) => (
-              <video
-                key={index}
-                controls
-                src={videoPreview}
-                className="w-32 h-32 object-cover rounded-lg border border-gray-300"
-              />
+              <div key={index} className="relative">
+                <video
+                  controls
+                  src={videoPreview}
+                  className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                />
+                <button
+                  onClick={() => removeVideo(index)}
+                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 cursor-pointer"
+                >
+                  &times;
+                </button>
+              </div>
             ))}
           </div>
         </div>
