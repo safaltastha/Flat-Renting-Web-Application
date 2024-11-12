@@ -21,6 +21,7 @@ import ProfileRedirect from "./components/dashboard/ProfileRedirect";
 import VehicleDashboard from "./components/dashboard/VehicleDashboard";
 import LandlordDashboard from "./components/dashboard/LandlordDashboard";
 import TenantDashboard from "./components/dashboard/TenantDashboard";
+import Vehicle from "./pages/form/Vehicle";
 
 const App = () => {
   return (
@@ -46,6 +47,10 @@ const App = () => {
             <Route
               path="/vehicle-supplier-dashboard"
               element={<VehicleDashboard />}
+            />
+            <Route
+              path="/vehicle"
+              element={<Vehicle />}
             />
           </Route>
           {/* Add other routes here */}

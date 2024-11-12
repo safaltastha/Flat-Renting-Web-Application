@@ -6,7 +6,7 @@ import { BiChevronDown } from "react-icons/bi";
 import { AiOutlineUser, AiOutlineRight } from "react-icons/ai";
 import { IoIosLogOut } from "react-icons/io";
 import { FaPlus } from "react-icons/fa6";
-import Cookies from "js-cookie"; 
+import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
@@ -17,11 +17,11 @@ export default function Navbar() {
   const [showProperties, setShowProperties] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const propertiesRef = useRef(null)
+  const propertiesRef = useRef(null);
 
-  const res = Cookies.get("token")
+  const res = Cookies.get("token");
 
-  console.log(res,  "esto ho")
+  console.log(res, "esto ho");
 
   useEffect(() => {
     console.log("Navbar component mounted");
@@ -62,19 +62,7 @@ export default function Navbar() {
   const handlePostPropertyClick = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await axios.get("http://localhost:3001/auth/role", {
-        withCredentials: true,
-      });
-
-      if (response.data.role === "landlord") {
-        navigate("/postyourproperty");
-      } else {
-        alert("Please Login as landlord to post your property");
-      }
-    } catch (error) {
-      alert("An error occurred while checking your role. Please try again.");
-    }
+    navigate("/postyourproperty");
   };
 
   return (
