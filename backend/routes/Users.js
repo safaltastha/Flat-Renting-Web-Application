@@ -1,6 +1,6 @@
 // routes/users.js
 const express = require('express');
-const { register, login, logout } = require('../controllers/userController');
+const { register, login, logout, getAllUsers, getUserById, updateUser, deleteUser } = require('../controllers/userController');
 const { authenticateJWT } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
@@ -10,12 +10,28 @@ router.post('/register', register);
 // Login route
 router.post('/login', login);
 
-//logout route
-router.post('/logout', authenticateJWT, logout);
-
+// get role
 router.get("/role", authenticateJWT, (req, res) => {
   res.json({ role: req.user.role }); 
 });
+
+// Get all users route
+router.get('/', authenticateJWT, getAllUsers);
+
+// Get user by ID route
+router.get('/:id', authenticateJWT, getUserById);
+
+// Update user route
+router.put('/update/:id', authenticateJWT, updateUser);
+
+// Delete user route
+router.delete('/delete/:id', authenticateJWT, deleteUser);
+
+
+//logout route
+router.post('/logout', authenticateJWT, logout);
+
+
 
 
 module.exports = router;

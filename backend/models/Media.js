@@ -2,6 +2,12 @@ module.exports = (sequelize, DataTypes) => {
   const Media = sequelize.define(
     "Media",
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false,
+      },
       file_path: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -16,6 +22,18 @@ module.exports = (sequelize, DataTypes) => {
           model: "Properties",
           key: "id",
         },
+        allowNull: true, // Allow null since this could be a vehicle image
+      },
+      vehicleId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "Vehicles", // Assuming you have a Vehicles model defined
+          key: "id",
+        },
+        allowNull: true, // Allow null since this could be a property image
+      },
+      entityType: {
+        type: DataTypes.ENUM("property", "vehicle"),
         allowNull: false,
       },
     },
@@ -28,6 +46,11 @@ module.exports = (sequelize, DataTypes) => {
   Media.associate = (models) => {
     Media.belongsTo(models.Property, {
       foreignKey: "propertyId",
+      onDelete: "CASCADE",
+    });
+
+    Media.belongsTo(models.Vehicle, {
+      foreignKey: "vehicleId",
       onDelete: "CASCADE",
     });
   };

@@ -5,15 +5,15 @@ const DescriptionAndRules = ({ onChange }) => {
   const [rules, setRules] = useState("");
 
   const handleDescriptionChange = (e) => {
-    const capitalizedDescription = e.target.value; // Assuming you want to keep it simple for now
+    const capitalizedDescription = e.target.value; 
     setDescription(capitalizedDescription);
     onChange("description", capitalizedDescription); // Pass data up
   };
 
   const handleRulesChange = (e) => {
-    const capitalizedRules = e.target.value; // Assuming you want to keep it simple for now
+    const capitalizedRules = e.target.value; 
     setRules(capitalizedRules);
-    onChange("rules", capitalizedRules); // Pass data up
+    onChange("houseRule", capitalizedRules); // Pass data up
   };
 
   return (

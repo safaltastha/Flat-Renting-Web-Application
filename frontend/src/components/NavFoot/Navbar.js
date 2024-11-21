@@ -21,7 +21,11 @@ export default function Navbar() {
 
   const res = Cookies.get("token");
 
+<<<<<<< HEAD
   console.log(res, "es");
+=======
+  console.log(res, "esto ho");
+>>>>>>> 0654abff8616482b00d446f8f22d90736da58ac2
 
   useEffect(() => {
     console.log("Navbar component mounted");
@@ -62,19 +66,7 @@ export default function Navbar() {
   const handlePostPropertyClick = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await axios.get("http://localhost:3001/auth/role", {
-        withCredentials: true,
-      });
-
-      if (response.data.role === "landlord") {
-        navigate("/postyourproperty");
-      } else {
-        alert("Please Login as landlord to post your property");
-      }
-    } catch (error) {
-      alert("An error occurred while checking your role. Please try again.");
-    }
+    navigate("/postyourproperty");
   };
 
   return (

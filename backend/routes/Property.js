@@ -4,17 +4,24 @@ const router = express.Router();
 const { Property, Media, Users } = require("../models");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/multerConfig");
+const { searchProperties } = require("../controllers/searchController");
+const Room = require("../models/Room");
+const fs = require("fs");
 
 //Post properties
 router.post(
   "/",
   authenticateJWT,
-  upload.fields([
-    { name: "image", maxCount: 10 },
-    { name: "video", maxCount: 5 },
-  ]),
+upload.fields([
+  { name: "propertyImage", maxCount: 10 }, //vehicleImage
+  { name: "propertyVideo", maxCount: 5 },
+]),
+
   async (req, res) => {
+    console.log(req.files, "Files uploaded");
+
     const {
+      entityType,
       category,
       locationCity,
       locationStreetNumber,
@@ -28,9 +35,29 @@ router.post(
       features,
       description,
       houseRule,
-    } = req.body;
+      floor,
+      StreetName,
+    } = req.body; // Ensure entityType is included in the request body
+
+ 
+
+    if (!entityType || entityType !== "property") { //vehicle
+      return res.status(400).json({
+        message: "Invalid or missing entity type. Expected 'property'.",
+      });
+    }
 
     try {
+      let parsedFeatures;
+      try {
+        parsedFeatures = JSON.parse(features);
+      } catch (parseError) {
+        return res.status(400).json({
+          message: "Invalid features format",
+          error: parseError.message,
+        });
+      }
+
       const propertyData = {
         category,
         locationCity,
@@ -42,19 +69,26 @@ router.post(
         numOfKitchens,
         monthlyRent,
         advancedRent,
-        features: JSON.parse(features),
+        features: parsedFeatures,
         description,
         houseRule,
+        floor,
+        StreetName,
         userId: req.user.id,
+        entityType,
       };
 
-      // Create the property
       const newProperty = await Property.create(propertyData);
 
+      const imagesDirectory = path.join(__dirname, "uploads/properties/images");
+      if (!fs.existsSync(imagesDirectory)) {
+        fs.mkdirSync(imagesDirectory, { recursive: true });
+      }
+
       // Handle image uploads
-      if (req.files["image"]) {
-        const imagePaths = req.files["image"].map((file) =>
-          path.join("uploads/images", file.filename)
+      if (req.files["propertyImage"]) {
+        const imagePaths = req.files["propertyImage"].map(
+          (file) => path.join("uploads/properties/images", file.filename) // Updated path
         );
 
         // Save each image path to the Media table
@@ -62,17 +96,21 @@ router.post(
           imagePaths.map((filePath) =>
             Media.create({
               propertyId: newProperty.id,
-              filePath,
-              mediaType: 0, // 0 for image
+              file_path: filePath,
+              file_type: "image",
+              entityType: "property",
+              vehicleId: null,
+            }).catch((err) => {
+              console.log("Error saving image to Media:", err);
             })
           )
         );
       }
 
       // Handle video uploads
-      if (req.files["video"]) {
-        const videoPaths = req.files["video"].map((file) =>
-          path.join("uploads/videos", file.filename)
+      if (req.files["propertyVideo"]) {
+        const videoPaths = req.files["propertyVideo"].map(
+          (file) => path.join("uploads/properties/videos", file.filename) // Updated path
         );
 
         // Save each video path to the Media table
@@ -80,8 +118,12 @@ router.post(
           videoPaths.map((filePath) =>
             Media.create({
               propertyId: newProperty.id,
-              filePath,
-              mediaType: 1, // 1 for video
+              file_path: filePath,
+              file_type: "video",
+              entityType: "property",
+              vehicleId: null,
+            }).catch((err) => {
+              console.log("Error saving video to Media:", err);
             })
           )
         );
@@ -93,12 +135,13 @@ router.post(
       });
     } catch (error) {
       res.status(500).json({ message: "Error creating property", error });
+      console.log(error, "érqw3434");
     }
   }
 );
 
 // Get all properties
-router.get("/", async (req, res) => {
+router.get("/", authenticateJWT, async (req, res) => {
   try {
     const properties = await Property.findAll({
       include: [
@@ -106,23 +149,64 @@ router.get("/", async (req, res) => {
           model: Users,
           attributes: ["id", "name", "email"],
         },
+        {
+          model: Media,
+          as: "media",
+          attributes: ["file_path", "file_type"],
+          where: { entityType: "property" },
+        },
       ],
     });
-    res.json(properties);
+    console.log(
+      "Properties with media data:",
+      JSON.stringify(properties, null, 2)
+    );
+
+    const reversedProperties = properties.reverse();
+
+    const baseUrl = "http://localhost:3001"; // Base URL for files
+
+    reversedProperties.forEach((property) => {
+      if (property.media) {
+        property.media.forEach((mediaItem) => {
+          const filePath = mediaItem.file_path.replace(/\\/g, "/"); // Ensure path formatting is consistent
+          if (mediaItem.file_type === "image") {
+            // Use the filePath directly without adding '/images'
+            mediaItem.file_path = `${baseUrl}/${filePath}`;
+          } else if (mediaItem.file_type === "video") {
+            // Use the filePath directly without adding '/videos'
+            mediaItem.file_path = `${baseUrl}/${filePath}`;
+          }
+        });
+      }
+    });
+
+    res.json(reversedProperties);
   } catch (error) {
+    console.error("Database Error:", error);
     res.status(500).json({ message: "Error retrieving properties", error });
   }
 });
 
+// search properties
+router.get("/search", authenticateJWT, searchProperties);
+
 // Get a property by ID
-router.get("/:id", async (req, res) => {
+router.get("/:id", authenticateJWT, async (req, res) => {
   const { id } = req.params;
+
   try {
     const property = await Property.findByPk(id, {
       include: [
         {
           model: Users,
           attributes: ["id", "name", "email"],
+        },
+        {
+          model: Media,
+          as: "media",
+          attributes: ["file_path", "file_type"],
+          where: { entityType: "property" }, // Include only property media
         },
       ],
     });
@@ -131,8 +215,18 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ message: "Property not found" });
     }
 
-    res.json(property);
+    // Format media paths
+    const baseUrl = "http://localhost:3001"; // Base URL for files
+    if (property.media) {
+      property.media.forEach((mediaItem) => {
+        const filePath = mediaItem.file_path.replace(/\\/g, "/"); // Ensure path formatting is consistent
+        mediaItem.file_path = `${baseUrl}/${filePath}`; // Construct full URL
+      });
+    }
+
+    res.status(200).json(property);
   } catch (error) {
+    console.error("Database Error:", error); // Log the error for debugging
     res.status(500).json({ message: "Error retrieving property", error });
   }
 });
@@ -155,19 +249,47 @@ router.put(
       // Update the property with the provided fields
       const updatedData = { ...req.body };
 
+      // Handle media updates
       if (req.files.length > 0) {
+        // Remove old media if needed (optional)
+        await Media.destroy({ where: { propertyId: id, file_type: "image" } });
+        await Media.destroy({ where: { propertyId: id, file_type: "video" } });
+
+        // Process new media uploads
         const imagePaths = req.files
           .filter((file) => file.mimetype.startsWith("image/"))
-          .map((file) => path.join("uploads/images", file.filename));
+          .map((file) => path.join("uploads/properties/images", file.filename));
 
         const videoPaths = req.files
           .filter((file) => file.mimetype.startsWith("video/"))
-          .map((file) => path.join("uploads/videos", file.filename));
+          .map((file) => path.join("uploads/properties/videos", file.filename));
 
-        updatedData.photo = imagePaths;
-        updatedData.video = videoPaths;
+        // Save each image path to the Media table
+        await Promise.all(
+          imagePaths.map((filePath) =>
+            Media.create({
+              propertyId: property.id,
+              file_path: filePath,
+              file_type: "image",
+              entityType: "property", // Set the entity type to property
+            })
+          )
+        );
+
+        // Save each video path to the Media table
+        await Promise.all(
+          videoPaths.map((filePath) =>
+            Media.create({
+              propertyId: property.id,
+              file_path: filePath,
+              file_type: "video",
+              entityType: "property", // Set the entity type to property
+            })
+          )
+        );
       }
 
+      // Update the property fields (if necessary)
       await property.update(updatedData);
       res.json({ message: "Property updated successfully", property });
     } catch (error) {
@@ -185,46 +307,15 @@ router.delete("/:id", authenticateJWT, async (req, res) => {
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
     }
+    // Delete associated media records
+    await Media.destroy({ where: { propertyId: id } });
+
+    // Now delete the property itself
 
     await property.destroy();
-    res.json({ message: "Property deleted successfully" });
+    res.json({ message: "Property and associated media deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting property", error });
-  }
-});
-
-//  Search on category, location, priceRange
-router.get("/search", async (req, res) => {
-  const { category, location, priceRange } = req.query;
-
-  // Build the query conditions
-  const conditions = {};
-
-  if (category) {
-    conditions.category = category; // Match category
-  }
-
-  if (location) {
-    conditions.locationCity = { $like: `%${location}%` }; // Use LIKE for location matching
-  }
-
-  if (priceRange) {
-    const [minPrice, maxPrice] = priceRange.split("-").map(Number);
-    conditions.monthlyRent = {
-      $gte: minPrice,
-      $lte: maxPrice,
-    }; // Filter by price range
-  }
-
-  try {
-    const properties = await Property.findAll({
-      where: conditions,
-    });
-
-    res.status(200).json(properties);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error retrieving properties", error });
   }
 });
 

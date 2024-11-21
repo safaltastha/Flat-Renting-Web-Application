@@ -1,36 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { ImLocation2 } from "react-icons/im";
-import { ImPhone } from "react-icons/im";
-import { ImMail } from "react-icons/im";
+import { ImLocation2, ImPhone, ImMail } from "react-icons/im";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const DetailedViewPage = () => {
   const navigate = useNavigate();
-
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAllImages, setShowAllImages] = useState(false);
 
-  const staticImages = [
-    "/images/room.jpg",
-    "/images/room2.jpg",
-    "/images/room3.jpg",
-    "/images/room4.jpg",
-    "/images/room5.jpg",
-  ];
-
   useEffect(() => {
     const fetchProperty = async () => {
       try {
+        const token = Cookies.get("token");
         const response = await axios.get(
-          `http://localhost:3001/properties/${id}`
+          `http://localhost:3001/properties/${id}`,
+          { withCredentials: true }
         );
+
         setProperty(response.data);
+        
       } catch (err) {
         setError(err);
       } finally {
@@ -55,18 +49,20 @@ const DetailedViewPage = () => {
           {/* Left Section: Images, Property Details, and Map */}
           <div className="flex-1 pr-4">
             {/* Large Image */}
-            <img
-              src={staticImages[0]}
-              alt="Large Property Image"
-              className="w-full h-[600px] object-cover rounded-md shadow-lg"
-            />
+            {property.media?.length > 0 && (
+              <img
+                src={property.media[0].file_path}
+                alt="Large Property Image"
+                className="w-full h-[600px] object-cover rounded-md shadow-lg"
+              />
+            )}
 
             {/* Property Details */}
             <div className="space-y-6 bg-white p-6 rounded-lg shadow-lg mt-4">
               <div className="flex items-center space-x-2 mt-2">
                 <ImLocation2 className="text-gray-600" size={18} />
-                <span>{property.streetNumber} street,</span>
-                <span>{property.streetName}</span>
+                <span>{property.locationStreetNumber} street,</span>
+                <span>{property.StreetName},</span>
                 <span>{property.locationCity}</span>
               </div>
               <p className="text-xl font-semibold text-gray-800">
@@ -79,39 +75,21 @@ const DetailedViewPage = () => {
               </p>
 
               <div className="space-y-3 text-gray-700">
-                <p className="text-lg">
-                  <strong>Bedrooms:</strong> {property.numOfBedrooms}
-                </p>
-                <p className="text-lg">
-                  <strong>Bathrooms:</strong> {property.numOfBathrooms}
-                </p>
-                <p className="text-lg">
-                  <strong>Living Rooms:</strong>{" "}
-                  {property.numOfLivingRooms || "No Living room"}
-                </p>
-                <p className="text-lg">
-                  <strong>Kitchen:</strong> {property.numOfKitchens}
-                </p>
-                <p className="text-lg">
-                  <strong>Floor:</strong> {property.floor}
-                </p>
-                <p className="text-lg">
-                  <strong>Monthly Rent:</strong> NRs. {property.monthlyRent}
-                </p>
-                <p className="text-lg">
-                  <strong>Advanced Rent:</strong> NRs.{" "}
-                  {property.advancedRent || "No advanced rent needed"}
-                </p>
+                <p className="text-lg"><strong>Bedrooms:</strong> {property.numOfBedrooms}</p>
+                <p className="text-lg"><strong>Bathrooms:</strong> {property.numOfBathrooms}</p>
+                <p className="text-lg"><strong>Living Rooms:</strong> {property.numOfLivingrooms || "No Living room"}</p>
+                <p className="text-lg"><strong>Kitchen:</strong> {property.numOfKitchens}</p>
+                <p className="text-lg"><strong>Floor:</strong> {property.floor}</p>
+                <p className="text-lg"><strong>Monthly Rent:</strong> NRs. {property.monthlyRent}</p>
+                <p className="text-lg"><strong>Advanced Rent:</strong> NRs. {property.advancedRent || "No advanced rent needed"}</p>
                 <p className="text-lg">
                   <strong>Facilities:</strong>{" "}
-                  {property.facilities && Array.isArray(property.facilities)
-                    ? property.facilities.join(", ")
-                    : "No facilities listed"}
+                  {Object.entries(property.features)
+                    .filter(([key, value]) => value)
+                    .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1))
+                    .join(', ') || 'None'}
                 </p>
-                <p className="text-lg">
-                  <strong>House Rules:</strong>{" "}
-                  {property.houseRule || "No house rule"}
-                </p>
+                <p className="text-lg"><strong>House Rules:</strong> {property.houseRule || "No house rule"}</p>
               </div>
 
               <div className="flex justify-center">
@@ -127,12 +105,13 @@ const DetailedViewPage = () => {
             {/* Map */}
             <div className="my-12">
               <p className="text-2xl font-semibold">Find the property on map</p>
-              {/* <img
-                src="/images/map.jpeg"
-                alt="Map"
-                className="w-full h-[300px] object-cover rounded-md shadow-lg mt-4"
-              /> */}
-              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d28129.0477250726!2d83.98528161614638!3d28.203342149521294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3995937bbf0376ff%3A0xf6cf823b25802164!2sPokhara!5e0!3m2!1sen!2snp!4v1727537868376!5m2!1sen!2snp" width="600" height="300"  allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d28129.0477250726!2d83.98528161614638!3d28.203342149521294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3995937bbf0376ff%3A0xf6cf823b25802164!2sPokhara!5e0!3m2!1sen!2snp!4v1727537868376!5m2!1sen!2snp"
+                width="600"
+                height="300"
+                allowFullScreen
+                loading="lazy"
+              ></iframe>
             </div>
           </div>
 
@@ -140,11 +119,10 @@ const DetailedViewPage = () => {
           <div className="w-[30%] sticky top-0">
             {/* Smaller Images */}
             <div className="flex flex-col space-y-2">
-              {/* Only showing two images initially */}
-              {staticImages.slice(1, 3).map((image, index) => (
+              {property.media?.slice(1, 3).map((image, index) => (
                 <img
                   key={index}
-                  src={image}
+                  src={image.file_path}
                   alt={`Small Image ${index + 1}`}
                   className="w-full h-[300px] object-cover rounded-md shadow-lg"
                 />
@@ -160,12 +138,12 @@ const DetailedViewPage = () => {
 
               {/* If showAllImages is true, display additional images */}
               {showAllImages &&
-                staticImages
-                  .slice(3, 5)
+                property.media
+                  .slice(3)
                   .map((image, index) => (
                     <img
                       key={index}
-                      src={image}
+                      src={image.file_path}
                       alt={`Small Image ${index + 3}`}
                       className="w-full h-[300px] object-cover rounded-md shadow-lg"
                     />
@@ -173,10 +151,7 @@ const DetailedViewPage = () => {
             </div>
 
             {/* Contact Info */}
-            <div
-              className="space-y-3 bg-white p-6 rounded-lg shadow-2xl mt-4 sticky top-0 z-10"
-              style={{ marginTop: "16px" }}
-            >
+            <div className="space-y-3 bg-white p-6 rounded-lg shadow-2xl mt-4 sticky top-0 z-10" style={{ marginTop: "16px" }}>
               <p className="text-2xl font-semibold">Contact Information</p>
               <div className="flex items-center">
                 <FaUserCircle className="mr-3 text-xl" />

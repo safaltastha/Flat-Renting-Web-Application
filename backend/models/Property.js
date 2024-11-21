@@ -1,9 +1,17 @@
 const Users = require("./Users");
+const Room = require("./Room");
 
 module.exports = (sequelize, DataTypes) => {
   const Property = sequelize.define(
     "Property",
     {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false,
+      },
+
       category: {
         type: DataTypes.ENUM("flat", "room", "apartment"),
         allowNull: false,
@@ -13,7 +21,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       locationStreetNumber: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      StreetName: {
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       numOfSpaces: {
@@ -36,6 +48,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+
+      floor: {
+        type: DataTypes.ENUM("first", "second", "third", "fourth", "fifth"),
+        allowNull: false,
+      },
       monthlyRent: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
@@ -55,6 +72,11 @@ module.exports = (sequelize, DataTypes) => {
       houseRule: {
         type: DataTypes.TEXT,
         allowNull: true,
+      },
+      status: {
+        type: DataTypes.ENUM("available", "booked"),
+        defaultValue: "available", // Set default status to 'available'
+        allowNull: false,
       },
 
       userId: {
@@ -77,13 +99,33 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-  };
-
-  Property.associate = (models) => {
     Property.hasMany(models.Media, {
       foreignKey: "propertyId",
-      as: "media",
+      as: "media", // Optional: can help in naming when accessing in queries
       onDelete: "CASCADE",
+    });
+    Property.hasMany(models.Room, {
+      foreignKey: "propertyId",
+      as: "rooms",
+      onDelete: "CASCADE",
+    });
+    Property.hasMany(models.Booking, {
+      foreignKey: "propertyId",
+      as: "bookings",
+      onDelete: "CASCADE",
+    });
+
+    Property.hasMany(models.Rating, {
+      foreignKey: "target_id",
+      as: "property",
+      constraints: false,
+
+      scope: { rating_type: "property" },
+    });
+
+    Property.hasMany(models.PropertyRating, {
+      foreignKey: "property_id",
+      as: "ratings",
     });
   };
 
