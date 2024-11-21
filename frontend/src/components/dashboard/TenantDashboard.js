@@ -26,7 +26,7 @@ const TenantDashboard = () => {
 
           {/* Links above the Search Bar */}
           <div className="flex space-x-4 mb-1">
-            <a href="#my-bookings" className="text-lg font-semibold px-4 py-2 bg-purple-100 rounded-md hover:bg-purple-200">My Bookings hello i am tenant</a>
+            <a href="#my-bookings" className="text-lg font-semibold px-4 py-2 bg-purple-100 rounded-md hover:bg-purple-200">My Bookings</a>
             <a href="#my-save" className="text-lg font-semibold px-4 py-2 bg-purple-100 rounded-md hover:bg-purple-200">My Save</a>
           </div>
 

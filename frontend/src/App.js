@@ -12,9 +12,9 @@ import LandlordForm from "./pages/form/LandlordForm";
 import ChangePaasword from "./components/ChangePassword";
 import Layout from "./components/Layout";
 import ContactUs from "./pages/form/ContactForm";
-import BookNowWithVehicleForm from "./pages/form/BookNowForm";
+import BookNowWithVehicleForm from "./components/BookNow";
+import Dashboard from "./pages/Dashboard";
 import Flat from "./components/Flat";
-<<<<<<< HEAD
 import AboutUs from "./pages/AboutUs";
 
 const App = () => {
@@ -38,51 +38,6 @@ const App = () => {
         {/* Add other routes here */}
       </Routes>
     </Router>
-=======
-import Test from "./components/Test";
-import VehicleForm from "./pages/form/VehicleForm";
-import { UserProvider } from "./context/UserContext";
-import ProfileRedirect from "./components/dashboard/ProfileRedirect";
-import VehicleDashboard from "./components/dashboard/VehicleDashboard";
-import LandlordDashboard from "./components/dashboard/LandlordDashboard";
-import TenantDashboard from "./components/dashboard/TenantDashboard";
-import Vehicle from "./pages/form/Vehicle";
-
-const App = () => {
-  return (
-    <UserProvider>
-      <Router>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/properties" element={<PropertyListing />} />
-            <Route path="/properties/:id" element={<DetailedViewPage />} />
-            <Route path="/signup" element={<RegistrationForm />} />
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/postyourproperty" element={<LandlordForm />} />
-            <Route path="/changepassword" element={<ChangePaasword />} />
-            <Route path="/contactus" element={<ContactUs />} />
-            <Route path="/booknow" element={<BookNowWithVehicleForm />} />
-            <Route path="/myprofile" element={<ProfileRedirect />} />
-            <Route path="/properties/flat" element={<Flat />} />
-            <Route path="/test" element={<Test />} />
-            <Route path="/vehicle-form" element={<VehicleForm />} />
-            <Route path="/tenant-dashboard" element={<TenantDashboard />} />
-            <Route path="/landlord-dashboard" element={<LandlordDashboard />} />
-            <Route
-              path="/vehicle-supplier-dashboard"
-              element={<VehicleDashboard />}
-            />
-            <Route
-              path="/vehicle"
-              element={<Vehicle />}
-            />
-          </Route>
-          {/* Add other routes here */}
-        </Routes>
-      </Router>
-    </UserProvider>
->>>>>>> 0654abff8616482b00d446f8f22d90736da58ac2
   );
 };
 
