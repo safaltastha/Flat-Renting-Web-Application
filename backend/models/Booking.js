@@ -1,7 +1,7 @@
-
-
 module.exports = (sequelize, DataTypes) => {
-    const Booking = sequelize.define('Booking', {
+  const Booking = sequelize.define(
+    "Booking",
+    {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -12,57 +12,59 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'Users', // Assumes a Users model for tenants
-          key: 'id',
+          model: "Users", // Assumes a Users model for tenants
+          key: "id",
         },
-        onDelete: 'CASCADE',
+        onDelete: "CASCADE",
       },
       propertyId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'Properties', // Assumes a Properties model for properties
-          key: 'id',
+          model: "Properties", // Assumes a Properties model for properties
+          key: "id",
         },
-        onDelete: 'CASCADE',
+        onDelete: "CASCADE",
       },
       vehicleId: {
         type: DataTypes.INTEGER,
         allowNull: true, // Allows null if no vehicle is booked
         references: {
-          model: 'Vehicles', // Assumes a Vehicles model for vehicles
-          key: 'id',
+          model: "Vehicles", // Assumes a Vehicles model for vehicles
+          key: "id",
         },
-        onDelete: 'SET NULL', // If a vehicle is deleted, the field is set to null
+        onDelete: "SET NULL", // If a vehicle is deleted, the field is set to null
       },
       status: {
-        type: DataTypes.ENUM('available', 'booked', 'cancelled'),
+        type: DataTypes.ENUM("available", "booked", "cancelled"),
         allowNull: false,
-        defaultValue: 'available',
+        defaultValue: "available",
       },
-    }, {
-      tableName: 'Bookings',
+    },
+    {
+      tableName: "Bookings",
       timestamps: true, // Adds createdAt and updatedAt fields
+    }
+  );
+
+  // Associations
+  Booking.associate = (models) => {
+    Booking.belongsTo(models.Users, {
+      foreignKey: "userId",
+      onDelete: "CASCADE",
     });
-  
-    // Associations
-    Booking.associate = (models) => {
-      Booking.belongsTo(models.Users, {
-        foreignKey: "userId",
-        onDelete: "CASCADE",
-      });
-      Booking.belongsTo(models.Property, {
-        foreignKey: "propertyId",
-        onDelete: "CASCADE",
-        as: "property",
-      });
-  
-      Booking.belongsTo(models.Vehicle, {
-        foreignKey: "vehicleId",
-        onDelete: "SET NULL",
-        as: "vehicle",
-      });
-    };
-  
-    return Booking;
+    Booking.belongsTo(models.Property, {
+      foreignKey: "propertyId",
+      onDelete: "CASCADE",
+      as: "property",
+    });
+
+    Booking.belongsTo(models.Vehicle, {
+      foreignKey: "vehicleId",
+      onDelete: "SET NULL",
+      as: "vehicle",
+    });
+  };
+
+  return Booking;
 };

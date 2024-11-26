@@ -42,7 +42,6 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "media",
     }
   );
-
   Media.associate = (models) => {
     Media.belongsTo(models.Property, {
       foreignKey: "propertyId",

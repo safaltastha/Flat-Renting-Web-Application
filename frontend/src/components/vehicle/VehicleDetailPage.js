@@ -5,151 +5,99 @@ import { ImLocation2, ImPhone, ImMail } from "react-icons/im";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { useVehicle } from "../../context/VehicleContext";
 
-import Rating from "../../components/Rating";
-
-const DetailedViewPage = () => {
+const VehicleDetailPage = () => {
   const navigate = useNavigate();
-  const { propertyId } = useParams();
-  const [property, setProperty] = useState(null);
+  const { id } = useParams();
+  const [vehicle, setVehicle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAllImages, setShowAllImages] = useState(false);
-  const [ratings, setRatings] = useState([]);
+
+  const { setSelectedVehicle } = useVehicle(); // Access context
+
+  const handleBookNow = () => {
+    localStorage.setItem("selectedVehicle", JSON.stringify(vehicle));
+    navigate("/bookproperty"); // Navigate to booking form
+  };
 
   useEffect(() => {
-    const fetchPropertyAndRatings = async () => {
+    const fetchVehicle = async () => {
       try {
-        // Fetch property details
         const token = Cookies.get("token");
-        const propertyResponse = await axios.get(
-          `http://localhost:3001/properties/${propertyId}`,
-          {
-            withCredentials: true,
-            headers: { Authorization: `Bearer ${token}` },
-          }
+        const response = await axios.get(
+          `http://localhost:3001/vehicle/${id}`,
+          { withCredentials: true }
         );
-        setProperty(propertyResponse.data);
 
-        // Fetch property ratings
-
-        const ratingResponse = await axios.get(
-          `http://localhost:3001/ratings?propertyId=${propertyId}`,
-          {
-            withCredentials: true,
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setRatings(ratingResponse.data);
+        setVehicle(response.data);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to load data.");
+        setError(err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPropertyAndRatings();
-  }, [propertyId]);
+    fetchVehicle();
+  }, [id]);
 
-  const handleNewRating = (newRating) => {
-    setRatings([...ratings, newRating]); // Add the new rating to the existing ratings
-  };
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading vehicle: {error.message}</div>;
 
   return (
     <div className="container max-w-[1600px] px-36 mt-8">
       <p className="text-3xl font-semibold text-[#9747FF] ">
-        {property.category} for rent in {property.locationCity}
+        {vehicle.type} for rent in {vehicle.vehicleLocation}
       </p>
 
-      {property ? (
-        <div className="flex mt-6">
+      {vehicle ? (
+        <div className="flex mt-6 flex-wrap gap-8">
           {/* Left Section: Images, Property Details, and Map */}
-          <div className="flex-1 pr-4">
+          <div className="flex-1 space-y-6">
             {/* Large Image */}
-            {property.media?.length > 0 && (
+            {vehicle.media?.length > 0 && (
               <img
-                src={property.media[0].file_path}
-                alt="Large Property Image"
+                src={vehicle.media[0].file_path}
+                alt="Large vehicle Image"
                 className="w-full h-[600px] object-cover rounded-md shadow-lg"
               />
             )}
 
-            {/* Property Details */}
-            <div className="space-y-6 bg-white p-6 rounded-lg shadow-lg mt-4">
-              <div className="flex items-center space-x-2 mt-2">
-                <ImLocation2 className="text-gray-600" size={18} />
-                <span>{property.locationStreetNumber} street,</span>
-                <span>{property.StreetName},</span>
-                <span>{property.locationCity}</span>
-              </div>
-              <p className="text-xl font-semibold text-gray-800">
-                <strong>Description:</strong>{" "}
-                {property.description || "No description available"}
-              </p>
-
-              <p className="text-3xl font-bold text-[#9747FF] border-b-2 pb-2 border-gray-300">
-                Features
-              </p>
-
+            {/* Vehicle Details */}
+            <div className="space-y-6 bg-white p-6 rounded-lg shadow-lg mt-4 ">
               <div className="space-y-3 text-gray-700">
                 <p className="text-lg">
-                  <strong>Bedrooms:</strong> {property.numOfBedrooms}
+                  <strong>Vehicle Registration Number:</strong>{" "}
+                  {vehicle.registrationNumber}
                 </p>
                 <p className="text-lg">
-                  <strong>Bathrooms:</strong> {property.numOfBathrooms}
+                  <strong>Vehicle Capacity:</strong> {vehicle.capacity} tons
                 </p>
                 <p className="text-lg">
-                  <strong>Living Rooms:</strong>{" "}
-                  {property.numOfLivingrooms || "No Living room"}
+                  <strong>Pricing:</strong> Nrs {vehicle.pricingPerHour}/hour
                 </p>
                 <p className="text-lg">
-                  <strong>Kitchen:</strong> {property.numOfKitchens}
+                  <strong>Location:</strong> {vehicle.vehicleLocation}
                 </p>
                 <p className="text-lg">
-                  <strong>Floor:</strong> {property.floor}
-                </p>
-                <p className="text-lg">
-                  <strong>Monthly Rent:</strong> NRs. {property.monthlyRent}
-                </p>
-                <p className="text-lg">
-                  <strong>Advanced Rent:</strong> NRs.{" "}
-                  {property.advancedRent || "No advanced rent needed"}
-                </p>
-                <p className="text-lg">
-                  <strong>Facilities:</strong>{" "}
-                  {Object.entries(property.features)
-                    .filter(([key, value]) => value)
-                    .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1))
-                    .join(", ") || "None"}
-                </p>
-                <p className="text-lg">
-                  <strong>House Rules:</strong>{" "}
-                  {property.houseRule || "No house rule"}
+                  <strong>Vehicle Features:</strong> {vehicle.vehicleFeatures}
                 </p>
               </div>
 
               <div className="flex justify-center">
                 <button
                   className="bg-[#9747FF] hover:bg-[#7735CC] transition-colors duration-300 px-20 py-3 rounded-md text-white text-lg font-semibold mt-6 shadow-lg"
-                  onClick={() => {
-                    localStorage.setItem(
-                      "selectedProperty",
-                      JSON.stringify(property)
-                    );
-                    navigate("/bookproperty");
-                  }}
+                  onClick={handleBookNow}
                 >
-                  Book Now
+                  Confirm vehicle
                 </button>
               </div>
             </div>
 
             {/* Map */}
             <div className="my-12">
-              <p className="text-2xl font-semibold">Find the property on map</p>
+              <p className="text-2xl font-semibold">Find the vehicle on map</p>
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d28129.0477250726!2d83.98528161614638!3d28.203342149521294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3995937bbf0376ff%3A0xf6cf823b25802164!2sPokhara!5e0!3m2!1sen!2snp!4v1727537868376!5m2!1sen!2snp"
                 width="600"
@@ -158,20 +106,13 @@ const DetailedViewPage = () => {
                 loading="lazy"
               ></iframe>
             </div>
-
-            {/* Pass propertyId and type to Rating component */}
-            <Rating
-              id={propertyId}
-              type="property"
-              onNewRating={handleNewRating}
-            />
           </div>
 
           {/* Right Section: Smaller Images and Contact Info */}
           <div className="w-[30%] sticky top-0">
             {/* Smaller Images */}
             <div className="flex flex-col space-y-2">
-              {property.media?.slice(1, 3).map((image, index) => (
+              {vehicle.media?.slice(1, 3).map((image, index) => (
                 <img
                   key={index}
                   src={image.file_path}
@@ -190,7 +131,7 @@ const DetailedViewPage = () => {
 
               {/* If showAllImages is true, display additional images */}
               {showAllImages &&
-                property.media
+                vehicle.media
                   .slice(3)
                   .map((image, index) => (
                     <img
@@ -227,16 +168,16 @@ const DetailedViewPage = () => {
                 <span className="text-lg">landlord@example.com</span>
               </div>
               <div className="text-lg font-semibold text-red-500">
-                Available: Everyday after 5pm
+                Availability Time: {vehicle.availabilityTime}
               </div>
             </div>
           </div>
         </div>
       ) : (
-        <div>No property found</div>
+        <div>No vehicle found</div>
       )}
     </div>
   );
 };
 
-export default DetailedViewPage;
+export default VehicleDetailPage;

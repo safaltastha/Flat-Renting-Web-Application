@@ -21,7 +21,7 @@ export default function Navbar() {
 
   const res = Cookies.get("token");
 
-  console.log(res, "es");
+  console.log(res, "esto ho");
 
   useEffect(() => {
     console.log("Navbar component mounted");
@@ -52,7 +52,7 @@ export default function Navbar() {
   };
 
   const handleProfile = () => {
-    navigate("/myprofile");
+    navigate("/dashboard");
   };
 
   const toggleDropdown = () => {
@@ -62,19 +62,13 @@ export default function Navbar() {
   const handlePostPropertyClick = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await axios.get("http://localhost:3001/auth/role", {
-        withCredentials: true,
-      });
+    navigate("/postyourproperty");
+  };
 
-      if (response.data.role === "landlord") {
-        navigate("/postyourproperty");
-      } else {
-        alert("Please Login as landlord to post your property");
-      }
-    } catch (error) {
-      alert("An error occurred while checking your role. Please try again.");
-    }
+  const handlePostVehicleClick = async (e) => {
+    e.preventDefault();
+
+    navigate("/postyourvehicle");
   };
 
   return (
@@ -128,11 +122,7 @@ export default function Navbar() {
           <li>
             <Link
               to="/"
-              className={`block px-4 py-2 text-purple-500 hover:text-purple-500 ${
-                location.pathname === "/"
-                  ? "underline decoration-2 decoration-purple-500"
-                  : ""
-              }`}
+              className={`block px-4 py-2 text-purple-500 font-semibold`}
             >
               Home
             </Link>
@@ -166,16 +156,13 @@ export default function Navbar() {
                   <Link to="/properties/room">Room</Link>
                 </li>
                 <li className="p-2 hover:bg-gray-200">
-                  <Link to="/properties/officespace">Office Space</Link>
-                </li>
-                <li className="p-2 hover:bg-gray-200">
-                  <Link to="/properties/shutters">Shutters</Link>
+                  <Link to="/properties/apartment">Apartment</Link>
                 </li>
               </ul>
             )}
           </li>
 
-          <li>
+          {/* <li>
             <Link
               to="/contactus"
               className={`block px-4 py-2 hover:text-purple-500 ${
@@ -184,8 +171,8 @@ export default function Navbar() {
             >
               Contact
             </Link>
-          </li>
-          <li>
+          </li> */}
+          {/* <li>
             <Link
               to="/aboutus"
               className={`block px-4 py-2 hover:text-purple-500 ${
@@ -194,7 +181,7 @@ export default function Navbar() {
             >
               About Us
             </Link>
-          </li>
+          </li> */}
           <li>
             <a
               href="/postyourproperty"
@@ -205,6 +192,19 @@ export default function Navbar() {
                 <FaPlus size={18} />
               </span>
               Post Your Property
+            </a>
+          </li>
+
+          <li>
+            <a
+              href="/postyourvehicle"
+              onClick={handlePostVehicleClick}
+              className="px-4 py-1 text-black lg:border-2 lg:border-purple-500 lg:hover:bg-purple-600 lg:hover:text-white transition-colors duration-200 rounded-md flex items-center gap-1"
+            >
+              <span className="text-sm">
+                <FaPlus size={18} />
+              </span>
+              Post Your Vehicle
             </a>
           </li>
 

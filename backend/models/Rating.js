@@ -1,73 +1,74 @@
-// models/Rating.js
 const Users = require("./Users");
+const Property = require("./Property");
+const Vehicle = require("./Vehicle");
+
 module.exports = (sequelize, DataTypes) => {
-  const Rating = sequelize.define("Rating", {
-    rating_value: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+  const Rating = sequelize.define(
+    "Rating",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false,
+      },
+      score: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          min: 1,
+          max: 5,
+        },
+      },
+      comment: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      propertyId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: Property,
+          key: "id",
+        },
+        allowNull: true, // Can be null if the rating is for a vehicle
+      },
+      vehicleId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: Vehicle,
+          key: "id",
+        },
+        allowNull: true, // Can be null if the rating is for a property
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: Users,
+          key: "id",
+        },
+        allowNull: false, // The user providing the rating
+      },
     },
-    review_text: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    rating_type: {
-      type: DataTypes.ENUM(
-        "property",
-        "vehicle",
-        "landlord",
-        "vehicle_supplier",
-        "tenant",
-        "test"
-      ),
-      allowNull: false,
-    },
-    target_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    rater_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-  });
-
+    {
+      timestamps: true,
+      tableName: "ratings",
+    }
+  );
+  // Associations
   Rating.associate = (models) => {
-    // Rating is associated with the User model for both rater and target
-    Rating.belongsTo(models.Users, { foreignKey: 'rater_id', as: 'rater' });
-
-    // Rating is associated with the User model for the rated user (target)
-    Rating.belongsTo(models.Users, { foreignKey: 'target_id', as: 'ratedUser' });
-
-    // Conditional associations based on rating_type
+    Rating.belongsTo(models.Users, {
+      foreignKey: "userId",
+      as: "user",
+    });
     Rating.belongsTo(models.Property, {
-      foreignKey: 'target_id',
-      as: 'property',
-      constraints: false, // Disable constraints because we have multiple target models
-      scope: {
-        rating_type: 'property',
-      },
+      foreignKey: "propertyId",
+      as: "property",
     });
-
     Rating.belongsTo(models.Vehicle, {
-      foreignKey: 'target_id',
-      as: 'vehicle',
-      constraints: false,
-      scope: {
-        rating_type: 'vehicle',
-      },
+      foreignKey: "vehicleId",
+      as: "vehicle",
     });
-
-    Rating.belongsTo(models.Test, {
-      foreignKey: 'target_id',
-      as: 'test',
-      constraints: false,
-      scope: {
-        rating_type: 'test',
-      },
-    });
-};
-
-
+  };
 
   return Rating;
 };

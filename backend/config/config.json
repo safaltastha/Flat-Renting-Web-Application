@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "Laravel1$",
-    "database": "project",
+    "database": "soch",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },

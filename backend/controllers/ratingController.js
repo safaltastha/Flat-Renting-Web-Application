@@ -1,135 +1,109 @@
-// controllers/ratingController.js
-const { Rating, Users, Property, Vehicle } = require("../models");
+const { Rating, Property, Users, Vehicle } = require("../models");
 
-exports.addRating = async (req, res) => {
-  const { rating_value, review_text, rating_type, target_id, rater_id } = req.body;
+// Create a rating or review for a property or vehicle
+exports.createRating = async (req, res) => {
+  const { score, comment, propertyId, vehicleId } = req.body;
+  const userId = req.user.id; // Assume user ID is extracted from the authenticated request
 
   try {
-    // Validate rating_type
-    if (!['property', 'vehicle', 'landlord', 'vehicle_supplier', 'tenant', 'test'].includes(rating_type)) {
-      return res.status(400).json({ error: 'Invalid rating type' });
+    // Ensure at least one of propertyId or vehicleId is provided
+    if (!propertyId && !vehicleId) {
+      return res.status(400).json({
+        error: "You must provide either a propertyId or a vehicleId.",
+      });
     }
 
-    // Verify target_id exists in the correct table based on rating_type
-    let targetExists = false;
-    switch (rating_type) {
-      case 'property':
-        targetExists = await Property.findByPk(target_id); // Check if Property exists
-        break;
-      case 'vehicle':
-        targetExists = await Vehicle.findByPk(target_id); // Check if Vehicle exists
-        break;
-      case 'test':
-        targetExists = await Test.findByPk(target_id); // Check if Test exists
-        break;
-        
-      // Add more cases for landlord, tenant, and vehicle_supplier if necessary
-    }
-
-    if (!targetExists) {
-      return res.status(400).json({ error: `No ${rating_type} found with ID ${target_id}` });
-    }
-
-    // Create the new rating
     const newRating = await Rating.create({
-      rating_value,
-      review_text,
-      rating_type,
-      target_id,
-      rater_id,
+      score,
+      comment,
+      propertyId: propertyId || null,
+      vehicleId: vehicleId || null,
+      userId,
     });
 
-    res.status(201).json(newRating);
+    res.status(201).json({
+      message: "Rating created successfully.",
+      data: newRating,
+    });
   } catch (error) {
-    console.error('Error details:', error);
-    res.status(500).json({ error: error.message });
+    console.error("Error creating rating:", error.message);
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the rating." });
   }
 };
 
+// Get all ratings
 
-exports.getUserRatings = async (req, res) => {
-  const { userId } = req.params;
-
+// Get ratings for either a property or a vehicle
+exports.getRatingById = async (req, res) => {
   try {
-    const ratings = await Rating.findAll({
-      where: {
-        target_id: userId,
-        rating_type: ["tenant", "landlord", "vehicle_supplier"],
-      },
-      include: [
-        { model: Users, as: "rater", attributes: ["name", "profileImage"] },
-      ],
-    });
+    const { propertyId, vehicleId } = req.query; // Get propertyId or vehicleId from query parameters
 
-    const averageRating =
-      ratings.reduce((sum, rating) => sum + rating.rating_value, 0) /
-        ratings.length || 0;
+    if (!propertyId && !vehicleId) {
+      return res
+        .status(400)
+        .json({ message: "Please provide either propertyId or vehicleId." });
+    }
 
-    res.status(200).json({ ratings, averageRating });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch user ratings" });
-  }
-};
+    let ratings;
+    if (propertyId) {
+      // Get ratings for property
+      ratings = await Rating.findAll({
+        where: { propertyId },
+        include: [
+          {
+            model: Users,
+            as: "user",
+            attributes: ["id", "email"],
+          },
+          {
+            model: Property,
+            as: "property",
+            attributes: [
+              "id",
+              "locationCity",
+              "locationStreetNumber",
+              "StreetName",
+            ],
+          },
+        ],
+      });
+    } else if (vehicleId) {
+      // Get ratings for vehicle
+      ratings = await Rating.findAll({
+        where: { vehicleId },
+        include: [
+          {
+            model: Users,
+            as: "user",
+            attributes: ["id", "email"],
+          },
+          {
+            model: Vehicle,
+            as: "vehicle",
+            attributes: ["id", "type", "registrationNumber"],
+          },
+        ],
+      });
+    }
 
-exports.getPropertyRatings = async (req, res) => {
-  const { propertyId } = req.params;
+    // Check if ratings exist and return specific error messages
+    if (!ratings || ratings.length === 0) {
+      if (propertyId) {
+        return res.status(404).json({
+          message: "No ratings found for the given property.",
+        });
+      } else if (vehicleId) {
+        return res.status(404).json({
+          message: "No ratings found for the given vehicle.",
+        });
+      }
+    }
 
-  try {
-    const ratings = await Rating.findAll({
-      where: { target_id: propertyId, rating_type: "property" },
-      include: [
-        { model: Users, as: "rater", attributes: ["name", "profileImage"] },
-      ],
-    });
-
-    const averageRating =
-      ratings.reduce((sum, rating) => sum + rating.rating_value, 0) /
-        ratings.length || 0;
-
-    res.status(200).json({ ratings, averageRating });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch property ratings" });
-  }
-};
-
-exports.getVehicleRatings = async (req, res) => {
-  const { vehicleId } = req.params;
-
-  try {
-    const ratings = await Rating.findAll({
-      where: { target_id: vehicleId, rating_type: "vehicle" },
-      include: [
-        { model: Users, as: "rater", attributes: ["name", "profileImage"] },
-      ],
-    });
-
-    const averageRating =
-      ratings.reduce((sum, rating) => sum + rating.rating_value, 0) /
-        ratings.length || 0;
-
-    res.status(200).json({ ratings, averageRating });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch vehicle ratings" });
-  }
-};
-
-exports.getTestRatings = async (req, res) => {
-  const { testId } = req.params;
-
-  try {
-    const ratings = await Rating.findAll({
-      where: { target_id: testId, rating_type: "test" },
-      include: [
-        { model: Users, as: "rater", attributes: ["name", "profileImage"] },
-      ],
-    });
-
-    const averageRating =
-      ratings.reduce((sum, rating) => sum + rating.rating_value, 0) /
-        ratings.length || 0;
-
-    res.status(200).json({ ratings, averageRating });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch property ratings" });
+    return res.status(200).json(ratings);
+  } catch (err) {
+    console.error("hello", err);
+    return res.status(500).json({ message: "Server error." });
   }
 };

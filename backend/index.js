@@ -6,15 +6,12 @@ const PropertyRouter = require("./routes/Property");
 const UserRouter = require("./routes/Users");
 const vehicleRouter = require("./routes/Vehicle");
 const path = require("path");
-const bookTestRouter = require("./routes/BookTest");
+
 const bookingRouter = require("./routes/Booking");
-const TestRouter = require("./routes/Test");
-const RatingRouter = require("./routes/Rating");
-const propertyRatingRouter = require("./routes/PropertyRating");
-const vehicleRatingRouter = require("./routes/VehicleRating");
-const userRatingRouter = require("./routes/UserRating");
+
 const contactRouter = require("./routes/Contact");
 
+const ratingRoutes = require("./routes/Rating");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -26,7 +23,6 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    
   })
 );
 
@@ -61,13 +57,10 @@ app.use("/properties", PropertyRouter);
 app.use("/auth", UserRouter);
 app.use("/vehicle", vehicleRouter);
 app.use("/booking", bookingRouter);
-app.use("/bookTest", bookTestRouter);
-app.use("/test", TestRouter);
-app.use("/rating", RatingRouter);
-app.use("/property-ratings", propertyRatingRouter);
-app.use("/vehicle-ratings", vehicleRatingRouter);
-app.use("/user-ratings", userRatingRouter);
-app.use("/contact",contactRouter);
+
+app.use("/contact", contactRouter);
+
+app.use("/ratings", ratingRoutes);
 
 db.sequelize.sync().then(() => {
   app.listen(3001, () => {

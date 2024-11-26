@@ -8,8 +8,6 @@ import DescriptionAndRules from "../../components/landlord/DescriptionAndRules";
 import AudioVideo from "../../components/landlord/AudioVideo";
 import Cookies from "js-cookie";
 
-console.log("GeneralCategory:", GeneralCategory);
-
 const LandlordForm = () => {
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -33,7 +31,6 @@ const LandlordForm = () => {
       petAllowed: false,
     },
     floor: "",
-    StreetName: "",
   });
   const navigate = useNavigate();
 
@@ -80,22 +77,25 @@ const LandlordForm = () => {
     };
 
     const propertyData = new FormData();
-    propertyData.append("category", formData.category);
-    propertyData.append("locationCity", formData.locationCity);
-    propertyData.append("locationStreetNumber", formData.locationStreetNumber);
-    propertyData.append("numOfSpaces", formData.numOfSpaces);
-    propertyData.append("numOfBedrooms", formData.numOfBedrooms);
-    propertyData.append("numOfLivingrooms", formData.numOfLivingRooms);
-    propertyData.append("numOfKitchens", formData.numOfKitchens);
-    propertyData.append("monthlyRent", formData.monthlyRent);
-    propertyData.append("advancedRent", formData.advancedRent);
-    propertyData.append("description", formData.description);
-    propertyData.append("houseRule", formData.houseRule);
+    propertyData.append("category", formData.category || "");
+    propertyData.append("locationCity", formData.locationCity || "");
+    propertyData.append(
+      "locationStreetNumber",
+      formData.locationStreetNumber || ""
+    );
+    propertyData.append("numOfSpaces", formData.numOfSpaces || 0);
+    propertyData.append("numOfBedrooms", formData.numOfBedrooms || 0);
+    propertyData.append("numOfLivingrooms", formData.numOfLivingRooms || 0);
+    propertyData.append("numOfBathrooms", formData.numOfBathrooms || 0);
+    propertyData.append("numOfKitchens", formData.numOfKitchens || 0);
+    propertyData.append("monthlyRent", formData.monthlyRent || 0);
+    propertyData.append("advancedRent", formData.advancedRent || 0); // Use default value if empty
+    propertyData.append("description", formData.description || "");
+    propertyData.append("houseRule", formData.houseRule || "");
     propertyData.append("features", JSON.stringify(featuresData));
-    propertyData.append("floor", formData.floor);
-    propertyData.append("StreetName", formData.StreetName);
+    propertyData.append("floor", formData.floor || "");
+    propertyData.append("StreetName", formData.StreetName || "");
     propertyData.append("entityType", "property");
-    propertyData.append("numOfBathrooms", formData.numOfBathrooms);
 
     // Append images and videos to FormData
     images.forEach((image) => {

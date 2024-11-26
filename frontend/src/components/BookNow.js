@@ -1,293 +1,180 @@
-import React, { useState } from "react";
-import { RiCloseLine } from "react-icons/ri";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { ImLocation2, ImPhone, ImMail } from "react-icons/im";
+import { FaUserCircle } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
-const VehicleTimeForm = ({ onChange, formData }) => {
+const VehicleDetailPage = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [vehicle, setVehicle] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showAllImages, setShowAllImages] = useState(false);
+
+  const handleBookNow = () => {
+    localStorage.setItem("selectedVehicle", JSON.stringify(vehicle));
+    navigate("/bookproperty"); // Navigate to booking form
+  };
+
+  useEffect(() => {
+    const fetchVehicle = async () => {
+      try {
+        const token = Cookies.get("token");
+        const response = await axios.get(
+          `http://localhost:3001/vehicle/${id}`,
+          { withCredentials: true }
+        );
+
+        setVehicle(response.data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicle();
+  }, [id]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading vehicle: {error.message}</div>;
+
   return (
-    <div className="mt-5">
-      <label htmlFor="vehicle-type" className="block text-gray-600">
-        Choose the type of vehicle:<span className="text-red-500">*</span>
-      </label>
-      <select
-        id="vehicle-type"
-        name="vehicleType"
-        value={formData.vehicleType}
-        onChange={onChange}
-        className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
-      >
-        <option value="truck">Truck</option>
-        <option value="van">Van</option>
-      </select>
+    <div className="container max-w-[1600px] px-36 mt-8">
+      <p className="text-3xl font-semibold text-[#9747FF] ">
+        {vehicle.type} for rent in {vehicle.vehicleLocation}
+      </p>
 
-      <label htmlFor="pickup-location" className="block text-gray-600">
-        Pick-up Location:<span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        id="pickup-location"
-        name="pickupLocation"
-        value={formData.pickupLocation}
-        placeholder="Enter pick-up location"
-        onChange={onChange}
-        className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
-      />
+      {vehicle ? (
+        <div className="flex mt-6 flex-wrap gap-8">
+          {/* Left Section: Images, Property Details, and Map */}
+          <div className="flex-1 space-y-6">
+            {/* Large Image */}
+            {vehicle.media?.length > 0 && (
+              <img
+                src={vehicle.media[0].file_path}
+                alt="Large vehicle Image"
+                className="w-full h-[600px] object-cover rounded-md shadow-lg"
+              />
+            )}
 
-      <label htmlFor="dropoff-location" className="block text-gray-600">
-        Drop-off Location:<span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        id="dropoff-location"
-        name="dropoffLocation"
-        value={formData.dropoffLocation}
-        placeholder="Enter drop-off location"
-        onChange={onChange}
-        className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
-      />
+            {/* Vehicle Details */}
+            <div className="space-y-6 bg-white p-6 rounded-lg shadow-lg mt-4 ">
+              <div className="space-y-3 text-gray-700">
+                <p className="text-lg">
+                  <strong>Vehicle Registration Number:</strong>{" "}
+                  {vehicle.registrationNumber}
+                </p>
+                <p className="text-lg">
+                  <strong>Vehicle Capacity:</strong> {vehicle.capacity} tons
+                </p>
+                <p className="text-lg">
+                  <strong>Pricing:</strong> Nrs {vehicle.pricingPerHour}/hour
+                </p>
+                <p className="text-lg">
+                  <strong>Location:</strong> {vehicle.vehicleLocation}
+                </p>
+                <p className="text-lg">
+                  <strong>Vehicle Features:</strong> {vehicle.vehicleFeatures}
+                </p>
+              </div>
 
-      <label htmlFor="date" className="block text-gray-600">
-        Please choose date and time:<span className="text-red-500">*</span>
-      </label>
-      <input
-        type="date"
-        id="date"
-        name="date"
-        value={formData.date}
-        onChange={onChange}
-        className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
-      />
-      <label htmlFor="time" className="block text-gray-600">
-        Time:
-      </label>
-      <input
-        type="time"
-        id="time"
-        name="time"
-        value={formData.time}
-        onChange={onChange}
-        className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
-      />
+              <div className="flex justify-center">
+                <button
+                  className="bg-[#9747FF] hover:bg-[#7735CC] transition-colors duration-300 px-20 py-3 rounded-md text-white text-lg font-semibold mt-6 shadow-lg"
+                  onClick={handleBookNow}
+                >
+                  Confirm vehicle
+                </button>
+              </div>
+            </div>
 
-      <label htmlFor="duration" className="block text-gray-600">
-        Duration (in hours):<span className="text-red-500">*</span>
-      </label>
-      <input
-        type="number"
-        id="duration"
-        name="duration"
-        min="1"
-        value={formData.duration}
-        placeholder="Enter duration in hours"
-        onChange={onChange}
-        className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
-      />
+            {/* Map */}
+            <div className="my-12">
+              <p className="text-2xl font-semibold">Find the vehicle on map</p>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d28129.0477250726!2d83.98528161614638!3d28.203342149521294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3995937bbf0376ff%3A0xf6cf823b25802164!2sPokhara!5e0!3m2!1sen!2snp!4v1727537868376!5m2!1sen!2snp"
+                width="600"
+                height="300"
+                allowFullScreen
+                loading="lazy"
+              ></iframe>
+            </div>
+          </div>
 
-      <label className="block text-gray-600">Do you need personnel for shifting?</label>
-      <div className="flex space-x-4 mt-2 mb-4">
-        <div className="flex items-center">
-          <input
-            type="radio"
-            id="personnel-yes"
-            name="personnel"
-            value="yes"
-            checked={formData.personnel === "yes"}
-            onChange={onChange}
-            className="mr-2"
-          />
-          <label htmlFor="personnel-yes" className="text-gray-700">Yes</label>
+          {/* Right Section: Smaller Images and Contact Info */}
+          <div className="w-[30%] sticky top-0">
+            {/* Smaller Images */}
+            <div className="flex flex-col space-y-2">
+              {vehicle.media?.slice(1, 3).map((image, index) => (
+                <img
+                  key={index}
+                  src={image.file_path}
+                  alt={`Small Image ${index + 1}`}
+                  className="w-full h-[300px] object-cover rounded-md shadow-lg"
+                />
+              ))}
+
+              {/* Button to show all images */}
+              <button
+                className="text-[#9747FF] mt-2 underline text-xl"
+                onClick={() => setShowAllImages(!showAllImages)}
+              >
+                {showAllImages ? "Show Less" : "Show More Images"}
+              </button>
+
+              {/* If showAllImages is true, display additional images */}
+              {showAllImages &&
+                vehicle.media
+                  .slice(3)
+                  .map((image, index) => (
+                    <img
+                      key={index}
+                      src={image.file_path}
+                      alt={`Small Image ${index + 3}`}
+                      className="w-full h-[300px] object-cover rounded-md shadow-lg"
+                    />
+                  ))}
+            </div>
+
+            {/* Contact Info */}
+            <div
+              className="space-y-3 bg-white p-6 rounded-lg shadow-2xl mt-4 sticky top-0 z-10"
+              style={{ marginTop: "16px" }}
+            >
+              <p className="text-2xl font-semibold">Contact Information</p>
+              <div className="flex items-center">
+                <FaUserCircle className="mr-3 text-xl" />
+                <span className="text-lg">John Doe</span>
+              </div>
+              <div className="flex items-center">
+                <ImPhone className="mr-3 text-xl" />
+                <span className="text-lg">+977-9800000000</span>
+              </div>
+              <div className="flex items-center">
+                <ImLocation2 className="mr-3 text-xl" />
+                <span className="text-lg">
+                  Street 9, Janapriya Marga, Nayabazar
+                </span>
+              </div>
+              <div className="flex items-center">
+                <ImMail className="mr-3 text-xl" />
+                <span className="text-lg">landlord@example.com</span>
+              </div>
+              <div className="text-lg font-semibold text-red-500">
+                Availability Time: {vehicle.availabilityTime}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center">
-          <input
-            type="radio"
-            id="personnel-no"
-            name="personnel"
-            value="no"
-            checked={formData.personnel === "no"}
-            onChange={onChange}
-            className="mr-2"
-          />
-          <label htmlFor="personnel-no" className="text-gray-700">No</label>
-        </div>
-      </div>
-
-      {formData.personnel === "yes" && (
-        <>
-          <label htmlFor="num-personnel" className="block text-gray-600">
-            Number of Personnel:<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            id="num-personnel"
-            name="numPersonnel"
-            value={formData.numPersonnel}
-            min="1"
-            placeholder="Enter number of personnel"
-            onChange={onChange}
-            className="w-full mt-2 mb-4 p-2 border rounded bg-white"
-          />
-          
-          <label htmlFor="personnel-duration" className="block text-gray-600">
-            For how long will you need personnel (in hours)?<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            id="personnel-duration"
-            name="personnelDuration"
-            value={formData.personnelDuration}
-            min="1"
-            placeholder="Enter duration for personnel in hours"
-            onChange={onChange}
-            className="w-full mt-2 mb-4 p-2 border rounded bg-white"
-          />
-        </>
+      ) : (
+        <div>No vehicle found</div>
       )}
     </div>
   );
 };
 
-const BookNowWithVehicleForm = () => {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    booking: "",
-    vehicleType: "truck",
-    pickupLocation: "",
-    dropoffLocation: "",
-    date: "",
-    time: "",
-    duration: "",
-    personnel: "",
-    numPersonnel: "",
-    personnelDuration: "", 
-  });
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-  };
-
-  return (
-    <div className="flex justify-center items-center min-h-screen bg-[#EEE5FF] py-10">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md p-6 border border-gray-300 bg-white rounded-md shadow-lg"
-      >
-        <div className="relative flex items-center justify-center mb-6">
-          <h1 className="text-xl font-semibold text-purple-600">Please fill this form</h1>
-          <RiCloseLine className="absolute right-0 text-2xl cursor-pointer text-gray-400 hover:text-gray-600" />
-        </div>
-
-        <div className="mt-3">
-          <label htmlFor="first-name" className="block text-gray-600">
-            First Name<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="first-name"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="border w-full mt-1 px-3 py-2 rounded-md bg-gray-50"
-            placeholder="John"
-          />
-        </div>
-
-        <div className="mt-5">
-          <label htmlFor="last-name" className="block text-gray-600">
-            Last Name<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="last-name"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="border w-full mt-1 px-3 py-2 rounded-md bg-gray-50"
-            placeholder="Doe"
-          />
-        </div>
-
-        <div className="mt-5">
-          <label htmlFor="email" className="block text-gray-600">
-            Email<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="border w-full mt-1 px-3 py-2 rounded-md bg-gray-50"
-            placeholder="abc12@gmail.com"
-          />
-        </div>
-
-        <div className="mt-5">
-          <label htmlFor="phone-number" className="block text-gray-600">
-            Phone Number<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="tel"
-            id="phone-number"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            className="border w-full mt-1 px-3 py-2 rounded-md bg-gray-50"
-            placeholder="98********"
-          />
-        </div>
-
-        <div className="mt-4">
-          <label className="block text-gray-600">Will you be booking a vehicle?</label>
-          <div className="flex space-x-4 mt-2 mb-4">
-            <div className="flex items-center">
-              <input
-                type="radio"
-                id="vehicle-yes"
-                name="booking"
-                value="yes"
-                checked={formData.booking === "yes"}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              <label htmlFor="vehicle-yes" className="text-gray-700">Yes</label>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="radio"
-                id="vehicle-no"
-                name="booking"
-                value="no"
-                checked={formData.booking === "no"}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              <label htmlFor="vehicle-no" className="text-gray-700">No</label>
-            </div>
-          </div>
-        </div>
-
-        {formData.booking === "yes" && (
-          <VehicleTimeForm onChange={handleChange} formData={formData} />
-        )}
-
-        <button
-          type="submit"
-          className="w-full mt-6 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700"
-        >
-          Submit
-        </button>
-      </form>
-    </div>
-  );
-};
-
-export default BookNowWithVehicleForm;
+export default VehicleDetailPage;

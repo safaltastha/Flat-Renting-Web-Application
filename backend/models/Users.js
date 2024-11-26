@@ -94,49 +94,9 @@ module.exports = (sequelize, DataTypes) => {
       as: "landlordBookings", // Alias for bookings of properties they posted
       onDelete: "CASCADE",
     });
-
-    Users.hasMany(models.BookTest, {
-      foreignKey: "userId",
-      as: "tenantBookTests", // Alias for BookTests made by this tenant
-      onDelete: "CASCADE",
-    });
-
-    // A user can have multiple BookTests as a landlord
-    Users.hasMany(models.Test, {
-      foreignKey: "userId", // Foreign key in Property model
-      as: "landlordBookProperties", // Alias for properties posted by this landlord
-      onDelete: "CASCADE",
-    });
-
-    // Define the association with BookTest (if a landlord wants to see their BookTests)
-    Users.hasMany(models.BookTest, {
-      foreignKey: "userId", // If a landlord is associated with BookTests
-      as: "landlordBookTests", // Alias for bookings of properties they posted
-      onDelete: "CASCADE",
-    });
-
-    // Ratings given by the user
     Users.hasMany(models.Rating, {
-      foreignKey: "rater_id",
-      as: "givenRatings",
-    });
-
-    // Ratings received by the user (as landlord, tenant, or vehicle supplier)
-    Users.hasMany(models.Rating, {
-      foreignKey: "target_id",
-      as: "receivedRatings",
-    });
-
-    // As a "rater", a user can have many ratings they have given
-    Users.hasMany(models.UserRating, {
-      foreignKey: "rater_id",
-      as: "ratingsGiven", // Alias to represent ratings given by the user
-    });
-
-    // As a "ratedUser", a user can have many ratings they have received
-    Users.hasMany(models.UserRating, {
-      foreignKey: "rated_user_id",
-      as: "ratingsReceived", // Alias to represent ratings received by the user
+      foreignKey: "userId", // Foreign key in the Rating model
+      as: "ratings", // Alias for easier querying
     });
 
     Users.hasMany(models.Contact, { foreignKey: "userId" });

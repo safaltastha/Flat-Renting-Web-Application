@@ -12,10 +12,10 @@ const fs = require("fs");
 router.post(
   "/",
   authenticateJWT,
-upload.fields([
-  { name: "propertyImage", maxCount: 10 }, //vehicleImage
-  { name: "propertyVideo", maxCount: 5 },
-]),
+  upload.fields([
+    { name: "propertyImage", maxCount: 10 }, //vehicleImage
+    { name: "propertyVideo", maxCount: 5 },
+  ]),
 
   async (req, res) => {
     console.log(req.files, "Files uploaded");
@@ -39,9 +39,8 @@ upload.fields([
       StreetName,
     } = req.body; // Ensure entityType is included in the request body
 
- 
-
-    if (!entityType || entityType !== "property") { //vehicle
+    if (!entityType || entityType !== "property") {
+      //vehicle
       return res.status(400).json({
         message: "Invalid or missing entity type. Expected 'property'.",
       });
@@ -244,6 +243,16 @@ router.put(
 
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
+      }
+
+      if (req.body.features && typeof req.body.features === "string") {
+        try {
+          req.body.features = JSON.parse(req.body.features);
+        } catch (error) {
+          return res
+            .status(400)
+            .json({ message: "Invalid features format", error });
+        }
       }
 
       // Update the property with the provided fields
