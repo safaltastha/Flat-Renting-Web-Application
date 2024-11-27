@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import PropertyCard from "../components/Property/PropertyCard";
 import { useLocation } from "react-router-dom";
 
-
 const PropertyListing = () => {
   const location = useLocation();
 
   const properties = location.state?.properties || [];
-  console.log(properties, 'image')
+  console.log(properties, "image");
 
   return (
     <div>
@@ -18,7 +17,7 @@ const PropertyListing = () => {
             <PropertyCard key={property.id} property={property} />
           ))
         ) : (
-          <p>No properties found.</p>
+          <p>This is listing ,No properties found.</p>
         )}
       </div>
     </div>

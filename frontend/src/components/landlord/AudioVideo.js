@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from "react";
 
-const AudioVideo = ({ onFilesChange }) => {
+const AudioVideo = ({ onFilesChange, onValidationError }) => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [videoPreviews, setVideoPreviews] = useState([]);
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const removeImage = (index) => {
     setImagePreviews((prevPreviews) =>
@@ -40,6 +41,11 @@ const AudioVideo = ({ onFilesChange }) => {
     const videoURLs = videoFiles.map((file) => URL.createObjectURL(file));
     setVideos((prevVideos) => [...prevVideos, ...videoFiles]);
     setVideoPreviews((prevPreviews) => [...prevPreviews, ...videoURLs]);
+
+    // Clear error message if images are added
+    if (images.length + imageFiles.length >= 3) {
+      setErrorMessage("");
+    }
   };
 
   useEffect(() => {
@@ -49,6 +55,17 @@ const AudioVideo = ({ onFilesChange }) => {
       videoPreviews.forEach((preview) => URL.revokeObjectURL(preview));
     };
   }, [imagePreviews, videoPreviews]);
+
+  const validateBeforeSubmit = () => {
+    if (images.length < 3) {
+      setErrorMessage("You must upload at least 3 images.");
+      if (onValidationError) {
+        onValidationError("You must upload at least 3 images.");
+      }
+      return false;
+    }
+    return true;
+  };
 
   return (
     <div>
@@ -85,6 +102,9 @@ const AudioVideo = ({ onFilesChange }) => {
               </div>
             ))}
           </div>
+          {errorMessage && (
+            <p className="text-red-600 mt-2 text-sm">{errorMessage}</p>
+          )}
         </div>
 
         {/* Video Upload Section */}

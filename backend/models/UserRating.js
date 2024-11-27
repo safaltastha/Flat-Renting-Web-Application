@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Users", // Refers to the User model (make sure 'Users' matches the actual table name)
+          model: "Users", 
           key: "id",
         },
         onDelete: "CASCADE",

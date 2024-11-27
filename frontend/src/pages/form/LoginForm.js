@@ -4,10 +4,13 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
 import Cookies from "js-cookie"; // Import js-cookie
+import { useUser } from "../../context/UserContext";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 
 function Login() {
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
+  const { setAuth, setUser } = useUser()
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -26,7 +29,7 @@ function Login() {
     // console.log("Submitting form with values:", values);
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/login",
+        "http://localhost:3002/auth/login",
         values,
         {
           withCredentials: true,
@@ -34,6 +37,21 @@ function Login() {
       );
 
       if (response.data) {
+        const token = response.data.token
+        const decodedToken = jwtDecode(token);
+        setAuth({
+          accessToken: token
+        })
+        setUser({
+          id: decodedToken.id,
+          role: decodedToken.role,
+          email: decodedToken.email,
+          name: decodedToken.name,
+          phoneNumber: decodedToken.phoneNumber
+        })
+        console.log(token,  'login token' )
+        console.log(decodedToken,  'decoded token' )
+
         if (rememberMe) {
           // Cookies.set("token", response.data.token, {
           //   expires: 1 / 24,

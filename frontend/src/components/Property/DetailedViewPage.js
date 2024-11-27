@@ -5,6 +5,8 @@ import { ImLocation2, ImPhone, ImMail } from "react-icons/im";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import Ratings from "../Ratings";
+import { useUser } from "../../context/UserContext";
 
 const DetailedViewPage = () => {
   const navigate = useNavigate();
@@ -13,18 +15,23 @@ const DetailedViewPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAllImages, setShowAllImages] = useState(false);
+  const {auth} = useUser()
 
   useEffect(() => {
     const fetchProperty = async () => {
       try {
         const token = Cookies.get("token");
         const response = await axios.get(
-          `http://localhost:3001/properties/${id}`,
-          { withCredentials: true }
+          `http://localhost:3002/properties/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${auth.accessToken}`,  // Add token to the Authorization header
+            },
+            withCredentials: true,  // Send cookies with the request (if needed for session)
+          }
         );
-
+console.log(response.data , 'asdfasdf80asd')
         setProperty(response.data);
-        
       } catch (err) {
         setError(err);
       } finally {
@@ -41,7 +48,10 @@ const DetailedViewPage = () => {
   return (
     <div className="container max-w-[1600px] px-36 mt-8">
       <p className="text-3xl font-semibold text-[#9747FF] ">
-        {property.category} for rent in {property.locationCity}
+        {property.category.charAt(0).toUpperCase() + property.category.slice(1)}{" "}
+        for rent in{" "}
+        {property.locationCity.charAt(0).toUpperCase() +
+          property.locationCity.slice(1)}
       </p>
 
       {property ? (
@@ -53,7 +63,7 @@ const DetailedViewPage = () => {
               <img
                 src={property.media[0].file_path}
                 alt="Large Property Image"
-                className="w-full h-[600px] object-cover rounded-md shadow-lg"
+                className="w-full h-[600px] object-contain rounded-md shadow-lg"
               />
             )}
 
@@ -75,27 +85,52 @@ const DetailedViewPage = () => {
               </p>
 
               <div className="space-y-3 text-gray-700">
-                <p className="text-lg"><strong>Bedrooms:</strong> {property.numOfBedrooms}</p>
-                <p className="text-lg"><strong>Bathrooms:</strong> {property.numOfBathrooms}</p>
-                <p className="text-lg"><strong>Living Rooms:</strong> {property.numOfLivingrooms || "No Living room"}</p>
-                <p className="text-lg"><strong>Kitchen:</strong> {property.numOfKitchens}</p>
-                <p className="text-lg"><strong>Floor:</strong> {property.floor}</p>
-                <p className="text-lg"><strong>Monthly Rent:</strong> NRs. {property.monthlyRent}</p>
-                <p className="text-lg"><strong>Advanced Rent:</strong> NRs. {property.advancedRent || "No advanced rent needed"}</p>
+                <p className="text-lg">
+                  <strong>Bedrooms:</strong> {property.numOfBedrooms}
+                </p>
+                <p className="text-lg">
+                  <strong>Bathrooms:</strong> {property.numOfBathrooms}
+                </p>
+                <p className="text-lg">
+                  <strong>Living Rooms:</strong>{" "}
+                  {property.numOfLivingrooms || "No Living room"}
+                </p>
+                <p className="text-lg">
+                  <strong>Kitchen:</strong> {property.numOfKitchens}
+                </p>
+                <p className="text-lg">
+                  <strong>Floor:</strong> {property.floor}
+                </p>
+                <p className="text-lg">
+                  <strong>Monthly Rent:</strong> NRs. {property.monthlyRent}
+                </p>
+                <p className="text-lg">
+                  <strong>Advanced Rent:</strong> NRs.{" "}
+                  {property.advancedRent || "No advanced rent needed"}
+                </p>
                 <p className="text-lg">
                   <strong>Facilities:</strong>{" "}
                   {Object.entries(property.features)
                     .filter(([key, value]) => value)
                     .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1))
-                    .join(', ') || 'None'}
+                    .join(", ") || "None"}
                 </p>
-                <p className="text-lg"><strong>House Rules:</strong> {property.houseRule || "No house rule"}</p>
+                <p className="text-lg">
+                  <strong>House Rules:</strong>{" "}
+                  {property.houseRule || "No house rule"}
+                </p>
               </div>
 
               <div className="flex justify-center">
                 <button
                   className="bg-[#9747FF] hover:bg-[#7735CC] transition-colors duration-300 px-20 py-3 rounded-md text-white text-lg font-semibold mt-6 shadow-lg"
-                  onClick={() => navigate("/booknow")}
+                  onClick={() => {
+                    localStorage.setItem(
+                      "selectedProperty",
+                      JSON.stringify(property)
+                    );
+                    navigate("/bookproperty");
+                  }}
                 >
                   Book Now
                 </button>
@@ -124,7 +159,7 @@ const DetailedViewPage = () => {
                   key={index}
                   src={image.file_path}
                   alt={`Small Image ${index + 1}`}
-                  className="w-full h-[300px] object-cover rounded-md shadow-lg"
+                  className="w-full h-[300px] object-co rounded-md shadow-lg"
                 />
               ))}
 
@@ -151,7 +186,10 @@ const DetailedViewPage = () => {
             </div>
 
             {/* Contact Info */}
-            <div className="space-y-3 bg-white p-6 rounded-lg shadow-2xl mt-4 sticky top-0 z-10" style={{ marginTop: "16px" }}>
+            <div
+              className="space-y-3 bg-white p-6 rounded-lg shadow-2xl mt-4 sticky top-0 z-10"
+              style={{ marginTop: "16px" }}
+            >
               <p className="text-2xl font-semibold">Contact Information</p>
               <div className="flex items-center">
                 <FaUserCircle className="mr-3 text-xl" />
@@ -180,6 +218,10 @@ const DetailedViewPage = () => {
       ) : (
         <div>No property found</div>
       )}
+
+      <div>
+        <Ratings />
+      </div>
     </div>
   );
 };

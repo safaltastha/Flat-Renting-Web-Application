@@ -42,6 +42,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      availabilityTime: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -69,11 +74,6 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "CASCADE",
     });
 
-    Vehicle.hasMany(models.Booking, {
-      foreignKey: "vehicleId",
-      as: "bookings",
-      onDelete: "CASCADE",
-    });
     Vehicle.hasMany(models.BookTest, {
       foreignKey: "vehicleId",
       as: "booktests",
@@ -88,9 +88,17 @@ module.exports = (sequelize, DataTypes) => {
       scope: { rating_type: "vehicle" },
     });
 
+    Vehicle.hasMany(models.VehicleRating, {
+      foreignKey: "vehicle_id",
+      as: "ratings",
+    });
+    Vehicle.hasMany(models.VehicleBooking, {
+      foreignKey: 'vehicleId',
+      as: 'vehicleBookings',
+    });
     
-Vehicle.hasMany(models.VehicleRating, { foreignKey: 'vehicle_id', as: 'ratings' });
 
+   
   };
 
   return Vehicle;

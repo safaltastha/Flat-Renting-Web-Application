@@ -1,31 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RiCloseLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const VehicleTimeForm = ({ onChange, formData }) => {
   return (
     <div className="mt-5">
-      <label htmlFor="vehicle-type" className="block text-gray-600">
-        Choose the type of vehicle:<span className="text-red-500">*</span>
-      </label>
-      <select
-        id="vehicle-type"
-        name="vehicleType"
-        value={formData.vehicleType}
-        onChange={onChange}
-        className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
-      >
-        <option value="truck">Truck</option>
-        <option value="van">Van</option>
-      </select>
-
+      {/* Vehicle time form components */}
       <label htmlFor="pickup-location" className="block text-gray-600">
         Pick-up Location:<span className="text-red-500">*</span>
       </label>
       <input
         type="text"
         id="pickup-location"
-        name="pickupLocation"
-        value={formData.pickupLocation}
+        name="pickup_location"
+        value={formData.pickup_location}
         placeholder="Enter pick-up location"
         onChange={onChange}
         className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
@@ -36,14 +25,15 @@ const VehicleTimeForm = ({ onChange, formData }) => {
       </label>
       <input
         type="text"
-        id="dropoff-location"
-        name="dropoffLocation"
-        value={formData.dropoffLocation}
+        id="dropoff_location"
+        name="dropoff_location"
+        value={formData.dropoff_location}
         placeholder="Enter drop-off location"
         onChange={onChange}
         className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
       />
 
+      {/* Date and time input */}
       <label htmlFor="date" className="block text-gray-600">
         Please choose date and time:<span className="text-red-500">*</span>
       </label>
@@ -67,21 +57,23 @@ const VehicleTimeForm = ({ onChange, formData }) => {
         className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
       />
 
-      <label htmlFor="duration" className="block text-gray-600">
+      <label htmlFor="vehicleDuration" className="block text-gray-600">
         Duration (in hours):<span className="text-red-500">*</span>
       </label>
       <input
         type="number"
-        id="duration"
-        name="duration"
+        id="vehicle_duration"
+        name="vehicle_duration"
         min="1"
-        value={formData.duration}
+        value={formData.vehicle_duration}
         placeholder="Enter duration in hours"
         onChange={onChange}
         className="border w-full mt-2 mb-4 px-3 py-2 rounded-md bg-white"
       />
 
-      <label className="block text-gray-600">Do you need personnel for shifting?</label>
+      <label className="block text-gray-600">
+        Do you need personnel for shifting?
+      </label>
       <div className="flex space-x-4 mt-2 mb-4">
         <div className="flex items-center">
           <input
@@ -93,7 +85,9 @@ const VehicleTimeForm = ({ onChange, formData }) => {
             onChange={onChange}
             className="mr-2"
           />
-          <label htmlFor="personnel-yes" className="text-gray-700">Yes</label>
+          <label htmlFor="personnel-yes" className="text-gray-700">
+            Yes
+          </label>
         </div>
         <div className="flex items-center">
           <input
@@ -105,34 +99,37 @@ const VehicleTimeForm = ({ onChange, formData }) => {
             onChange={onChange}
             className="mr-2"
           />
-          <label htmlFor="personnel-no" className="text-gray-700">No</label>
+          <label htmlFor="personnelno" className="text-gray-700">
+            No
+          </label>
         </div>
       </div>
 
       {formData.personnel === "yes" && (
         <>
-          <label htmlFor="num-personnel" className="block text-gray-600">
+          <label htmlFor="num_personnel" className="block text-gray-600">
             Number of Personnel:<span className="text-red-500">*</span>
           </label>
           <input
             type="number"
-            id="num-personnel"
-            name="numPersonnel"
-            value={formData.numPersonnel}
+            id="num_personnel"
+            name="num_personnel"
+            value={formData.num_personnel}
             min="1"
             placeholder="Enter number of personnel"
             onChange={onChange}
             className="w-full mt-2 mb-4 p-2 border rounded bg-white"
           />
-          
+
           <label htmlFor="personnel-duration" className="block text-gray-600">
-            For how long will you need personnel (in hours)?<span className="text-red-500">*</span>
+            For how long will you need personnel (in hours)?
+            <span className="text-red-500">*</span>
           </label>
           <input
             type="number"
-            id="personnel-duration"
-            name="personnelDuration"
-            value={formData.personnelDuration}
+            id="personnel_duration"
+            name="personnel_duration"
+            value={formData.personnel_duration}
             min="1"
             placeholder="Enter duration for personnel in hours"
             onChange={onChange}
@@ -145,22 +142,44 @@ const VehicleTimeForm = ({ onChange, formData }) => {
 };
 
 const BookNowWithVehicleForm = () => {
+  const navigate = useNavigate();
+  const [selectedProperty, setSelectedProperty] = useState(null);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    booking: "",
-    vehicleType: "truck",
-    pickupLocation: "",
-    dropoffLocation: "",
+    pickup_location: "",
+    dropoff_location: "",
     date: "",
     time: "",
-    duration: "",
-    personnel: "",
-    numPersonnel: "",
-    personnelDuration: "", 
+    vehicle_duration: "",
+    requires_personnel: "",
+    num_Personnel: "",
+    personnel_duration: "",
+    booking: "",
+    vehicleChosen: false,
+    vehicleDetails: null,
+    selectedProperty: null,
   });
+
+  useEffect(() => {
+    const vehicleData = JSON.parse(localStorage.getItem("selectedVehicle"));
+
+    if (vehicleData) {
+      setFormData((prevData) => ({
+        ...prevData,
+        booking: "yes",
+        vehicleChosen: true,
+        vehicleDetails: vehicleData,
+      }));
+    }
+
+    const property = JSON.parse(localStorage.getItem("selectedProperty"));
+
+    if (property) {
+      setFormData((prevData) => ({
+        ...prevData,
+        selectedProperty: property,
+      }));
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -171,7 +190,58 @@ const BookNowWithVehicleForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    console.log("hello", formData);
+  };
+
+  const handleVehicleBooking = () => {
+    navigate("/vehicles");
+  };
+
+  const handleCancelBooking = () => {
+    localStorage.removeItem("selectedVehicle");
+    navigate("/");
+  };
+
+  const handleConfirmBooking = async () => {
+    const payload = {
+      vehicleBooking: {
+        pickup_location: formData.pickup_location,
+        dropoff_location: formData.dropoff_location,
+        date: formData.date,
+        time: formData.time,
+        vehicle_duration: formData.vehicle_duration,
+      },
+    };
+
+    if (formData.booking === "yes" && formData.vehicleChosen) {
+      payload.vehicleBooking.vehicleDetails = formData.vehicleDetails;
+    }
+
+    if (formData.personnel === "yes") {
+      payload.personnel = {
+        num_Personnel: formData.num_Personnel,
+        personnel_duration: formData.personnel_duration,
+      };
+    }
+
+    // Add the selected property information to the payload
+    if (formData.selectedProperty) {
+      payload.property = formData.selectedProperty; // Include selected property data
+    }
+
+    // Log the payload data before sending it
+    console.log("Payload being sent to the backend:", payload);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3002/booking",
+        payload
+      );
+      console.log("Booking Successful:", response.data);
+      navigate("/");
+    } catch (error) {
+      console.error("Error booking:", error);
+    }
   };
 
   return (
@@ -181,59 +251,19 @@ const BookNowWithVehicleForm = () => {
         className="w-full max-w-md p-6 border border-gray-300 bg-white rounded-md shadow-lg"
       >
         <div className="relative flex items-center justify-center mb-6">
-          <h1 className="text-xl font-semibold text-purple-600">Please fill this form</h1>
-          <RiCloseLine className="absolute right-0 text-2xl cursor-pointer text-gray-400 hover:text-gray-600" />
-        </div>
-
-        <div className="mt-3">
-          <label htmlFor="first-name" className="block text-gray-600">
-            First Name<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="first-name"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="border w-full mt-1 px-3 py-2 rounded-md bg-gray-50"
-            placeholder="John"
-          />
-        </div>
-
-        <div className="mt-5">
-          <label htmlFor="last-name" className="block text-gray-600">
-            Last Name<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="last-name"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="border w-full mt-1 px-3 py-2 rounded-md bg-gray-50"
-            placeholder="Doe"
-          />
-        </div>
-
-        
-
-        <div className="mt-5">
-          <label htmlFor="phone-number" className="block text-gray-600">
-            Phone Number<span className="text-red-500">*</span>
-          </label>
-          <input
-            type="tel"
-            id="phone-number"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            className="border w-full mt-1 px-3 py-2 rounded-md bg-gray-50"
-            placeholder="98********"
+          <h1 className="text-xl font-semibold text-purple-600">
+            Please fill this form
+          </h1>
+          <RiCloseLine
+            className="absolute right-0 text-2xl cursor-pointer text-gray-400 hover:text-gray-600"
+            onClick={handleCancelBooking}
           />
         </div>
 
         <div className="mt-4">
-          <label className="block text-gray-600">Will you be booking a vehicle?</label>
+          <label className="block text-gray-600">
+            Will you be booking a vehicle?
+          </label>
           <div className="flex space-x-4 mt-2 mb-4">
             <div className="flex items-center">
               <input
@@ -245,7 +275,9 @@ const BookNowWithVehicleForm = () => {
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="vehicle-yes" className="text-gray-700">Yes</label>
+              <label htmlFor="vehicle-yes" className="text-gray-700">
+                Yes
+              </label>
             </div>
             <div className="flex items-center">
               <input
@@ -257,21 +289,68 @@ const BookNowWithVehicleForm = () => {
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="vehicle-no" className="text-gray-700">No</label>
+              <label htmlFor="vehicle-no" className="text-gray-700">
+                No
+              </label>
             </div>
           </div>
         </div>
 
-        {formData.booking === "yes" && (
-          <VehicleTimeForm onChange={handleChange} formData={formData} />
+        {formData.vehicleChosen && formData.vehicleDetails && (
+          <div className="mb-4 p-4 bg-purple-100 border-2 border-purple-600 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold text-purple-800">
+              Your Chosen Vehicle
+            </h3>
+            <p className="text-gray-700">
+              Vehicle Type:{" "}
+              <span className="text-lg text-purple-600">
+                {formData.vehicleDetails.type}
+              </span>
+            </p>
+            <p className="text-gray-700">
+              Pricing:{" "}
+              <span className="text-lg text-purple-600">
+                Nrs.{formData.vehicleDetails.pricingPerHour}/hour
+              </span>
+            </p>
+          </div>
         )}
 
-        <button
-          type="submit"
-          className="w-full mt-6 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700"
-        >
-          Submit
-        </button>
+        {formData.booking === "yes" && !formData.vehicleChosen && (
+          <div>
+            <button
+              type="button"
+              onClick={handleVehicleBooking}
+              className="w-full mt-6 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700"
+            >
+              Choose vehicle
+            </button>
+            <VehicleTimeForm onChange={handleChange} formData={formData} />
+          </div>
+        )}
+
+        {formData.vehicleChosen && (
+          <div className="mt-4">
+            <VehicleTimeForm onChange={handleChange} formData={formData} />
+          </div>
+        )}
+
+        <div className="flex space-x-2">
+          <button
+            type="button"
+            onClick={handleCancelBooking}
+            className="w-full mt-6 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700"
+          >
+            Cancel Booking
+          </button>
+          <button
+            type="button"
+            onClick={handleConfirmBooking}
+            className="w-full mt-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700"
+          >
+            Confirm Booking
+          </button>
+        </div>
       </form>
     </div>
   );

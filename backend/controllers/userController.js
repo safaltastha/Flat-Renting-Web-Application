@@ -2,6 +2,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Users, UserRating } = require("../models");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 // Registration handler
@@ -19,7 +21,13 @@ exports.register = async (req, res) => {
     });
 
     const token = jwt.sign(
-      { id: newUser.id, role: newUser.role },
+      {
+        id: newUser.id,
+        name: newUser.name,
+        role: newUser.role,
+        email: newUser.email,
+        phoneNumber: newUser.phoneNumber,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -51,7 +59,13 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -166,7 +180,83 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// Login handler
+exports.requestPasswordReset = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Find user by email
+    const user = await Users.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate reset token (using crypto to generate a random token)
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpiration = Date.now() + 3600000; // Token valid for 1 hour
+
+    // Save the token and expiration date to the user
+    user.resetToken = resetToken;
+    user.resetTokenExpiration = resetTokenExpiration;
+    await user.save();
+
+    // Send reset email
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // Or your email service provider
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset Request",
+      text: `You requested a password reset. Click the link to reset your password: ${resetURL}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: "Error sending email", error });
+      }
+      res.json({ message: "Password reset email sent" });
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error processing password reset", error });
+  }
+};
+
+// Reset password using token
+exports.resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    // Find user by reset token
+    const user = await Users.findOne({
+      where: {
+        resetToken: token,
+        resetTokenExpiration: { [Sequelize.Op.gt]: Date.now() },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Hash the new password and update it
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.resetToken = null; // Clear the reset token
+    user.resetTokenExpiration = null; // Clear the expiration time
+    await user.save();
+
+    res.json({ message: "Password reset successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Error resetting password", error });
+  }
+};
 
 // Logout handler
 exports.logout = (req, res) => {
