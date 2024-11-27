@@ -34,7 +34,7 @@ const ContactUs = () => {
     };
     try {
       const response = await axios.post(
-        "http://localhost:3001/contact",
+        "http://localhost:3002/contact",
         formData,
         {
           headers: {

@@ -28,7 +28,6 @@ const Test = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data.message);
       } else {
         const errorData = await response.json();
         console.error("Error:", errorData.error);

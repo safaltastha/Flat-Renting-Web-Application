@@ -13,6 +13,7 @@ const VechileDashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-purple-100 p-4 md:p-8">
+       <h1>I am vehicle</h1>
       {/* Left Sidebar with Profile Card */}
       <ProfileCard/>
 

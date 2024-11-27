@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ImLocation2 } from "react-icons/im";
+import { useUser } from "../../context/UserContext";
 
 const PropertyCard = ({ property, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
+  const { user } = useUser();
 
-  
-console.log(property, '35lh')
+
+  console.log(user,  'user for properyt' )
+
   // Extract the first image path from the media array
-  const propertyImage =
-  property.media?.find((mediaItem) => mediaItem.file_type === "image")?.file_path.replace(/\\/g, '/');
-
+  const propertyImage = property.media
+    ?.find((mediaItem) => mediaItem.file_type === "image")
+    ?.file_path.replace(/\\/g, "/");
 
   return (
     <div
@@ -21,7 +24,7 @@ console.log(property, '35lh')
       }`}
       onClick={onClick}
     >
-      <div className="relative">
+      <div className="relative bg-white">
         {/* Image */}
         <img
           src={propertyImage}
@@ -33,14 +36,18 @@ console.log(property, '35lh')
       {/* Property Details */}
       <div className="p-4">
         <h2 className="text-2xl font-semibold mb-3 text-[#3B0C96]">
-          {property.category} for Rent
+          {property.category.charAt(0).toUpperCase() +
+            property.category.slice(1)}{" "}
+          for rent
         </h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <div className="flex items-center mb-2 space-x-1">
               <ImLocation2 className="text-gray-600" size={18} />
               <p className="text-gray-700 font-medium text-sm">
-                {property.locationCity}
+                {property.locationCity.charAt(0).toUpperCase() +
+                  property.locationCity.slice(1)}
               </p>
             </div>
             <p className="text-sm font-medium text-gray-700">
@@ -59,12 +66,14 @@ console.log(property, '35lh')
           </div>
         </div>
         <div className="mt-4">
-          <Link
-            to={`/properties/${property.id}`}
-            className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
-          >
-            View Details
-          </Link>
+          {user.role === "tenant" && (
+            <Link
+              to={`/properties/${property.id}`}
+              className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
+            >
+              View Details
+            </Link>
+          )}
         </div>
 
         <div

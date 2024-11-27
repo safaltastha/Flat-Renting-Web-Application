@@ -1,15 +1,44 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [userRole, setUserRole] = useState(null);
+  const initialUser = {
+    id: "",
+    role: "",
+    name: "",
+    email: "",
+    phoneNumber: "",
+  };
+
+  const initialAuth = {
+    accessToken: "",
+  };
+
+  const [user, setUser] = useState(initialUser);
+  const [auth, setAuth] = useState(initialAuth);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const logout = () => {
+    setAuth(initialAuth);
+    setUser(initialUser);
+  };
+
+  const contextData = {
+    user,
+    setUser,
+    auth,
+    setAuth,
+    isLoading,
+    setIsLoading,
+    logout,
+  };
 
   return (
-    <UserContext.Provider value={{ userRole, setUserRole }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={contextData}>{children}</UserContext.Provider>
   );
 };
 
-export const useUserContext = () => useContext(UserContext);
+export const useUser = () => useContext(UserContext);

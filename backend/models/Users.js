@@ -75,23 +75,10 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "CASCADE",
     });
 
-    Users.hasMany(models.Booking, {
-      foreignKey: "userId",
-      as: "tenantBookings", // Alias for bookings made by this tenant
-      onDelete: "CASCADE",
-    });
-
     // A user can have multiple bookings as a landlord
     Users.hasMany(models.Property, {
       foreignKey: "userId", // Foreign key in Property model
       as: "landlordProperties", // Alias for properties posted by this landlord
-      onDelete: "CASCADE",
-    });
-
-    // Define the association with Booking (if a landlord wants to see their bookings)
-    Users.hasMany(models.Booking, {
-      foreignKey: "propertyId", // If a landlord is associated with bookings
-      as: "landlordBookings", // Alias for bookings of properties they posted
       onDelete: "CASCADE",
     });
 
@@ -139,7 +126,14 @@ module.exports = (sequelize, DataTypes) => {
       as: "ratingsReceived", // Alias to represent ratings received by the user
     });
 
-    Users.hasMany(models.Contact, { foreignKey: "userId" });
+    Users.hasMany(models.Contact,
+       { foreignKey: "userId" });
+
+     // A user can have many bookings
+     Users.hasMany(models.Bookings, {
+      foreignKey: 'userId',
+      onDelete: 'CASCADE',
+    });
   };
 
   return Users;

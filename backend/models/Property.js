@@ -78,6 +78,18 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: "available", // Set default status to 'available'
         allowNull: false,
       },
+      availableStart: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      availableEnd: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      availabilityTime: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
 
       userId: {
         type: DataTypes.INTEGER,
@@ -109,11 +121,6 @@ module.exports = (sequelize, DataTypes) => {
       as: "rooms",
       onDelete: "CASCADE",
     });
-    Property.hasMany(models.Booking, {
-      foreignKey: "propertyId",
-      as: "bookings",
-      onDelete: "CASCADE",
-    });
 
     Property.hasMany(models.Rating, {
       foreignKey: "target_id",
@@ -126,6 +133,12 @@ module.exports = (sequelize, DataTypes) => {
     Property.hasMany(models.PropertyRating, {
       foreignKey: "property_id",
       as: "ratings",
+    });
+
+    // A property can have many bookings
+    Property.hasMany(models.Bookings, {
+      foreignKey: "propertyId",
+      onDelete: "SET NULL",
     });
   };
 

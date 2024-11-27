@@ -33,41 +33,42 @@ module.exports = (sequelize, DataTypes) => {
 
   Rating.associate = (models) => {
     // Rating is associated with the User model for both rater and target
-    Rating.belongsTo(models.Users, { foreignKey: 'rater_id', as: 'rater' });
+    Rating.belongsTo(models.Users, { foreignKey: "rater_id", as: "rater" });
 
     // Rating is associated with the User model for the rated user (target)
-    Rating.belongsTo(models.Users, { foreignKey: 'target_id', as: 'ratedUser' });
+    Rating.belongsTo(models.Users, {
+      foreignKey: "target_id",
+      as: "ratedUser",
+    });
 
     // Conditional associations based on rating_type
     Rating.belongsTo(models.Property, {
-      foreignKey: 'target_id',
-      as: 'property',
+      foreignKey: "target_id",
+      as: "property",
       constraints: false, // Disable constraints because we have multiple target models
       scope: {
-        rating_type: 'property',
+        rating_type: "property",
       },
     });
 
     Rating.belongsTo(models.Vehicle, {
-      foreignKey: 'target_id',
-      as: 'vehicle',
+      foreignKey: "target_id",
+      as: "vehicle",
       constraints: false,
       scope: {
-        rating_type: 'vehicle',
+        rating_type: "vehicle",
       },
     });
 
     Rating.belongsTo(models.Test, {
-      foreignKey: 'target_id',
-      as: 'test',
+      foreignKey: "target_id",
+      as: "test",
       constraints: false,
       scope: {
-        rating_type: 'test',
+        rating_type: "test",
       },
     });
-};
-
-
+  };
 
   return Rating;
 };

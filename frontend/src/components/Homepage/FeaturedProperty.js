@@ -41,13 +41,12 @@ const FeaturedProperties = () => {
     const loadFeaturedProperties = async () => {
       try {
         const token = Cookies.get("token");
-        const response = await axios.get("http://localhost:3001/properties", {
+        const response = await axios.get("http://localhost:3002/properties", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
           withCredentials: true,
         });
-        console.log(response.data,  'res' );
         setProperties(response.data);
       } catch (error) {
         setError(error);
@@ -61,9 +60,9 @@ const FeaturedProperties = () => {
 
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: false, // Enable infinite scrolling only if there are more than 1 property
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: Math.min(properties.length, 3), // Show only as many slides as there are properties (max 3)
     slidesToScroll: 1,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
@@ -71,13 +70,13 @@ const FeaturedProperties = () => {
       {
         breakpoint: 1024, // Tablet and medium screens
         settings: {
-          slidesToShow: 2,
+          slidesToShow: Math.min(properties.length, 2), // Adjust for smaller screens
         },
       },
       {
         breakpoint: 640, // Mobile screens
         settings: {
-          slidesToShow: 1,
+          slidesToShow: 1, // Show only one slide on mobile
         },
       },
     ],
@@ -87,25 +86,36 @@ const FeaturedProperties = () => {
   if (error)
     return <div>Error loading featured properties: {error.message}</div>;
 
-   console.log(properties,  'asdf' )
 
   return (
     <div className="container max-w-[1600px] py-8 relative">
       <h2 className="text-2xl font-bold mb-6 text-center">
         Featured Properties
       </h2>
-      <Slider {...settings}>
-        {properties.length > 0 ? (
-          properties.map((property) => (
-            <div key={property.id} className="px-8">
-              {/* Use PropertyCard component */}
-              <PropertyCard property={property} />
-            </div>
-          ))
-        ) : (
-          <div>No featured properties available</div>
-        )}
-      </Slider>
+      {properties.length > 0 ? (
+        <div
+          className={`${properties.length === 1 ? "flex justify-center" : ""}`} // Center slider when there's only one property
+        >
+          <Slider
+            {...{
+              ...settings,
+              centerMode: properties.length === 1, // Enable center mode for single property
+              centerPadding: properties.length === 1 ? "0px" : "50px", // Remove padding for single property
+            }}
+          >
+            {properties.map((property) => (
+              <div
+                key={property.id}
+                className={`px-8 ${properties.length === 1 ? "mx-auto" : ""}`} // Center single slide
+              >
+                <PropertyCard property={property} />
+              </div>
+            ))}
+          </Slider>
+        </div>
+      ) : (
+        <div className="text-center">No featured properties available</div>
+      )}
     </div>
   );
 };

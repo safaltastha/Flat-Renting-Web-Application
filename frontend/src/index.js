@@ -3,11 +3,20 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { VehicleProvider } from "./context/VehicleContext";
+import { UserProvider } from "./context/UserContext";
+import { BrowserRouter } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+    <UserProvider>
+      <VehicleProvider>
+        <App />
+      </VehicleProvider>
+    </UserProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );
 

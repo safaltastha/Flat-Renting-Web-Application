@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import { TextField } from "@mui/material";
-
-import { Formik, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { RiArrowDownSLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import axios from "axios";
+
 import AudioVideo from "../../components/landlord/AudioVideo";
-import Availability from "../../components/Availability";
+import Cookies from "js-cookie";
+import { RiArrowDownSLine } from "react-icons/ri";
 
 const VehicleForm = () => {
+  const [images, setImages] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [formData, setFormData] = useState({
     type: "",
     capacity: "",
@@ -18,62 +16,88 @@ const VehicleForm = () => {
     pricingPerHour: "",
     vehicleLocation: "",
     vehicleFeatures: "",
-    availableStart: null,
-    availableEnd: null,
+    availableStart: "",
+    availableEnd: "",
+    availabilityTime: "",
   });
-
-  const validationSchema = Yup.object({
-    type: Yup.string().required("Vehicle Type is required"),
-    capacity: Yup.number()
-      .typeError("Capacity must be a number"),
-    registrationNumber: Yup.string(),
-    availableStart: Yup.date().required("Available Start time is required"),
-    availableEnd: Yup.date().required("Available End time is required"),
-    pricingPerHour: Yup.number()
-      .typeError("Pricing must be a valid number")
-      //.required("Pricing is required")
-      .positive("Pricing must be a positive number")
-      .min(1, "Pricing must be greater than or equal to 1"),
-    vehicleFeatures: Yup.string()
-      .nullable()
-      .max(500, "Features description is too long")
-      .optional(),
-    vehicleLocation: Yup.string(),
-  });
-
   const navigate = useNavigate();
 
-  const handleCancel = () => {
-    navigate("/");
+  const capitalizeWords = (value) => {
+    return value.replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
-  const handleSubmit = async () => {
-    const vehicleData = new FormData();
+  const handleFilesChange = (imageFiles, videoFiles) => {
+    setImages(imageFiles);
+    setVideos(videoFiles);
+  };
 
-    // Append formData to FormData
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null && value !== undefined) {
-        vehicleData.append(key, value);
-      }
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const startDate = new Date(formData.availableStart);
+    const endDate = new Date(formData.availableEnd);
+
+    if (endDate < startDate) {
+      alert("Availability End date cannot be before Availability Start date.");
+      return;
+    }
+
+    if (images.length === 0) {
+      alert("Please upload at least one image .");
+      return;
+    }
+
+    const vehicleData = new FormData();
+    vehicleData.append("type", formData.type);
+    vehicleData.append("capacity", formData.capacity);
+    vehicleData.append("registrationNumber", formData.registrationNumber);
+    vehicleData.append("vehicleFeatures", formData.vehicleFeatures);
+    vehicleData.append("vehicleLocation", formData.vehicleLocation);
+    vehicleData.append("availableStart", formData.availableStart);
+    vehicleData.append("availableEnd", formData.availableEnd);
+    vehicleData.append("pricingPerHour", formData.pricingPerHour);
+    vehicleData.append("availabilityTime", formData.availabilityTime);
+    vehicleData.append("entityType", "vehicle");
+
+    // Append images and videos to FormData
+    images.forEach((image) => {
+      vehicleData.append("vehicleImage", image);
     });
-    console.log(formData, 'asdfasd')
+    videos.forEach((video) => {
+      vehicleData.append("vehicleVideo", video);
+    });
 
     const token = Cookies.get("token");
+    console.log("Token before submission:", token);
+
+    console.log("Vehicle Data contents:");
+    vehicleData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
+
     try {
       const response = await axios.post(
-        "http://localhost:3001/vehicle",
+        "http://localhost:3002/vehicle",
         vehicleData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+
             Authorization: `Bearer ${token}`,
           },
           withCredentials: true,
         }
       );
       if (response.status === 201) {
-        alert("Vehicle posted successfully!");
         navigate("/");
+        alert("Vehicle posted successfully!");
       }
     } catch (error) {
       console.error(
@@ -84,197 +108,192 @@ const VehicleForm = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleCancel = () => {
+    navigate("/");
   };
 
-  const handleDateChange = (field, value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    handleChange(name, value);
   };
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-custom-gray shadow-lg rounded-lg my-12">
-      <Formik
-        initialValues={formData}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ errors, touched, isSubmitting }) => (
-          <Form className="space-y-6">
-            {/* Vehicle Details Section */}
-            <h2 className="text-lg font-medium  ">Vehicle Details</h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Vehicle Type Field */}
-              <div className="flex flex-col">
-                <label className="block mb-2 font-medium text-[#9747FF]">
-                  Vehicle Type
-                  <span className="text-red-600 text-[20px] ml-1">*</span>
-                </label>
-                <div className="relative">
-                  <select
-                    name="type"
-                    required
-                    onChange={handleChange}
-                    value={formData.type}
-                    className="w-full px-3 py-2 bg-white border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500 appearance-none"
-                  >
-                    <option value="" disabled hidden></option>
-                    <option value="Truck">Truck</option>
-                    <option value="Car">Car</option>
-                    <option value="Jeep">Jeep</option>
-                  </select>
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                    <RiArrowDownSLine className="h-5 w-5 text-black" />
-                  </div>
+      <form className="space-y-6" method="post" onSubmit={handleSubmit}>
+        <div>
+          <h2 className="text-lg font-medium  ">Vehicle Details</h2>
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Vehicle Type
+                <span className="text-red-600 text-[20px] ml-1"> *</span>
+              </label>
+              <div className="relative">
+                <select
+                  name="type"
+                  value={formData.type}
+                  required
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500 appearance-none"
+                >
+                  <option value="" className=""></option>
+                  <option value="flat">Van</option>
+                  <option value="room">Truck</option>
+                  <option value="apartment">Jeep</option>
+                </select>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <RiArrowDownSLine className="h-5 w-5 text-black" />
                 </div>
               </div>
-
-              {/* Vehicle Capacity Field */}
-              <div className="flex flex-col">
-                <label className="block mb-2 font-medium text-[#9747FF]">
-                  Vehicle Capacity (in tons)
-                  <span className="text-red-600 ml-1 text-[20px]">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="capacity"
-                  value={formData.capacity}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-                  placeholder="Ex: 5"
-                />
-                <ErrorMessage
-                  name="capacity"
-                  component="div"
-                  className="text-red-600 text-sm mt-1"
-                />
-              </div>
-
-              {/* Vehicle Registration Number Field */}
-              <div className="flex flex-col">
-                <label className="block mb-2 font-medium text-[#9747FF]">
-                  Vehicle Registration Number
-                  <span className="text-red-600 ml-1 text-[20px]">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="registrationNumber"
-                  value={formData.registrationNumber}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-                  placeholder="Ex: ABC-1234"
-                />
-                <ErrorMessage
-                  name="registrationNumber"
-                  component="div"
-                  className="text-red-600 text-sm mt-1"
-                />
-              </div>
             </div>
 
-            <Availability
-              formData={formData}
-              handleDateChange={handleDateChange}
-              errors={errors}
-            />
-
-            <h2 className="text-lg font-medium  ">
-              Pricing, Features & Location
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2  gap-4">
-              {/* Pricing Per Hour */}
-              <div className="flex flex-col">
-                <label className="block mb-2 font-medium text-[#9747FF]">
-                  Pricing per Hour
-                  <span className="text-red-600 ml-1 text-[20px]">*</span>
-                </label>
-                <input
-                  type="number"
-                  name="pricingPerHour"
-                  value={formData.pricingPerHour}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-                  placeholder="Ex: 500"
-                />
-                <ErrorMessage
-                  name="pricingPerHour"
-                  component="div"
-                  className="text-red-600 text-sm mt-1"
-                />
-              </div>
-
-              {/* Vehicle Location */}
-              <div className="flex flex-col">
-                <label className="block mb-2 font-medium text-[#9747FF]">
-                  Vehicle Location
-                  <span className="text-red-600 ml-1 text-[20px]">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="vehicleLocation"
-                  value={formData.vehicleLocation}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-                  placeholder="Ex: Ranipauwa"
-                />
-                <ErrorMessage
-                  name="vehicleLocation"
-                  component="div"
-                  className="text-red-600 text-sm mt-1"
-                />
-              </div>
-            </div>
-
-            {/* Vehicle Features */}
-            <div className="flex flex-col">
+            <div className="flex-1">
               <label className="block mb-2 font-medium text-[#9747FF]">
-                Vehicle Features
+                Vehicle Capacity(in tons)
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
               </label>
-              <textarea
-                name="vehicleFeatures"
-                value={formData.vehicleFeatures}
-                onChange={handleChange}
-                className="w-full px-3 py-2 bg-white border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500 resize-none"
-                rows="3"
-                placeholder="Add vehicle features"
-              />
-              <ErrorMessage
-                name="vehicleFeatures"
-                component="div"
-                className="text-red-600 text-sm mt-1"
+              <input
+                type="number"
+                name="capacity"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
               />
             </div>
 
-            <AudioVideo />
-
-            {/* Submit and Cancel Buttons */}
-            <div className=" mt-6">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="ml-4 px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-500 disabled:bg-gray-300"
-              >
-                Submit
-              </button>
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Vehicle Registration Number
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="text"
+                name="registrationNumber"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+              />
             </div>
-          </Form>
-        )}
-      </Formik>
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-medium mt-9 ">
+            Pricing,Features & Location
+          </h2>
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Pricing Per Hour
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="number"
+                name="pricingPerHour"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Vehicle Location
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="text"
+                name="vehicleLocation"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="block mb-2 font-medium text-[#9747FF]">
+            Vehicle Features
+          </label>
+          <textarea
+            className="w-full px-3 py-2 bg-white border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500 resize-none"
+            rows="3"
+            name="vehicleFeatures"
+            onChange={handleInputChange}
+            placeholder="Add vehicle features"
+          ></textarea>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-medium mt-9  ">
+            Availability Start and Availability End
+          </h2>
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Availability Start
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="date"
+                name="availableStart"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+              ></input>
+            </div>
+
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Availability End
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="date"
+                name="availableEnd"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+              ></input>
+            </div>
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Your availability time{" "}
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="text"
+                name="availabilityTime"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+                placeholder="Ex: after 5pm, between 11am-5pm"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <AudioVideo onFilesChange={handleFilesChange} />
+        </div>
+
+        <div className="flex space-x-4 ">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-[#A06FFF] text-white rounded-md hover:bg-[#473965]"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

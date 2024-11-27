@@ -1,7 +1,9 @@
 import React from 'react'
 import { MdMailOutline } from "react-icons/md";
+import { useUser } from '../../context/UserContext';
 
 const ProfileCard = () => {
+  const {user} = useUser()
   return (
     <div>
               <div className="flex-grow flex items-center justify-center mb-4 md:mb-0">
@@ -14,10 +16,10 @@ const ProfileCard = () => {
           />
           {/* User Info */}
           <div className="flex flex-col items-start">
-            <h2 className="mt-5 text-xl md:text-2xl font-semibold">Shreya Thapa</h2>
+            <h2 className="mt-5 text-xl md:text-2xl font-semibold">{user.name}</h2>
             <p className="mt-2 md:mt-5 text-base flex items-center">
               <MdMailOutline className="mr-2" />
-              shreya123@gmail.com
+             {user.email}
             </p>
           </div>
 

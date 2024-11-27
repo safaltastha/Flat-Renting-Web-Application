@@ -14,10 +14,17 @@ const propertyRatingRouter = require("./routes/PropertyRating");
 const vehicleRatingRouter = require("./routes/VehicleRating");
 const userRatingRouter = require("./routes/UserRating");
 const contactRouter = require("./routes/Contact");
+const ChangePasswordRouter = require("./routes/ChangePassword");
 
+const bodyParser = require("body-parser");
+
+require("dotenv").config();
+const JWT_SECRET = process.env.JWT_SECRET;
+const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET;
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.json());
 
 // CORS configuration
 app.use(
@@ -26,7 +33,6 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    
   })
 );
 
@@ -67,10 +73,11 @@ app.use("/rating", RatingRouter);
 app.use("/property-ratings", propertyRatingRouter);
 app.use("/vehicle-ratings", vehicleRatingRouter);
 app.use("/user-ratings", userRatingRouter);
-app.use("/contact",contactRouter);
+app.use("/contact", contactRouter);
+app.use("/changepassword", ChangePasswordRouter);
 
 db.sequelize.sync().then(() => {
-  app.listen(3001, () => {
-    console.log("Server Running on port 3001");
+  app.listen(3002, () => {
+    console.log("Server Running on port 3002");
   });
 });

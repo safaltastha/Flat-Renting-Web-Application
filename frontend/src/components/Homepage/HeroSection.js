@@ -29,17 +29,14 @@ const HeroSection = () => {
     try {
       const token = Cookies.get("token");
       const response = await axios.get(
-        `http://localhost:3001/properties/search?category=${category}&locationCity=${sanitizedLocation}&priceRange${priceRange}`,
-        
+        `http://localhost:3002/properties/search?category=${category}&locationCity=${sanitizedLocation}&priceRange${priceRange}`,
+
         {
-        
           withCredentials: true,
         }
       );
 
-     
-      const properties = response.data; 
-      console.log("Fetched Properties:", properties);
+      const properties = response.data;
 
       // Navigate to PropertyListing and pass fetched properties in state
       navigate("/properties", { state: { properties } });
@@ -71,8 +68,7 @@ const HeroSection = () => {
                   </option>
                   <option value="Flat">Flat</option>
                   <option value="Room">Room</option>
-                  <option value="Office Space">Office Space</option>
-                  <option value="Shutters">Shutters</option>
+                  <option value="apartment">Apartment</option>
                 </select>
 
                 {/* Custom Dropdown Icon */}
@@ -153,8 +149,7 @@ const HeroSection = () => {
                     >
                       <option value="Flat">Flat</option>
                       <option value="Room">Room</option>
-                      <option value="Office space">Office space</option>
-                      <option value="Shutters">Shutters</option>
+                      <option value="apartment">Apartment</option>
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                       <RiArrowDownSLine className="w-5 h-5 text-gray-500" />
