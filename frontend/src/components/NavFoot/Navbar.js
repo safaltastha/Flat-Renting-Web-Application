@@ -52,6 +52,7 @@ export default function Navbar() {
 
   const handleProfile = () => {
     navigate("/dashboard");
+    navigate("/dashboard");
   };
 
   const toggleDropdown = () => {
@@ -121,9 +122,7 @@ export default function Navbar() {
           <li>
             <Link
               to="/"
-              className={`block px-4 py-2 hover:text-purple-500 ${
-                location.pathname === "/" ? "underline" : ""
-              }`}
+              className={`block px-4 py-2 text-purple-500 font-semibold`}
             >
               Home
             </Link>
@@ -158,6 +157,7 @@ export default function Navbar() {
                 </li>
                 <li className="p-2 hover:bg-gray-200">
                   <Link to="/properties/apartment">Apartment</Link>
+                  <Link to="/properties/apartment">Apartment</Link>
                 </li>
               </ul>
             )}
@@ -173,6 +173,19 @@ export default function Navbar() {
                 <FaPlus size={18} />
               </span>
               Post Your Property
+            </a>
+          </li>
+
+          <li>
+            <a
+              href="/postyourvehicle"
+              onClick={handlePostVehicleClick}
+              className="px-4 py-1 text-black lg:border-2 lg:border-purple-500 lg:hover:bg-purple-600 lg:hover:text-white transition-colors duration-200 rounded-md flex items-center gap-1"
+            >
+              <span className="text-sm">
+                <FaPlus size={18} />
+              </span>
+              Post Your Vehicle
             </a>
           </li>
 

@@ -267,6 +267,16 @@ router.put(
         return res.status(404).json({ message: "Property not found" });
       }
 
+      if (req.body.features && typeof req.body.features === "string") {
+        try {
+          req.body.features = JSON.parse(req.body.features);
+        } catch (error) {
+          return res
+            .status(400)
+            .json({ message: "Invalid features format", error });
+        }
+      }
+
       // Update the property with the provided fields
       const updatedData = { ...req.body };
 

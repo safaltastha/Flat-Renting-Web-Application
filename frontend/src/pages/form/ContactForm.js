@@ -1,13 +1,7 @@
-"use client";
 import React from "react";
 import { TiLocation } from "react-icons/ti";
 import { IoMail } from "react-icons/io5";
 import { FaPhone } from "react-icons/fa6";
-import Cookies from "js-cookie";
-import axios from "axios";
-import { useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
 
 const ContactUs = () => {
   // Using state for form fields
@@ -67,8 +61,8 @@ const ContactUs = () => {
           Contact Us
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-          <div className="bg-white p-8 rounded-lg shadow-md h-full md:col-span-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="mt-10 bg-white p-8 rounded-lg shadow-md h-3/4">
             <div className="mb-5">
               <h2 className="text-lg font-semibold mb-2 flex items-center">
                 Address:
@@ -90,7 +84,7 @@ const ContactUs = () => {
               </p>
               <p className="flex items-center mt-4">
                 <FaPhone className="mr-2" />
-                9800000000
+                980-8753345
               </p>
             </div>
             <div>
@@ -103,12 +97,12 @@ const ContactUs = () => {
               </p>
               <p className="flex items-center mt-4">
                 <FaPhone className="mr-2" />
-                9800000000
+                984-6423456
               </p>
             </div>
           </div>
 
-          <div className="space-y-4 md:col-span-2">
+          <div className="mt-10 md:col-span-2 space-y-4 ">
             <div className="flex flex-col">
               <label className="block md:text-sm font-medium text-gray-700">
                 First Name <span className="text-red-500">*</span>
@@ -116,9 +110,7 @@ const ContactUs = () => {
               <input
                 type="text"
                 placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
+                className=" mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
             </div>
             <div className="flex flex-col">
@@ -128,8 +120,17 @@ const ContactUs = () => {
               <input
                 type="text"
                 placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
+              />
+            </div>
+            
+            <div className="flex flex-col">
+              <label className="block md:text-sm font-medium text-gray-700">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Phone Number"
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
             </div>
@@ -139,8 +140,6 @@ const ContactUs = () => {
               </label>
               <textarea
                 placeholder="Message"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none resize-none"
                 rows="6"
               ></textarea>
@@ -148,10 +147,7 @@ const ContactUs = () => {
 
             {/* Buttons */}
             <div className="flex gap-4 mt-6">
-              <button
-                className="bg-purple-600 px-4 py-2 rounded text-white hover:bg-purple-700"
-                onClick={handleSubmit}
-              >
+              <button className="bg-purple-600 px-4 py-2 rounded text-white hover:bg-purple-700 ">
                 Submit
               </button>
               <button className="bg-gray-300 px-4 py-2 rounded text-black hover:bg-gray-400">

@@ -89,4 +89,3 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
 };
 
 export default PropertyCard;
-

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { RiArrowDownSLine } from 'react-icons/ri'; 
+import React, { useState } from "react";
+import { RiArrowDownSLine } from "react-icons/ri";
 
 const FloorSelection = ({ handleInputChange }) => {
   const floorOptions = ["first", "second", "third", "fourth", "fifth"];
@@ -17,7 +17,9 @@ const FloorSelection = ({ handleInputChange }) => {
           onChange={handleInputChange}
           className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500 appearance-none"
         >
-          <option value="" disabled >Select Floor</option>
+          <option value="" disabled>
+            Select Floor
+          </option>
           {floorOptions.map((floor) => (
             <option key={floor} value={floor}>
               {floor.charAt(0).toUpperCase() + floor.slice(1)}

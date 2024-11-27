@@ -12,8 +12,8 @@ export default function Navbar() {
         <img
           src="/logo/logo.jpg"
           alt="Logo"
-          height="170"
-          width="200"
+          height="180"
+          width="210"
           className="flex lg:hidden"
         />
         {/* logo for large screen hidden |*/}

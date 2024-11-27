@@ -19,6 +19,7 @@ const validationSchema = Yup.object().shape({
       /^[a-z0-9]+$/,
       "Name must be lowercase letters and numbers only, with no spaces"
     )
+  
     .min(3, "Name must be at least 3 characters long")
     .max(50, "Name must not exceed 50 characters")
     .required("Name is required"),
@@ -33,6 +34,7 @@ const validationSchema = Yup.object().shape({
     .oneOf([Yup.ref("password"), null], "Passwords must match")
     .required("Confirm Password is required"),
   role: Yup.string()
+    .oneOf(["tenant", "landlord", "vehicleSupplier"], "Invalid role")
     .oneOf(["tenant", "landlord", "vehicleSupplier"], "Invalid role")
     .required("Role is required"),
   phoneNumber: Yup.string()
@@ -69,6 +71,8 @@ const RegisterForm = () => {
           password: "",
           confirmPassword: "",
           role: "",
+          phoneNumber: "",
+          userPhoto: "",
           phoneNumber: "",
           userPhoto: "",
         }}
@@ -203,6 +207,7 @@ const RegisterForm = () => {
                   <option value="" label="Select role" />
                   <option value="tenant" label="Tenant" />
                   <option value="landlord" label="Landlord" />
+                  <option value="vehicleSupplier" label="Vehicle Supplier" />
                   <option value="vehicleSupplier" label="Vehicle Supplier" />
                 </Field>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">

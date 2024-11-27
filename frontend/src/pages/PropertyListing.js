@@ -1,23 +1,50 @@
 import React, { useEffect, useState } from "react";
 import PropertyCard from "../components/Property/PropertyCard";
-import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 const PropertyListing = () => {
-  const location = useLocation();
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedCardId, setSelectedCardId] = useState(null);
 
-  const properties = location.state?.properties || [];
-  console.log(properties, "image");
+  useEffect(() => {
+    const loadProperties = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/properties");
+        console.log(response.data);
+        setProperties(response.data);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProperties();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading properties: {error.message}</div>;
+
+  const handleCardClick = (id) => {
+    setSelectedCardId(id);
+  };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">Available Properties</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="p-5">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 ">
         {properties.length > 0 ? (
           properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCard
+              key={property.id}
+              property={property}
+              isSelected={property.id === selectedCardId}
+              onClick={() => handleCardClick(property.id)}
+            />
           ))
         ) : (
-          <p>This is listing ,No properties found.</p>
+          <div>This is listing ,No properties available</div>
         )}
       </div>
     </div>

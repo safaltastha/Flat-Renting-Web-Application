@@ -1,4 +1,3 @@
-// src/App.js
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import DetailedViewPage from "./components/Property/DetailedViewPage";
@@ -10,7 +9,8 @@ import LandlordForm from "./pages/form/LandlordForm";
 import ChangePassword from "./components/password/ChangePassword";
 import Layout from "./components/Layout";
 import ContactUs from "./pages/form/ContactForm";
-import BookNowWithVehicleForm from "./pages/form/BookNowForm";
+import BookNowWithVehicleForm from "./components/BookNow";
+import Dashboard from "./pages/Dashboard";
 import Flat from "./components/Flat";
 
 import { UserProvider, useUser } from "./context/UserContext";

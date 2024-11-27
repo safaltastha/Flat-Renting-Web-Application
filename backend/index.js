@@ -6,18 +6,15 @@ const PropertyRouter = require("./routes/Property");
 const UserRouter = require("./routes/Users");
 const vehicleRouter = require("./routes/Vehicle");
 const path = require("path");
-const bookTestRouter = require("./routes/BookTest");
+
 const bookingRouter = require("./routes/Booking");
-const TestRouter = require("./routes/Test");
-const RatingRouter = require("./routes/Rating");
-const propertyRatingRouter = require("./routes/PropertyRating");
-const vehicleRatingRouter = require("./routes/VehicleRating");
-const userRatingRouter = require("./routes/UserRating");
+
 const contactRouter = require("./routes/Contact");
 const ChangePasswordRouter = require("./routes/ChangePassword");
 
 const bodyParser = require("body-parser");
 
+const ratingRoutes = require("./routes/Rating");
 require("dotenv").config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET;
@@ -73,8 +70,7 @@ app.use("/rating", RatingRouter);
 app.use("/property-ratings", propertyRatingRouter);
 app.use("/vehicle-ratings", vehicleRatingRouter);
 app.use("/user-ratings", userRatingRouter);
-app.use("/contact", contactRouter);
-app.use("/changepassword", ChangePasswordRouter);
+app.use("/contact",contactRouter);
 
 db.sequelize.sync().then(() => {
   app.listen(3002, () => {

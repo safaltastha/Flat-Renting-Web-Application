@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { RiArrowDownSLine } from "react-icons/ri";
-import FloorSelection from "./FloorSelection";
+import FloorSelection from "../../components/landlord/FloorSelection";
+
+console.log("FloorSelection:", FloorSelection);
 
 const LengthWidthFields = ({ num, type, onChange }) => {
   return [...Array(num)].map((_, i) => (

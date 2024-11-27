@@ -111,11 +111,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-    Property.hasMany(models.Media, {
-      foreignKey: "propertyId",
-      as: "media", // Optional: can help in naming when accessing in queries
-      onDelete: "CASCADE",
-    });
+
     Property.hasMany(models.Room, {
       foreignKey: "propertyId",
       as: "rooms",
@@ -123,16 +119,14 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Property.hasMany(models.Rating, {
-      foreignKey: "target_id",
-      as: "property",
-      constraints: false,
-
-      scope: { rating_type: "property" },
+      foreignKey: "propertyId", // Foreign key in the Rating model
+      as: "ratings", // Alias for easier querying
     });
 
-    Property.hasMany(models.PropertyRating, {
-      foreignKey: "property_id",
-      as: "ratings",
+    Property.hasMany(models.Media, {
+      foreignKey: "propertyId",
+      as: "media", // Optional: can help in naming when accessing in queries
+      onDelete: "CASCADE",
     });
 
     // A property can have many bookings
