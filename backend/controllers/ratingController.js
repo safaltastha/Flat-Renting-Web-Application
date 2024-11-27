@@ -35,6 +35,23 @@ exports.createRating = async (req, res) => {
 
 // Get all ratings
 
+exports.getAllRatings = async (req, res) => {
+  try {
+    const ratings = await Rating.findAll({
+      include: {
+        model: Users,
+        as: "user", // Alias defined in the association
+        attributes: ["id", "name", "email"], // Fetch only required fields
+      },
+    });
+
+    res.status(200).json(ratings);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch ratings and reviews" });
+  }
+};
+
 // Get ratings for either a property or a vehicle
 exports.getRatingById = async (req, res) => {
   try {
@@ -55,7 +72,7 @@ exports.getRatingById = async (req, res) => {
           {
             model: Users,
             as: "user",
-            attributes: ["id", "email"],
+            attributes: ["id", "name", "email"],
           },
           {
             model: Property,
@@ -105,5 +122,50 @@ exports.getRatingById = async (req, res) => {
   } catch (err) {
     console.error("hello", err);
     return res.status(500).json({ message: "Server error." });
+  }
+};
+
+// Add Like for a review
+exports.likeReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params; // Review ID from URL
+    const review = await Rating.findByPk(reviewId);
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    // Increment the like count
+    review.likes = (review.likes || 0) + 1;
+    console.log("Before saving:", review.likes);
+    await review.save();
+    console.log("After saving:", review.likes);
+    // Save the updated review
+
+    return res.status(200).json({ likes: review.likes });
+  } catch (error) {
+    console.error("Error liking review:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Add Dislike for a review
+exports.dislikeReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params; // Review ID from URL
+    const review = await Rating.findByPk(reviewId);
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    // Increment the dislike count
+    review.dislikes = (review.dislikes || 0) + 1;
+    await review.save(); // Save the updated review
+
+    return res.status(200).json({ dislikes: review.dislikes });
+  } catch (error) {
+    console.error("Error disliking review:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };

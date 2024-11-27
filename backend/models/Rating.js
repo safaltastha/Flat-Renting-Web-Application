@@ -1,6 +1,7 @@
 const Users = require("./Users");
 const Property = require("./Property");
 const Vehicle = require("./Vehicle");
+const RatingReactions = require("./RatingReactions");
 
 module.exports = (sequelize, DataTypes) => {
   const Rating = sequelize.define(
@@ -14,12 +15,13 @@ module.exports = (sequelize, DataTypes) => {
       },
       score: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true, // Optional for likes/dislikes
         validate: {
           min: 1,
           max: 5,
         },
       },
+
       comment: {
         type: DataTypes.TEXT,
         allowNull: true,
@@ -67,6 +69,10 @@ module.exports = (sequelize, DataTypes) => {
     Rating.belongsTo(models.Vehicle, {
       foreignKey: "vehicleId",
       as: "vehicle",
+    });
+    Rating.hasMany(models.RatingReactions, {
+      foreignKey: "ratingId",
+      as: "reactions",
     });
   };
 

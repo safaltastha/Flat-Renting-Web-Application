@@ -92,6 +92,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId", // Foreign key in the Rating model
       as: "ratings", // Alias for easier querying
     });
+    Users.hasMany(models.RatingReactions, {
+      foreignKey: "userId",
+      as: "ratingReactions",
+    });
 
     Users.hasMany(models.Contact, { foreignKey: "userId" });
   };
