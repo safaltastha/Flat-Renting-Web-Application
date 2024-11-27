@@ -12,6 +12,7 @@ const bookingRouter = require("./routes/Booking");
 const contactRouter = require("./routes/Contact");
 
 const ratingRoutes = require("./routes/Rating");
+const reactionToRatingRoutes = require("./routes/RatingReactions");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -61,6 +62,7 @@ app.use("/booking", bookingRouter);
 app.use("/contact", contactRouter);
 
 app.use("/ratings", ratingRoutes);
+app.use("/reactions", reactionToRatingRoutes);
 
 db.sequelize.sync().then(() => {
   app.listen(3001, () => {

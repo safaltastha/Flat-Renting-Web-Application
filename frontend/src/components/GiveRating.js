@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const RatingReview = ({ id, type, onNewRating }) => {
+const GiveRating = ({ id, type, onNewRating }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [review, setReview] = useState("");
@@ -47,13 +47,13 @@ const RatingReview = ({ id, type, onNewRating }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white border border-gray-300 rounded-lg shadow-sm">
-      <h2 className="text-xl font-semibold text-blue-700">Rating/Review</h2>
+    <div className="mw-full  mx-auto p-6 bg-white border border-gray-300 rounded-lg shadow-sm my-10">
+      <h2 className="text-xl font-semibold text-[#9747FF]">Rating/Review</h2>
 
       <form onSubmit={handleSubmit} className="mt-4">
         <div>
           <label className="block text-gray-700 font-medium mb-1">
-            Your Rating *
+            Your Rating <span className="text-red-500">*</span>
           </label>
           <div className="flex space-x-1">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -76,7 +76,7 @@ const RatingReview = ({ id, type, onNewRating }) => {
         </div>
         <div className="mt-4">
           <label className="block text-gray-700 font-medium mb-1">
-            Your Review *
+            Your Review <span className="text-red-500">*</span>
           </label>
           <textarea
             className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
@@ -87,15 +87,17 @@ const RatingReview = ({ id, type, onNewRating }) => {
             required
           ></textarea>
         </div>
-        <button
-          type="submit"
-          className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
-        >
-          Submit
-        </button>
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className="bg-[#9747FF] hover:bg-[#7735CC] transition-colors duration-300 px-16 py-3 rounded-md text-white text-lg font-semibold mt-6 shadow-lg"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default RatingReview;
+export default GiveRating;
