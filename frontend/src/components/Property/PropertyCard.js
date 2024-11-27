@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ImLocation2 } from "react-icons/im";
-import { useUser } from "../../context/UserContext";
+import { GrLocation } from "react-icons/gr";
+import { BsBookmarkPlus } from "react-icons/bs";
+import { RiParkingBoxLine } from "react-icons/ri";
+import { PiWarehouse } from "react-icons/pi";
+import { GiMoneyStack } from "react-icons/gi";
 
 const PropertyCard = ({ property, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
@@ -17,7 +20,7 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
 
   return (
     <div
-      className={`property-card bg-[#D9D9D9] border border-gray-300 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105 hover:transition-transform duration-300 ease-in-out cursor-pointer ${
+      className={`property-card border  rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105 hover:transition-transform duration-300 ease-in-out cursor-pointer ${
         isSelected
           ? "border-blue-500 text-blue-500"
           : "border-gray-300 text-gray-700"
@@ -34,6 +37,20 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
       </div>
 
       {/* Property Details */}
+<<<<<<< HEAD
+      <div className="p-4 bg-[#D9D9D9]">
+        <div className="flex justify-between items-center ">
+          <div>
+            {" "}
+            <h2 className="text-2xl font-semibold mb-3 text-purple-500">
+              {property.category} for Rent
+            </h2>
+          </div>
+          <div>
+            <BsBookmarkPlus className="text-xl cursor-pointer text-purple-500" />
+          </div>
+        </div>
+=======
       <div className="p-4">
         <h2 className="text-2xl font-semibold mb-3 text-[#3B0C96]">
           {property.category.charAt(0).toUpperCase() +
@@ -41,25 +58,36 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
           for rent
         </h2>
 
+>>>>>>> origin/main
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <div className="flex items-center mb-2 space-x-1">
-              <ImLocation2 className="text-gray-600" size={18} />
+              <GrLocation className="text-gray-600" size={18} />
               <p className="text-gray-700 font-medium text-sm">
                 {property.locationCity.charAt(0).toUpperCase() +
                   property.locationCity.slice(1)}
               </p>
             </div>
-            <p className="text-sm font-medium text-gray-700">
-              NRs {property.monthlyRent} / month
+            <p className="text-sm font-medium text-gray-700 flex ">
+              <span className="flex items-center">
+                <GiMoneyStack />
+              </span>
+              NRs {property.monthlyRent} /{" "}
+              <span className="text-xs flex items-end">month</span>
             </p>
           </div>
           <div>
-            <p className="text-sm mb-1">
+            <p className="text-sm mb-1 flex gap-2">
+              <span className="flex items-center">
+                <PiWarehouse />
+              </span>
               <span className="font-medium text-gray-700">Total Spaces:</span>{" "}
               {property.numOfSpaces}
             </p>
-            <p className="text-sm">
+            <p className="text-sm flex gap-2">
+              <span className="flex items-center">
+                <RiParkingBoxLine />
+              </span>{" "}
               <span className="font-medium text-gray-700">Parking:</span>{" "}
               {property.parking ? "Yes" : "No"}
             </p>
