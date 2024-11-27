@@ -44,7 +44,7 @@ const PropertyListing = () => {
             />
           ))
         ) : (
-          <div>No properties available</div>
+          <div>This is listing ,No properties available</div>
         )}
       </div>
     </div>

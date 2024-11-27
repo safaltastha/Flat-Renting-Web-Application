@@ -8,6 +8,10 @@ import { GiMoneyStack } from "react-icons/gi";
 
 const PropertyCard = ({ property, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
+  const { user } = useUser();
+
+
+  console.log(user,  'user for properyt' )
 
   // Extract the first image path from the media array
   const propertyImage = property.media
@@ -23,7 +27,7 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
       }`}
       onClick={onClick}
     >
-      <div className="relative">
+      <div className="relative bg-white">
         {/* Image */}
         <img
           src={propertyImage}
@@ -33,6 +37,7 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
       </div>
 
       {/* Property Details */}
+<<<<<<< HEAD
       <div className="p-4 bg-[#D9D9D9]">
         <div className="flex justify-between items-center ">
           <div>
@@ -45,12 +50,22 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
             <BsBookmarkPlus className="text-xl cursor-pointer text-purple-500" />
           </div>
         </div>
+=======
+      <div className="p-4">
+        <h2 className="text-2xl font-semibold mb-3 text-[#3B0C96]">
+          {property.category.charAt(0).toUpperCase() +
+            property.category.slice(1)}{" "}
+          for rent
+        </h2>
+
+>>>>>>> origin/main
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <div className="flex items-center mb-2 space-x-1">
               <GrLocation className="text-gray-600" size={18} />
               <p className="text-gray-700 font-medium text-sm">
-                {property.locationCity}
+                {property.locationCity.charAt(0).toUpperCase() +
+                  property.locationCity.slice(1)}
               </p>
             </div>
             <p className="text-sm font-medium text-gray-700 flex ">
@@ -79,12 +94,14 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
           </div>
         </div>
         <div className="mt-4">
-          <Link
-            to={`/properties/${property.id}`}
-            className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
-          >
-            View Details
-          </Link>
+          {user.role === "tenant" && (
+            <Link
+              to={`/properties/${property.id}`}
+              className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
+            >
+              View Details
+            </Link>
+          )}
         </div>
 
         <div

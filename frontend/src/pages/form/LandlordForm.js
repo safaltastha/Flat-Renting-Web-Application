@@ -11,6 +11,7 @@ import Cookies from "js-cookie";
 const LandlordForm = () => {
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [formData, setFormData] = useState({
     category: "",
     locationCity: "",
@@ -31,6 +32,9 @@ const LandlordForm = () => {
       petAllowed: false,
     },
     floor: "",
+    availableStart: "",
+    availableEnd: "",
+    availabilityTime: "",
   });
   const navigate = useNavigate();
 
@@ -61,8 +65,36 @@ const LandlordForm = () => {
     }));
   };
 
+  const handleRoomsChange = (index, roomType, field, value) => {
+    console.log();
+    setRooms((prev) => {
+      const updatedRooms = [...prev];
+      if (!updatedRooms[index]) {
+        updatedRooms[index] = { roomType, length: 0, width: 0 };
+      }
+      updatedRooms[index][field] = value;
+      return updatedRooms;
+    });
+  };
+
+  const handleRoomDimensionsChange = (name, value) => {
+    console.log("Room Dimension Change from landlord form - Name:", name, "Value:", value);
+    // You can also update your formData or room data here if necessary
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const startDate = new Date(formData.availableStart);
+    const endDate = new Date(formData.availableEnd);
+    if (endDate < startDate) {
+      alert("Availability End date cannot be before Availability Start date.");
+      return;
+    }
+    // Validation for minimum number of images
+    if (images.length < 3) {
+      alert("Please upload at least 3 images.");
+      return;
+    }
 
     if (images.length === 0) {
       alert("Please upload at least one image .");
@@ -97,6 +129,11 @@ const LandlordForm = () => {
     propertyData.append("StreetName", formData.StreetName || "");
     propertyData.append("entityType", "property");
 
+    propertyData.append("availableStart", formData.availableStart);
+    propertyData.append("availableEnd", formData.availableEnd);
+
+    propertyData.append("availabilityTime", formData.availabilityTime);
+
     // Append images and videos to FormData
     images.forEach((image) => {
       propertyData.append("propertyImage", image);
@@ -115,7 +152,7 @@ const LandlordForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/properties",
+        "http://localhost:3002/properties",
         propertyData,
         {
           headers: {
@@ -142,6 +179,10 @@ const LandlordForm = () => {
   const handleCancel = () => {
     navigate("/");
   };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    handleChange(name, value);
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-custom-gray shadow-lg rounded-lg my-12">
@@ -151,7 +192,10 @@ const LandlordForm = () => {
           onChange={handleChange}
           setFormData={setFormData}
         />
-        <GeneralCategory onChange={handleChange} />
+        <GeneralCategory
+          onChange={handleRoomsChange}
+          onRoomDimensionsChange={handleRoomDimensionsChange}
+        />
         <Rent onChange={handleChange} />
         <DescriptionAndRules
           capitalizeWords={capitalizeWords}
@@ -202,6 +246,55 @@ const LandlordForm = () => {
               />
               <span className="mr-2 text-[#777777]">Pet Allowed</span>
             </label>
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-medium mt-9  ">
+            Availability Start and Availability End
+          </h2>
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Availability Start
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="date"
+                name="availableStart"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+              ></input>
+            </div>
+
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Availability End
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="date"
+                name="availableEnd"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+              ></input>
+            </div>
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Your availability time{" "}
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="text"
+                name="availabilityTime"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+                placeholder="Ex: after 5pm, between 11am-5pm"
+              />
+            </div>
           </div>
         </div>
         <div>

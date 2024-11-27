@@ -9,41 +9,40 @@ import { FaPlus } from "react-icons/fa6";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { useUser } from "../../context/UserContext";
 
 export default function Navbar() {
+  const { user, auth } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showProperties, setShowProperties] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const propertiesRef = useRef(null);
+  const { logout } = useUser();
 
   const res = Cookies.get("token");
 
-  console.log(res, "esto ho");
-
-  useEffect(() => {
-    console.log("Navbar component mounted");
-    const token = Cookies.get("token");
-    console.log("Token retrieved:", token);
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        console.log(decodedToken); // Decode the token
-        setUser(decodedToken); // Set user state to decoded token
-      } catch (error) {
-        console.error("Invalid token:", error);
-        setUser(null);
-      }
-    } else {
-      setUser(null);
-    }
-  }, []);
+  //TODO:  Remove this
+  // useEffect(() => {
+  //   const token = Cookies.get("token");
+  //   if (token) {
+  //     try {
+  //       const decodedToken = jwtDecode(token);
+  //       console.log(decodedToken); // Decode the token
+  //       setUser(decodedToken); // Set user state to decoded token
+  //     } catch (error) {
+  //       console.error("Invalid token:", error);
+  //       setUser(null);
+  //     }
+  //   } else {
+  //     setUser(null);
+  //   }
+  // }, []);
 
   const handleLogout = () => {
+    logout();
     Cookies.remove("token");
-    setUser(null);
     navigate("/login");
   };
 
@@ -52,6 +51,7 @@ export default function Navbar() {
   };
 
   const handleProfile = () => {
+    navigate("/dashboard");
     navigate("/dashboard");
   };
 
@@ -157,31 +157,12 @@ export default function Navbar() {
                 </li>
                 <li className="p-2 hover:bg-gray-200">
                   <Link to="/properties/apartment">Apartment</Link>
+                  <Link to="/properties/apartment">Apartment</Link>
                 </li>
               </ul>
             )}
           </li>
 
-          {/* <li>
-            <Link
-              to="/contactus"
-              className={`block px-4 py-2 hover:text-purple-500 ${
-                location.pathname === "/contactus" ? "underline" : ""
-              }`}
-            >
-              Contact
-            </Link>
-          </li> */}
-          {/* <li>
-            <Link
-              to="/aboutus"
-              className={`block px-4 py-2 hover:text-purple-500 ${
-                location.pathname === "/aboutus" ? "underline" : ""
-              }`}
-            >
-              About Us
-            </Link>
-          </li> */}
           <li>
             <a
               href="/postyourproperty"
@@ -208,8 +189,21 @@ export default function Navbar() {
             </a>
           </li>
 
+          <li>
+            <a
+              href="/postyourvehicle"
+              onClick={handlePostVehicleClick}
+              className="px-4 py-1 text-black lg:border-2 lg:border-purple-500 lg:hover:bg-purple-600 lg:hover:text-white transition-colors duration-200 rounded-md flex items-center gap-1"
+            >
+              <span className="text-sm">
+                <FaPlus size={18} />
+              </span>
+              Post Your Vehicle
+            </a>
+          </li>
+
           {/* User Profile Dropdown */}
-          {user ? (
+          {auth.accessToken ? (
             <li className="relative" onClick={toggleDropdown}>
               {/* Use static user photo here */}
               <img

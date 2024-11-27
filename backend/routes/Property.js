@@ -37,6 +37,9 @@ router.post(
       houseRule,
       floor,
       StreetName,
+      availableStart,
+      availableEnd,
+      availabilityTime,
     } = req.body; // Ensure entityType is included in the request body
 
     if (!entityType || entityType !== "property") {
@@ -47,7 +50,7 @@ router.post(
     }
 
     try {
-      let parsedFeatures;
+      let parsedFeatures, parsedRooms;
       try {
         parsedFeatures = JSON.parse(features);
       } catch (parseError) {
@@ -73,11 +76,27 @@ router.post(
         houseRule,
         floor,
         StreetName,
+        availableStart,
+        availableEnd,
+        availabilityTime,
         userId: req.user.id,
         entityType,
       };
 
       const newProperty = await Property.create(propertyData);
+      // Save room dimensions to the Room table
+      // if (parsedRooms && parsedRooms.length > 0) {
+      //   await Promise.all(
+      //     parsedRooms.map((room) =>
+      //       Room.create({
+      //         propertyId: newProperty.id,
+      //         roomType: room.roomType,
+      //         length: room.length,
+      //         width: room.width,
+      //       })
+      //     )
+      //   );
+      // }
 
       const imagesDirectory = path.join(__dirname, "uploads/properties/images");
       if (!fs.existsSync(imagesDirectory)) {
@@ -142,7 +161,10 @@ router.post(
 // Get all properties
 router.get("/", authenticateJWT, async (req, res) => {
   try {
+    const { category } = req.query;
+    const whereCondition = category ? { category } : {};
     const properties = await Property.findAll({
+      where: whereCondition,
       include: [
         {
           model: Users,
@@ -163,7 +185,7 @@ router.get("/", authenticateJWT, async (req, res) => {
 
     const reversedProperties = properties.reverse();
 
-    const baseUrl = "http://localhost:3001"; // Base URL for files
+    const baseUrl = "http://localhost:3002"; // Base URL for files
 
     reversedProperties.forEach((property) => {
       if (property.media) {
@@ -215,7 +237,7 @@ router.get("/:id", authenticateJWT, async (req, res) => {
     }
 
     // Format media paths
-    const baseUrl = "http://localhost:3001"; // Base URL for files
+    const baseUrl = "http://localhost:3002"; // Base URL for files
     if (property.media) {
       property.media.forEach((mediaItem) => {
         const filePath = mediaItem.file_path.replace(/\\/g, "/"); // Ensure path formatting is consistent

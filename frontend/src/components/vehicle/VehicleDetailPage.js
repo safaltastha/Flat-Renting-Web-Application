@@ -19,7 +19,7 @@ const VehicleDetailPage = () => {
 
   const handleBookNow = () => {
     localStorage.setItem("selectedVehicle", JSON.stringify(vehicle));
-    navigate("/bookproperty"); // Navigate to booking form
+    navigate("/bookproperty"); // Navigate to booking formcd 
   };
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const VehicleDetailPage = () => {
       try {
         const token = Cookies.get("token");
         const response = await axios.get(
-          `http://localhost:3001/vehicle/${id}`,
+          `http://localhost:3002/vehicle/${id}`,
           { withCredentials: true }
         );
 

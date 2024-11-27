@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
+import PhoneNumValidation from "../../components/PhoneNumValidation"; // Adjust the path as needed
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -18,6 +19,7 @@ const validationSchema = Yup.object().shape({
       /^[a-z0-9]+$/,
       "Name must be lowercase letters and numbers only, with no spaces"
     )
+  
     .min(3, "Name must be at least 3 characters long")
     .max(50, "Name must not exceed 50 characters")
     .required("Name is required"),
@@ -33,13 +35,10 @@ const validationSchema = Yup.object().shape({
     .required("Confirm Password is required"),
   role: Yup.string()
     .oneOf(["tenant", "landlord", "vehicleSupplier"], "Invalid role")
+    .oneOf(["tenant", "landlord", "vehicleSupplier"], "Invalid role")
     .required("Role is required"),
   phoneNumber: Yup.string()
-    .required("Phone number is required")
-    .matches(
-      /^\+977 ?\d{10}$/,
-      "Phone number must be in the format +977XXXXXXXXXX"
-    ),
+  .required("Phone number is required"),
 });
 
 const RegisterForm = () => {
@@ -48,14 +47,12 @@ const RegisterForm = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/register",
+        "http://localhost:3002/auth/register",
         values
       );
-      // Assuming successful registration, navigate to login
       resetForm();
       navigate("/login");
     } catch (error) {
-      // Handle the error appropriately
       alert(
         "Failed to register user: " +
           (error.response?.data?.message || error.message)
@@ -76,16 +73,19 @@ const RegisterForm = () => {
           role: "",
           phoneNumber: "",
           userPhoto: "",
+          phoneNumber: "",
+          userPhoto: "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form className="w-full max-w-screen-md bg-white p-6 rounded-lg shadow-md">
             <h1 className="text-2xl text-center font-bold text-[#A06FFF] mb-6">
               Register
             </h1>
 
+            {/* Username */}
             <div className="mb-4">
               <label
                 htmlFor="name"
@@ -107,6 +107,7 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Email */}
             <div className="mb-4">
               <label
                 htmlFor="email"
@@ -127,6 +128,7 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Password */}
             <div className="mb-4">
               <label
                 htmlFor="password"
@@ -147,6 +149,7 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Confirm Password */}
             <div className="mb-4">
               <label
                 htmlFor="confirmPassword"
@@ -167,19 +170,18 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Phone Number */}
             <div className="mb-4">
               <label
                 htmlFor="phoneNumber"
-                className="block md:text-sm font-medium text-gray-700"
+                className="block mb-1 md:text-sm font-medium text-gray-700"
               >
                 Phone Number{" "}
-                <span className="ml-1 text-red-600 text-[20px]">*</span>
+                <span className="ml-1  text-red-600 text-[20px]">*</span>
               </label>
-              <Field
-                type="text"
-                name="phoneNumber"
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
-                placeholder="+977 9800000000"
+              <PhoneNumValidation
+                setFieldValue={setFieldValue}
+                fieldName="phoneNumber"
               />
               <ErrorMessage
                 name="phoneNumber"
@@ -188,6 +190,7 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Role */}
             <div className="mb-4">
               <label
                 htmlFor="role"
@@ -205,6 +208,7 @@ const RegisterForm = () => {
                   <option value="tenant" label="Tenant" />
                   <option value="landlord" label="Landlord" />
                   <option value="vehicleSupplier" label="Vehicle Supplier" />
+                  <option value="vehicleSupplier" label="Vehicle Supplier" />
                 </Field>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                   <RiArrowDownSLine className="h-5 w-5 text-black" />
@@ -217,6 +221,7 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Submit Button */}
             <div>
               <button
                 type="submit"
@@ -227,6 +232,7 @@ const RegisterForm = () => {
               </button>
             </div>
 
+            {/* Login Redirect */}
             <div className="flex justify-center items-center mt-3">
               Already have an account?{" "}
               <Link

@@ -1,31 +1,3 @@
-// const express = require("express");
-// const router = express.Router();
-// const { authenticateJWT } = require("../middlewares/authMiddleware");
-// const { createVehicle, getAllVehicles, getVehicleById, updateVehicle,deleteVehicle } = require("../controllers/vehicleController");
-
-// // Middleware to parse JSON bodies
-// router.use(express.json());
-
-// // POST route to create a new vehicle
-
-// router.post('/',
-//     upload.fields([
-//         { name: "propertyImage", maxCount: 10 }, //vehicleImage
-//         { name: "propertyVideo", maxCount: 5 },
-//       ]), authenticateJWT, createVehicle);
-
-// router.get('/', authenticateJWT, getAllVehicles);
-
-// router.get('/:id', authenticateJWT, getVehicleById);
-
-// // Update user route
-// router.put('/update/:id', authenticateJWT, updateVehicle);
-
-// // Delete user route
-// router.delete('/delete/:id', authenticateJWT, deleteVehicle);
-
-// module.exports = router;
-
 const express = require("express");
 const path = require("path");
 const router = express.Router();
@@ -55,6 +27,7 @@ router.post(
       pricingPerHour,
       vehicleFeatures,
       vehicleLocation,
+      availabilityTime,
       entityType,
     } = req.body; // Ensure entityType is included in the request body
 
@@ -65,16 +38,51 @@ router.post(
       });
     }
 
+    if (!availableStart || !availableEnd) {
+      return res
+        .status(400)
+        .json({ message: "Both start and end dates are required." });
+    }
+
+    const startDate = new Date(availableStart);
+    const endDate = new Date(availableEnd);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return res.status(400).json({ message: "Invalid date format." });
+    }
+
+    if (endDate <= startDate) {
+      return res.status(400).json({
+        message: "Availability End must be after Availability Start.",
+      });
+    }
+
+    // Updated Regex for multiple formats
+    const timeFormatRegex =
+      /^(1[0-2]|0?[1-9])(am|pm)-(1[0-2]|0?[1-9])(am|pm)$|^between\s(1[0-2]|0?[1-9])(am|pm)-(1[0-2]|0?[1-9])(am|pm)$|^after\s(1[0-2]|0?[1-9])(am|pm)$/;
+
+    // Debug: Log availabilityTime to check if it matches expected value
+    console.log("Availability Time:", availabilityTime);
+
+    // Validate availabilityTime (ensure it matches the expected format)
+    if (!timeFormatRegex.test(availabilityTime)) {
+      return res.status(400).json({
+        message:
+          "Invalid availability time format. Use formats like '1pm-2pm', 'between 1pm-2pm', or 'after 2pm'.",
+      });
+    }
+
     try {
       const vehicleData = {
         type,
         capacity,
         registrationNumber,
-        availableStart: new Date(availableStart), // Convert to Date object
-        availableEnd: new Date(availableEnd),
+        availableStart: startDate, // Convert to Date object
+        availableEnd: endDate,
         pricingPerHour,
         vehicleFeatures,
         vehicleLocation,
+        availabilityTime,
         userId: req.user.id,
         entityType,
       };
@@ -158,11 +166,11 @@ router.get("/", authenticateJWT, async (req, res) => {
         },
       ],
     });
-    console.log("Vehilces with media data:", JSON.stringify(vehicles, null, 2));
+    console.log("Vehicles with media data:", JSON.stringify(vehicles, null, 2));
 
     const reversedVehicles = vehicles.reverse();
 
-    const baseUrl = "http://localhost:3001"; // Base URL for files
+    const baseUrl = "http://localhost:3002"; // Base URL for files
 
     reversedVehicles.forEach((vehicle) => {
       if (vehicle.media) {
@@ -211,7 +219,7 @@ router.get("/:id", authenticateJWT, async (req, res) => {
     }
 
     // Format media paths
-    const baseUrl = "http://localhost:3001"; // Base URL for files
+    const baseUrl = "http://localhost:3002"; // Base URL for files
     if (vehicle.media) {
       vehicle.media.forEach((mediaItem) => {
         const filePath = mediaItem.file_path.replace(/\\/g, "/"); // Ensure path formatting is consistent
@@ -223,6 +231,27 @@ router.get("/:id", authenticateJWT, async (req, res) => {
   } catch (error) {
     console.error("Database Error:", error); // Log the error for debugging
     res.status(500).json({ message: "Error retrieving property", error });
+  }
+});
+
+// Delete a property
+router.delete("/:id", authenticateJWT, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const vehicle = await Vehicle.findByPk(id);
+
+    if (!vehicle) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+    // Delete associated media records
+    await Media.destroy({ where: { vehicleId: id } });
+
+    // Now delete the property itself
+
+    await vehicle.destroy();
+    res.json({ message: "Vehicle and associated media deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting vehicle", error });
   }
 });
 

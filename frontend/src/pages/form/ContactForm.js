@@ -4,6 +4,56 @@ import { IoMail } from "react-icons/io5";
 import { FaPhone } from "react-icons/fa6";
 
 const ContactUs = () => {
+  // Using state for form fields
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const token = Cookies.get("token");
+  let userId;
+  if (token) {
+    const decodedToken = jwtDecode(token);
+    userId = decodedToken.id; // Extract `id` as `userId` from the decoded token
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      firstName,
+      lastName,
+      message,
+      userId,
+    };
+    try {
+      const response = await axios.post(
+        "http://localhost:3002/contact",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Sending token in Authorization header
+          },
+          withCredentials: true, // Only set if your backend requires credentials (like cookies)
+        }
+      );
+
+      if (response.status === 201) {
+        setFirstName("");
+        setLastName("");
+        setMessage("");
+        alert("Form submitted successfully!");
+        navigate("/");
+      } else {
+        alert(`Error ho: ${response.data.error}`);
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("Failed to submit the form. Please try again.");
+    }
+  };
+
   return (
     <div className="bg-[#dddcdf] min-h-screen flex items-center justify-center p-4">
       <div className="p-8 max-w-4xl w-full">

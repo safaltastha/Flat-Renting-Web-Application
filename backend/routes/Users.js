@@ -1,6 +1,6 @@
 // routes/users.js
 const express = require('express');
-const { register, login, logout, getAllUsers, getUserById, updateUser, deleteUser } = require('../controllers/userController');
+const { register, login, logout, getAllUsers, getUserById, updateUser, deleteUser, requestPasswordReset,resetPassword } = require('../controllers/userController');
 const { authenticateJWT } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
@@ -30,6 +30,10 @@ router.delete('/delete/:id', authenticateJWT, deleteUser);
 
 //logout route
 router.post('/logout', authenticateJWT, logout);
+
+router.post('/request-password-reset', requestPasswordReset);
+
+router.post("/reset-password",resetPassword);
 
 
 

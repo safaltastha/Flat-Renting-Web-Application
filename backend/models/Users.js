@@ -75,12 +75,6 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "CASCADE",
     });
 
-    Users.hasMany(models.Booking, {
-      foreignKey: "userId",
-      as: "tenantBookings", // Alias for bookings made by this tenant
-      onDelete: "CASCADE",
-    });
-
     // A user can have multiple bookings as a landlord
     Users.hasMany(models.Property, {
       foreignKey: "userId", // Foreign key in Property model

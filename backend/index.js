@@ -10,12 +10,22 @@ const path = require("path");
 const bookingRouter = require("./routes/Booking");
 
 const contactRouter = require("./routes/Contact");
+const ChangePasswordRouter = require("./routes/ChangePassword");
+
+const bodyParser = require("body-parser");
 
 const ratingRoutes = require("./routes/Rating");
+<<<<<<< HEAD
 const reactionToRatingRoutes = require("./routes/RatingReactions");
+=======
+require("dotenv").config();
+const JWT_SECRET = process.env.JWT_SECRET;
+const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET;
+>>>>>>> origin/main
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(bodyParser.json());
 
 // CORS configuration
 app.use(
@@ -58,14 +68,24 @@ app.use("/properties", PropertyRouter);
 app.use("/auth", UserRouter);
 app.use("/vehicle", vehicleRouter);
 app.use("/booking", bookingRouter);
+<<<<<<< HEAD
 
 app.use("/contact", contactRouter);
 
 app.use("/ratings", ratingRoutes);
 app.use("/reactions", reactionToRatingRoutes);
+=======
+app.use("/bookTest", bookTestRouter);
+app.use("/test", TestRouter);
+app.use("/rating", RatingRouter);
+app.use("/property-ratings", propertyRatingRouter);
+app.use("/vehicle-ratings", vehicleRatingRouter);
+app.use("/user-ratings", userRatingRouter);
+app.use("/contact",contactRouter);
+>>>>>>> origin/main
 
 db.sequelize.sync().then(() => {
-  app.listen(3001, () => {
-    console.log("Server Running on port 3001");
+  app.listen(3002, () => {
+    console.log("Server Running on port 3002");
   });
 });
