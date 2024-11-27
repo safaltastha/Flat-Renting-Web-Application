@@ -1,22 +1,16 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-<<<<<<< HEAD
-import { ImLocation2 } from "react-icons/im";
-import { useUser } from "../../context/UserContext";
-=======
 import { GrLocation } from "react-icons/gr";
 import { BsBookmarkPlus } from "react-icons/bs";
 import { RiParkingBoxLine } from "react-icons/ri";
 import { PiWarehouse } from "react-icons/pi";
 import { GiMoneyStack } from "react-icons/gi";
->>>>>>> 8340cc2 (edited)
 
 const PropertyCard = ({ property, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
   const { user } = useUser();
 
-
-  console.log(user,  'user for properyt' )
+  console.log(user, "user for properyt");
 
   // Extract the first image path from the media array
   const propertyImage = property.media
@@ -42,15 +36,6 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
       </div>
 
       {/* Property Details */}
-<<<<<<< HEAD
-      <div className="p-4">
-        <h2 className="text-2xl font-semibold mb-3 text-[#3B0C96]">
-          {property.category.charAt(0).toUpperCase() +
-            property.category.slice(1)}{" "}
-          for rent
-        </h2>
-
-=======
       <div className="p-4 bg-[#D9D9D9]">
         <div className="flex justify-between items-center ">
           <div>
@@ -63,7 +48,6 @@ const PropertyCard = ({ property, isSelected, onClick }) => {
             <BsBookmarkPlus className="text-xl cursor-pointer text-purple-500" />
           </div>
         </div>
->>>>>>> 8340cc2 (edited)
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <div className="flex items-center mb-2 space-x-1">
