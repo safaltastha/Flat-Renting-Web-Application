@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+<<<<<<< HEAD:src/components/Ratings.js
 
 // Sample data for reviews
 const sampleReviews = [
@@ -63,22 +64,97 @@ const Ratings = () => {
     }
     setSortOrder(order);
     setReviews(sortedReviews);
+=======
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import axios from "axios";
+import PropertyCard from "../Property/PropertyCard";
+import Cookies from "js-cookie";
+
+const FeaturedProperties = () => {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Custom Left Arrow Component
+  const PrevArrow = ({ onClick }) => {
+    return (
+      <button
+        className="absolute top-1/2 left-0 transform -translate-y-1/2 z-10 p-2 bg-purple-600 border-2 border-transparent text-white rounded-full hover:bg-white hover:border-purple-500 hover:text-black"
+        onClick={onClick}
+      >
+        <FaArrowLeft />
+      </button>
+    );
   };
 
-  // Handle filtering by star rating
-  const handleFilter = (stars) => {
-    if (stars === "all") {
-      setFilter("all");
-      setReviews(sampleReviews);
-    } else {
-      const filteredReviews = sampleReviews.filter(
-        (review) => review.rating === stars
-      );
-      setFilter(stars);
-      setReviews(filteredReviews);
-    }
+  // Custom Right Arrow Component
+  const NextArrow = ({ onClick }) => {
+    return (
+      <button
+        className="absolute top-1/2 right-0 transform -translate-y-1/2 z-10 p-2 bg-purple-600 border-2 border-transparent text-white rounded-full hover:bg-white hover:border-purple-500 hover:text-black"
+        onClick={onClick}
+      >
+        <FaArrowRight />
+      </button>
+    );
   };
 
+  // Fetch featured properties from the backend
+  useEffect(() => {
+    const loadFeaturedProperties = async () => {
+      try {
+        const token = Cookies.get("token");
+        const response = await axios.get("http://localhost:3002/properties", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
+        console.log(response.data, "res");
+        setProperties(response.data);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFeaturedProperties();
+  }, []);
+
+  const settings = {
+    dots: true,
+    infinite: false, // Enable infinite scrolling only if there are more than 1 property
+    speed: 500,
+    slidesToShow: Math.min(properties.length, 3), // Show only as many slides as there are properties (max 3)
+    slidesToScroll: 1,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+    responsive: [
+      {
+        breakpoint: 1024, // Tablet and medium screens
+        settings: {
+          slidesToShow: Math.min(properties.length, 2), // Adjust for smaller screens
+        },
+      },
+      {
+        breakpoint: 640, // Mobile screens
+        settings: {
+          slidesToShow: 1, // Show only one slide on mobile
+        },
+      },
+    ],
+>>>>>>> fc96b82d12482081c2b4a643213f999649b7f923:frontend/src/components/Homepage/FeaturedProperty.js
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error)
+    return <div>Error loading featured properties: {error.message}</div>;
+
+<<<<<<< HEAD:src/components/Ratings.js
   // Handle "like" click
   const handleLike = (reviewId) => {
     setReviews((prevReviews) =>
@@ -98,28 +174,37 @@ const Ratings = () => {
       )
     );
   };
+=======
+  console.log(properties, "asdf");
+>>>>>>> fc96b82d12482081c2b4a643213f999649b7f923:frontend/src/components/Homepage/FeaturedProperty.js
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="rating-review-container p-6 bg-white shadow-md rounded-lg w-1/2">
-        {/* Overall Rating */}
-        <div className="overall-rating flex items-center">
-          <div className="text-4xl font-bold">{averageRating}</div>
-          <div className="text-gray-500 text-xl">/5</div>
-          <div className="ml-4 flex items-center">
-            {[...Array(5)].map((_, index) => (
-              <span
-                key={index}
-                className={`text-yellow-500 ${
-                  index < Math.round(averageRating) ? "filled" : ""
-                }`}
+    <div className="container max-w-[1600px] py-8 relative">
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        Featured Properties
+      </h2>
+      {properties.length > 0 ? (
+        <div
+          className={`${properties.length === 1 ? "flex justify-center" : ""}`} // Center slider when there's only one property
+        >
+          <Slider
+            {...{
+              ...settings,
+              centerMode: properties.length === 1, // Enable center mode for single property
+              centerPadding: properties.length === 1 ? "0px" : "50px", // Remove padding for single property
+            }}
+          >
+            {properties.map((property) => (
+              <div
+                key={property.id}
+                className={`px-8 ${properties.length === 1 ? "mx-auto" : ""}`} // Center single slide
               >
-                ★
-              </span>
+                <PropertyCard property={property} />
+              </div>
             ))}
-          </div>
-          <p className="ml-4 text-gray-500">{reviews.length} Ratings</p>
+          </Slider>
         </div>
+<<<<<<< HEAD:src/components/Ratings.js
 
         {/* Sort and Filter */}
 
@@ -166,8 +251,17 @@ const Ratings = () => {
           ))}
         </div>
       </div>
+=======
+      ) : (
+        <div className="text-center">No featured properties available</div>
+      )}
+>>>>>>> fc96b82d12482081c2b4a643213f999649b7f923:frontend/src/components/Homepage/FeaturedProperty.js
     </div>
   );
 };
 
+<<<<<<< HEAD:src/components/Ratings.js
 export default Ratings;
+=======
+export default FeaturedProperties;
+>>>>>>> fc96b82d12482081c2b4a643213f999649b7f923:frontend/src/components/Homepage/FeaturedProperty.js
