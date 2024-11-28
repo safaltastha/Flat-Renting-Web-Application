@@ -16,12 +16,21 @@ const bodyParser = require("body-parser");
 
 const ratingRoutes = require("./routes/Rating");
 <<<<<<< HEAD
+<<<<<<< HEAD
 require("dotenv").config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET;
 =======
 const reactionToRatingRoutes = require("./routes/RatingReactions");
 >>>>>>> 8340cc2 (edited)
+=======
+const reactionToRatingRoutes = require("./routes/RatingReactions");
+=======
+require("dotenv").config();
+const JWT_SECRET = process.env.JWT_SECRET;
+const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET;
+>>>>>>> origin/main
+>>>>>>> origin/main
 
 app.use(express.json());
 app.use(cookieParser());
@@ -69,6 +78,15 @@ app.use("/auth", UserRouter);
 app.use("/vehicle", vehicleRouter);
 app.use("/booking", bookingRouter);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+app.use("/contact", contactRouter);
+
+app.use("/ratings", ratingRoutes);
+app.use("/reactions", reactionToRatingRoutes);
+=======
+>>>>>>> origin/main
 app.use("/bookTest", bookTestRouter);
 app.use("/test", TestRouter);
 app.use("/rating", RatingRouter);
@@ -76,6 +94,7 @@ app.use("/property-ratings", propertyRatingRouter);
 app.use("/vehicle-ratings", vehicleRatingRouter);
 app.use("/user-ratings", userRatingRouter);
 app.use("/contact",contactRouter);
+<<<<<<< HEAD
 =======
 
 app.use("/contact", contactRouter);
@@ -83,6 +102,9 @@ app.use("/contact", contactRouter);
 app.use("/ratings", ratingRoutes);
 app.use("/reactions", reactionToRatingRoutes);
 >>>>>>> 8340cc2 (edited)
+=======
+>>>>>>> origin/main
+>>>>>>> origin/main
 
 db.sequelize.sync().then(() => {
   app.listen(3002, () => {

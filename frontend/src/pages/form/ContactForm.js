@@ -2,6 +2,11 @@ import React from "react";
 import { TiLocation } from "react-icons/ti";
 import { IoMail } from "react-icons/io5";
 import { FaPhone } from "react-icons/fa6";
+import { useState } from "react";
+import axios from "axios";
+import Cookies from "jwt-decode";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const ContactUs = () => {
   // Using state for form fields
@@ -123,7 +128,7 @@ const ContactUs = () => {
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
               />
             </div>
-            
+
             <div className="flex flex-col">
               <label className="block md:text-sm font-medium text-gray-700">
                 Phone Number <span className="text-red-500">*</span>
