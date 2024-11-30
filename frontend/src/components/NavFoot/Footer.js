@@ -46,19 +46,49 @@ const Footer = () => {
         {/* 2nd Column - 20% Width */}
         <div className="lg:w-[20%] px-8  lg:px-4">
           <ul className="flex flex-col gap-4 lg:gap-2 ">
+<<<<<<< HEAD
             <li className="font-bold text-4xl lg:text-base ">Useful Links</li>
+=======
+            <li className="font-bold text-4xl lg:text-base text-purple-500 ">
+              Useful Links
+            </li>
+>>>>>>> pranisha
             <li className="flex flex-col gap-2 text-3xl lg:text-base ">
               <li>
-                <Link to="/">Home</Link>
+                <Link
+                  to="/"
+                  className={`block   hover:text-purple-500 font-semibold
+                  }`}
+                >
+                  Home
+                </Link>
               </li>
               <li>
-                <Link to="/contact">Contact</Link>
+                <Link
+                  to="/contactus"
+                  className={`block hover:text-purple-500  font-semibold
+                  }`}
+                >
+                  Contact
+                </Link>
               </li>
               <li>
-                <Link to="/about">About</Link>
+                <Link
+                  to="/aboutus"
+                  className={`block hover:text-purple-500 font-semibold
+                  }`}
+                >
+                  About
+                </Link>
               </li>
               <li>
-                <Link to="/terms">Terms and Conditions</Link>
+                <Link
+                  to="/terms"
+                  className={`block hover:text-purple-500 font-semibold
+                  }`}
+                >
+                  Terms and Conditions
+                </Link>
               </li>
             </li>
           </ul>
@@ -66,19 +96,49 @@ const Footer = () => {
         {/* 3rd Column - 20% Width */}
         <div className="lg:w-[20%]  px-8  lg:px-4">
           <ul className="flex flex-col gap-2">
+<<<<<<< HEAD
             <li className="font-bold text-3xl lg:text-base ">Properties</li>
+=======
+            <li className="font-bold text-3xl lg:text-base text-purple-500">
+              Properties
+            </li>
+>>>>>>> pranisha
             <li className="flex flex-col gap-2 text-3xl lg:text-base">
               <li>
-                <Link to="/">Flat</Link>
+                <Link
+                  to="/"
+                  className={`block hover:text-purple-500 font-semibold
+                  }`}
+                >
+                  Flat
+                </Link>
               </li>
               <li>
-                <Link to="/contact">Room</Link>
+                <Link
+                  to="/contact"
+                  className={`block hover:text-purple-500 font-semibold
+                  }`}
+                >
+                  Room
+                </Link>
               </li>
               <li>
-                <Link to="/about">Office Space</Link>
+                <Link
+                  to="/about"
+                  className={`block hover:text-purple-500 font-semibold
+                  }`}
+                >
+                  Office Space
+                </Link>
               </li>
               <li>
-                <Link to="/terms">Shutters</Link>
+                <Link
+                  to="/terms"
+                  className={`block hover:text-purple-500 font-semibold
+                  }`}
+                >
+                  Shutters
+                </Link>
               </li>
             </li>
           </ul>
@@ -87,17 +147,22 @@ const Footer = () => {
         {/* 4th Column - 20% Width */}
         <div className="lg:w-[20%]  px-8  lg:px-4 ">
           <ul className="flex flex-col gap-2 text-3xl lg:text-base ">
+<<<<<<< HEAD
             <li className="font-bold">Contact</li>
+=======
+            <li className="font-bold text-purple-500">Contact</li>
+>>>>>>> pranisha
             <li className="flex flex-col gap-2">
               <li className="flex items-center gap-2">
                 <span>
-                  <IoLocationOutline />
+                  <IoLocationOutline style={{ color: "purple" }} size={20} />
                 </span>
-                Pokhara,Ranipuwa
+                Pokhara, Ranipuwa
               </li>
+
               <li className="flex items-center gap-2">
                 <span>
-                  <CiMail />
+                  <CiMail style={{ color: "purple" }} size={20} />
                 </span>
                 <a
                   href="mailto:basaisarai@example.com"
@@ -108,7 +173,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-2">
                 <span>
-                  <FiPhone />
+                  <FiPhone style={{ color: "purple" }} size={20} />
                 </span>
                 <a href="+977 9801010101" className="hover:underline">
                   +977 9801010101

@@ -13,6 +13,7 @@ console.log("GeneralCategory:", GeneralCategory);
 const LandlordForm = () => {
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
+
   const [formData, setFormData] = useState({
     category: "",
     locationCity: "",
@@ -33,7 +34,18 @@ const LandlordForm = () => {
       petAllowed: false,
     },
     floor: "",
+<<<<<<< HEAD
     StreetName: "",
+=======
+    availableStart: "",
+    availableEnd: "",
+    availabilityTime: "",
+    dimensions: {
+      bedrooms: [],
+      kitchens: [],
+      livingrooms: [],
+    },
+>>>>>>> pranisha
   });
   const navigate = useNavigate();
 
@@ -47,10 +59,63 @@ const LandlordForm = () => {
   };
 
   const handleChange = (name, value) => {
+    console.log(name, value);
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+  const handleDimensionChange = (e, index, type, dimensionType) => {
+    const { value } = e.target;
+    setFormData((prevData) => {
+      const updatedDimensions = [...prevData.dimensions[type]];
+      if (!updatedDimensions[index])
+        updatedDimensions[index] = { length: "", breadth: "" };
+      updatedDimensions[index][dimensionType] = value;
+      return {
+        ...prevData,
+        dimensions: {
+          ...prevData.dimensions,
+          [type]: updatedDimensions,
+        },
+      };
+    });
+  };
+
+  const renderDimensionFields = (count, type) => {
+    const fields = [];
+    for (let i = 0; i < count; i++) {
+      fields.push(
+        <div key={`${type}-${i}`} className="mb-2">
+          <label className=" block mb-2 font-medium text-[#9747FF]">
+            {type.charAt(0).toUpperCase() + type.slice(1)} {i + 1}{" "}
+            Dimensions(inch)
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              placeholder="Length"
+              className=" rounded-md p-2 w-1/2"
+              value={formData.dimensions[type][i]?.length || ""}
+              onChange={(e) => handleDimensionChange(e, i, type, "length")}
+            />
+            <input
+              type="number"
+              placeholder="Breadth"
+              className=" rounded-md p-2 w-1/2"
+              value={formData.dimensions[type][i]?.breadth || ""}
+              onChange={(e) => handleDimensionChange(e, i, type, "breadth")}
+            />
+          </div>
+          <div className="mt-1 text-sm text-gray-600">
+            Preview: Length = {formData.dimensions[type][i]?.length || "N/A"}{" "}
+            inch, Breadth = {formData.dimensions[type][i]?.breadth || "N/A"}{" "}
+            inch
+          </div>
+        </div>
+      );
+    }
+    return fields;
   };
 
   const handleCheckboxChange = (e) => {
@@ -64,14 +129,44 @@ const LandlordForm = () => {
     }));
   };
 
+  const handleRoomDimensionsChange = (name, value) => {
+    console.log(
+      "Room Dimension Change from landlord form - Name:",
+      name,
+      "Value:",
+      value
+    );
+    // You can also update your formData or room data here if necessary
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+<<<<<<< HEAD
 
     if (images.length === 0) {
       alert("Please upload at least one image .");
       return;
     }
 
+=======
+    const startDate = new Date(formData.availableStart);
+    const endDate = new Date(formData.availableEnd);
+    if (endDate < startDate) {
+      alert("Availability End date cannot be before Availability Start date.");
+      return;
+    }
+    // Validation for minimum number of images
+    if (images.length < 3) {
+      alert("Please upload at least 3 images.");
+      return;
+    }
+
+    if (images.length === 0) {
+      alert("Please upload at least one image .");
+      return;
+    }
+
+>>>>>>> pranisha
     const featuresData = {
       wifi: formData.features.wifi,
       parking: formData.features.parking,
@@ -79,6 +174,25 @@ const LandlordForm = () => {
       petAllowed: formData.features.petAllowed,
     };
 
+<<<<<<< HEAD
+=======
+    const dimensionsData = {
+      bedrooms: formData.dimensions.bedrooms.map((bedroom) => ({
+        length: bedroom.length,
+        breadth: bedroom.breadth,
+      })),
+      kitchens: formData.dimensions.kitchens.map((kitchen) => ({
+        length: kitchen.length,
+        breadth: kitchen.breadth,
+      })),
+      livingrooms: formData.dimensions.livingrooms.map((livingroom) => ({
+        length: livingroom.length,
+        breadth: livingroom.breadth,
+      })),
+    };
+    
+
+>>>>>>> pranisha
     const propertyData = new FormData();
     propertyData.append("category", formData.category);
     propertyData.append("locationCity", formData.locationCity);
@@ -96,6 +210,29 @@ const LandlordForm = () => {
     propertyData.append("StreetName", formData.StreetName);
     propertyData.append("entityType", "property");
     propertyData.append("numOfBathrooms", formData.numOfBathrooms);
+<<<<<<< HEAD
+=======
+
+    propertyData.append("availableStart", formData.availableStart);
+    propertyData.append("availableEnd", formData.availableEnd);
+
+    propertyData.append("availabilityTime", formData.availabilityTime);
+    // Append the dimensions (bedrooms)
+    formData.dimensions.bedrooms.forEach((bedroom, index) => {
+      propertyData.append(`bedroom${index + 1}_length`, bedroom.length);
+      propertyData.append(`bedroom${index + 1}_breadth`, bedroom.breadth);
+    });
+
+    // Append the dimensions (kitchens)
+    formData.dimensions.kitchens.forEach((kitchen, index) => {
+      propertyData.append(`kitchen${index + 1}_length`, kitchen.length);
+      propertyData.append(`kitchen${index + 1}_breadth`, kitchen.breadth);
+    });
+    formData.dimensions.livingrooms.forEach((livingroom, index) => {
+      propertyData.append(`livingroom${index + 1}_length`, livingroom.length);
+      propertyData.append(`livingroom${index + 1}_breadth`, livingroom.breadth);
+    });
+>>>>>>> pranisha
 
     // Append images and videos to FormData
     images.forEach((image) => {
@@ -115,7 +252,11 @@ const LandlordForm = () => {
 
     try {
       const response = await axios.post(
+<<<<<<< HEAD
         "http://localhost:3001/properties",
+=======
+        "http://localhost:3002/properties",
+>>>>>>> pranisha
         propertyData,
         {
           headers: {
@@ -142,6 +283,10 @@ const LandlordForm = () => {
   const handleCancel = () => {
     navigate("/");
   };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    handleChange(name, value);
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-custom-gray shadow-lg rounded-lg my-12">
@@ -151,7 +296,72 @@ const LandlordForm = () => {
           onChange={handleChange}
           setFormData={setFormData}
         />
-        <GeneralCategory onChange={handleChange} />
+        <GeneralCategory
+          onChange={handleChange}
+          onRoomDimensionsChange={handleRoomDimensionsChange}
+        />
+
+        <div className="grid grid-cols-2 gap-x-4 px-4  ">
+          <div className="">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Bedrooms
+              <span className="text-red-600 text-[20px] ml-1"> *</span>
+            </label>
+            <input
+              type="number"
+              name="numOfBedrooms"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfBedrooms}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfBedrooms || 0}
+            </div>
+            {formData.numOfBedrooms > 0 &&
+              renderDimensionFields(+formData.numOfBedrooms, "bedrooms")}
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Kitchens
+              <span className="text-red-600 text-[20px] ml-1"> *</span>
+            </label>
+            <input
+              type="number"
+              name="numOfKitchens"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfKitchens}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfKitchens || 0}
+            </div>
+            {formData.numOfKitchens > 0 &&
+              renderDimensionFields(+formData.numOfKitchens, "kitchens")}
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Living Rooms
+            </label>
+            <input
+              type="number"
+              name="numOfLivingRooms"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfLivingRooms}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfLivingRooms || 0}
+            </div>
+            {formData.numOfKitchens > 0 &&
+              renderDimensionFields(+formData.numOfLivingRooms, "livingrooms")}
+          </div>
+        </div>
+
         <Rent onChange={handleChange} />
         <DescriptionAndRules
           capitalizeWords={capitalizeWords}
@@ -202,6 +412,55 @@ const LandlordForm = () => {
               />
               <span className="mr-2 text-[#777777]">Pet Allowed</span>
             </label>
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-medium mt-9  ">
+            Availability Start and Availability End
+          </h2>
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Availability Start
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="date"
+                name="availableStart"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+              ></input>
+            </div>
+
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Availability End
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="date"
+                name="availableEnd"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+              ></input>
+            </div>
+            <div className="flex-1">
+              <label className="block mb-2 font-medium text-[#9747FF]">
+                Your availability time{" "}
+                <span className="text-red-600 ml-1 text-[20px]">*</span>
+              </label>
+              <input
+                type="text"
+                name="availabilityTime"
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+                required
+                placeholder="Ex: after 5pm, between 11am-5pm"
+              />
+            </div>
           </div>
         </div>
         <div>

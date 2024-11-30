@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { MdMailOutline } from "react-icons/md";
 import { IoFilterOutline } from "react-icons/io5";
-import ProfileCard from './ProfileCard';
+import ProfileCard from "./ProfileCard";
 
 const LandlordDashboard = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -13,8 +13,9 @@ const LandlordDashboard = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-purple-100 p-4 md:p-8">
+      <h1>I am landlord</h1>
       {/* Left Sidebar with Profile Card */}
-<ProfileCard/>
+      <ProfileCard />
       {/* Vertical Divider Left */}
       <div className="border-l border-gray-400 mx-2 hidden md:block" />
 
@@ -26,20 +27,26 @@ const LandlordDashboard = () => {
 
           {/* Links above the Search Bar */}
           <div className="flex space-x-4 mb-1">
-            <a href="#my-properties" className="text-lg font-semibold px-4 py-2 bg-purple-100 rounded-md hover:bg-purple-200">My Properties</a>
-            <a href="#bookings" className="text-lg font-semibold px-4 py-2 bg-purple-100 rounded-md hover:bg-purple-200">Bookings</a>
+            <a
+              href="#my-properties"
+              className="text-lg font-semibold px-4 py-2 bg-purple-100 rounded-md hover:bg-purple-200"
+            >
+              My Properties
+            </a>
+            <a
+              href="#bookings"
+              className="text-lg font-semibold px-4 py-2 bg-purple-100 rounded-md hover:bg-purple-200"
+            >
+              Bookings
+            </a>
           </div>
 
           {/* Horizontal Divider */}
           <div className="border-t border-gray-400 mb-2 w-full" />
-
-         
-          
         </div>
-        
       </div>
     </div>
   );
-}
+};
 
 export default LandlordDashboard;

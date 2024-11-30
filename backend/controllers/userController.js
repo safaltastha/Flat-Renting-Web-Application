@@ -2,32 +2,46 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Users } = require("../models");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 // Registration handler
 exports.register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { firstName, lastName, address, email, password, role, phoneNumber } =
+    req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await Users.create({
-      name,
+      firstName,
+      lastName,
+      address,
       email,
       password: hashedPassword,
       role,
+      phoneNumber,
     });
 
     const token = jwt.sign(
-      { id: newUser.id, role: newUser.role },
+      {
+        id: newUser.id,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        address: newUser.address,
+        role: newUser.role,
+        email: newUser.email,
+        phoneNumber: newUser.phoneNumber,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 3600000,
+      maxAge: 86400000,
     });
 
     res.json({ message: "Registration successful", user: newUser });
@@ -36,7 +50,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// Login handler
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -51,21 +64,161 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        address: user.address,
+        role: user.role,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("token", token, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 3600000,
+      maxAge: 86400000,
     });
 
     res.json({ message: "Login successful", token });
   } catch (error) {
     res.status(500).json({ message: "Error logging in", error });
+  }
+};
+
+// Get all users
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await Users.findAll();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving users", error });
+  }
+};
+
+// Get user by ID
+
+// Update user
+exports.updateUser = async (req, res) => {
+  const { id } = req.params;
+  const { firstName, lastName, address, email, password, role, phoneNumber } =
+    req.body;
+
+  try {
+    const user = await Users.findByPk(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (password) {
+      user.password = await bcrypt.hash(password, 10);
+    }
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.address = address || user.address;
+    user.email = email || user.email;
+    user.role = role || user.role;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+
+    await user.save();
+    res.json({ message: "User updated successfully", user });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user", error });
+  }
+};
+
+// Delete user
+exports.deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await Users.findByPk(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    await user.destroy();
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting user", error });
+  }
+};
+
+exports.requestPasswordReset = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Find user by email
+    const user = await Users.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate reset token (using crypto to generate a random token)
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpiration = Date.now() + 3600000; // Token valid for 1 hour
+
+    // Save the token and expiration date to the user
+    user.resetToken = resetToken;
+    user.resetTokenExpiration = resetTokenExpiration;
+    await user.save();
+
+    // Send reset email
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // Or your email service provider
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset Request",
+      text: `You requested a password reset. Click the link to reset your password: ${resetURL}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        return res.status(500).json({ message: "Error sending email", error });
+      }
+      res.json({ message: "Password reset email sent" });
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error processing password reset", error });
+  }
+};
+
+// Reset password using token
+exports.resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    // Find user by reset token
+    const user = await Users.findOne({
+      where: {
+        resetToken: token,
+        resetTokenExpiration: { [Sequelize.Op.gt]: Date.now() },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Hash the new password and update it
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.resetToken = null; // Clear the reset token
+    user.resetTokenExpiration = null; // Clear the expiration time
+    await user.save();
+
+    res.json({ message: "Password reset successful" });
+  } catch (error) {
+    res.status(500).json({ message: "Error resetting password", error });
   }
 };
 

@@ -6,7 +6,7 @@ const FloorSelection = ({ handleInputChange }) => {
 
   return (
     <div className="flex-1">
-      <label className="block mb-2 font-medium text-[#9747FF]">
+      <label className="block my-2 font-medium text-[#9747FF]">
         Select a Floor
         <span className="text-red-600 text-[20px] ml-1">*</span>
       </label>

@@ -1,69 +1,82 @@
-import React, { useState } from 'react';
-import { IoMdSearch } from "react-icons/io";
-import { IoFilterOutline } from "react-icons/io5";
-import ProfileCard from './ProfileCard';
+import React from "react";
+import ProfileCard from "./ProfileCard";
+import { useUser } from "../../context/UserContext";
 
-const TenantDashboard = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+const Dashboard = () => {
+  const { user } = useUser(); // Access user data from context
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-purple-100 p-4 md:p-8">
-      {/* Left Sidebar with Profile Card */}
-      <ProfileCard/>
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <aside className="w-1/4 bg-white shadow-lg p-4">
+        <ProfileCard />
+      </aside>
 
-      {/* Vertical Divider Left */}
-      <div className="border-l border-gray-400 mx-2 hidden md:block" />
-
-      {/* Right Sidebar with Search Bar and Navigation */}
-      <div className="w-full md:w-2/3 p-4 flex flex-col justify-start ">
-        <div className="bg-white bg-opacity-10 p-4 md:p-6 rounded-lg shadow-md flex flex-col w-full md:w-1/2 h-full">
-          {/* Top Navigation */}
-          <div className="mb-4 md:mb-10"></div>
-
-          {/* Links above the Search Bar */}
-          <div className="flex space-x-4 mb-1">
-            <a href="#my-bookings" className="text-lg font-semibold px-4 py-2 bg-purple-100 rounded-md hover:bg-purple-200">My Bookings</a>
-            <a href="#my-save" className="text-lg font-semibold px-4 py-2 bg-purple-100 rounded-md hover:bg-purple-200">My Save</a>
-          </div>
-
-          {/* Horizontal Divider */}
-          <div className="border-t border-gray-400 mb-2 w-full" />
-
-          {/* Search Bar and Filter Icon */}
-          <div className="relative flex items-center mb-4 w-full">
-            <div className="flex items-center bg-white p-2 rounded-lg shadow-md flex-grow mr-2">
-              <IoMdSearch className="mr-4 text-2xl" />
-              <input 
-                type="text" 
-                placeholder="Search Properties" 
-                className="flex-grow p-1 text-gray-700 text-base focus:outline-none" 
-              />
-            </div>
-
-            <div onClick={toggleDropdown} className="cursor-pointer relative">
-              <IoFilterOutline className="mr-2 text-2xl" /> {/* Filter icon */}
-            </div>
-
-            {/* Dropdown for Filter Options */}
-            {isDropdownOpen && (
-              <div className="absolute right-0 top-[calc(100%+4px)] bg-white shadow-md rounded-md z-10 flex flex-col w-40 p-2">
-                <ul>
-                  <li className="py-1 hover:bg-purple-100 cursor-pointer">Location</li>
-                  <li className="py-1 hover:bg-purple-100 cursor-pointer">High to Low</li>
-                  <li className="py-1 hover:bg-purple-100 cursor-pointer">Low to High</li>
-                </ul>
-              </div>
+      {/* Main Content */}
+      <main className="flex-1 bg-white shadow-lg p-6">
+        {/* Navigation Tabs */}
+        <div className="border-b pb-2 mb-4">
+          <nav className="flex space-x-6">
+            {/* Show tabs based on user role */}
+            {user?.role === "tenant" && (
+              <>
+                <button className="text-gray-700 font-semibold border-b-2 border-black">
+                  My Bookings
+                </button>
+                <button className="text-gray-500">Save Lists</button>
+              </>
             )}
+
+            {user?.role === "landlord" && (
+              <>
+                <button className="text-gray-700 font-semibold border-b-2 border-black">
+                  My Properties
+                </button>
+                <button className="text-gray-500">Properties Booked</button>
+              </>
+            )}
+
+            {user?.role === "vehicleSupplier" && (
+              <>
+                <button className="text-gray-700 font-semibold border-b-2 border-black">
+                  My Vehicles
+                </button>
+                <button className="text-gray-500">Vehicles Booked</button>
+              </>
+            )}
+          </nav>
+        </div>
+
+        {/* Content Area - Dynamic based on selected tab */}
+        <div className="grid grid-cols-3 gap-6">
+          {/* Example placeholder content for demonstration */}
+          <div className="border rounded-lg p-4 relative">
+            <div className="w-full h-40 bg-gray-300 mb-4 relative">
+              <span className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">
+                On Hold
+              </span>
+            </div>
+            <h3 className="text-lg font-semibold">Sofa</h3>
+            <p className="text-sm text-gray-500">Used</p>
+            <p className="text-lg font-semibold mt-2">₹ 54,000</p>
           </div>
         </div>
-      </div>
+      </main>
+
+      {/* Right Sidebar */}
+      <aside className="w-1/4 p-4 text-sm text-gray-500 bg-white shadow-lg">
+        <ul className="space-y-2">
+          <li>HB Select</li>
+          <li>Terms of Use</li>
+          <li>Safety Tips</li>
+          <li>Posting Rules</li>
+          <li>FAQ</li>
+          <li>Contact</li>
+          <li>Report Bugs</li>
+        </ul>
+      </aside>
     </div>
   );
-}
+};
 
-export default TenantDashboard;
-
+export default Dashboard;

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
+import { RxHamburgerMenu } from "react-icons/rx";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiSettings } from "react-icons/ci";
 import { BiChevronDown } from "react-icons/bi";
@@ -9,15 +10,17 @@ import { FaPlus } from "react-icons/fa6";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { useUser } from "../../context/UserContext";
 
 export default function Navbar() {
+  const { user, auth } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showProperties, setShowProperties] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const propertiesRef = useRef(null);
+<<<<<<< HEAD
 
   const res = Cookies.get("token");
 
@@ -40,10 +43,32 @@ export default function Navbar() {
       setUser(null);
     }
   }, []);
+=======
+  const { logout } = useUser();
+
+  const res = Cookies.get("token");
+
+  //TODO:  Remove this
+  // useEffect(() => {
+  //   const token = Cookies.get("token");
+  //   if (token) {
+  //     try {
+  //       const decodedToken = jwtDecode(token);
+  //       console.log(decodedToken); // Decode the token
+  //       setUser(decodedToken); // Set user state to decoded token
+  //     } catch (error) {
+  //       console.error("Invalid token:", error);
+  //       setUser(null);
+  //     }
+  //   } else {
+  //     setUser(null);
+  //   }
+  // }, []);
+>>>>>>> pranisha
 
   const handleLogout = () => {
+    logout();
     Cookies.remove("token");
-    setUser(null);
     navigate("/login");
   };
 
@@ -52,7 +77,8 @@ export default function Navbar() {
   };
 
   const handleProfile = () => {
-    navigate("/myprofile");
+    navigate("/dashboard");
+    navigate("/dashboard");
   };
 
   const toggleDropdown = () => {
@@ -62,30 +88,24 @@ export default function Navbar() {
   const handlePostPropertyClick = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await axios.get("http://localhost:3001/auth/role", {
-        withCredentials: true,
-      });
+    navigate("/postyourproperty");
+  };
 
-      if (response.data.role === "landlord") {
-        navigate("/postyourproperty");
-      } else {
-        alert("Please Login as landlord to post your property");
-      }
-    } catch (error) {
-      alert("An error occurred while checking your role. Please try again.");
-    }
+  const handlePostVehicleClick = async (e) => {
+    e.preventDefault();
+
+    navigate("/postyourvehicle");
   };
 
   return (
-    <div className="border border-spacing-3 flex items-center justify-between px-4 h-20">
+    <div className="border border-spacing-3 flex items-center justify-between px-6 h-50">
       {/* Logo */}
       <div className="py-1">
         <img
           src="/logo/logo.jpg"
           alt="Logo"
-          height="170"
-          width="200"
+          height="350"
+          width="300"
           className="flex lg:hidden"
         />
         <img
@@ -101,9 +121,9 @@ export default function Navbar() {
       <div className="block lg:hidden text-xl">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="text-purple-600 focus:outline-none text-4xl"
+          className="text-purple-600 focus:outline-none text-6xl"
         >
-          <FaBars />
+          <RxHamburgerMenu />
         </button>
       </div>
 
@@ -128,11 +148,15 @@ export default function Navbar() {
           <li>
             <Link
               to="/"
+<<<<<<< HEAD
               className={`block px-4 py-2 text-purple-500 hover:text-purple-500 ${
                 location.pathname === "/"
                   ? "underline decoration-2 decoration-purple-500"
                   : ""
               }`}
+=======
+              className={`block px-4 py-2 text-purple-500 font-semibold`}
+>>>>>>> pranisha
             >
               Home
             </Link>
@@ -166,35 +190,13 @@ export default function Navbar() {
                   <Link to="/properties/room">Room</Link>
                 </li>
                 <li className="p-2 hover:bg-gray-200">
-                  <Link to="/properties/officespace">Office Space</Link>
-                </li>
-                <li className="p-2 hover:bg-gray-200">
-                  <Link to="/properties/shutters">Shutters</Link>
+                  <Link to="/properties/apartment">Apartment</Link>
+                  <Link to="/properties/apartment">Apartment</Link>
                 </li>
               </ul>
             )}
           </li>
 
-          <li>
-            <Link
-              to="/contactus"
-              className={`block px-4 py-2 hover:text-purple-500 ${
-                location.pathname === "/contactus" ? "underline" : ""
-              }`}
-            >
-              Contact
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/aboutus"
-              className={`block px-4 py-2 hover:text-purple-500 ${
-                location.pathname === "/aboutus" ? "underline" : ""
-              }`}
-            >
-              About Us
-            </Link>
-          </li>
           <li>
             <a
               href="/postyourproperty"
@@ -208,8 +210,21 @@ export default function Navbar() {
             </a>
           </li>
 
+          <li>
+            <a
+              href="/postyourvehicle"
+              onClick={handlePostVehicleClick}
+              className="px-4 py-1 text-black lg:border-2 lg:border-purple-500 lg:hover:bg-purple-600 lg:hover:text-white transition-colors duration-200 rounded-md flex items-center gap-1"
+            >
+              <span className="text-sm">
+                <FaPlus size={18} />
+              </span>
+              Post Your Vehicle
+            </a>
+          </li>
+
           {/* User Profile Dropdown */}
-          {user ? (
+          {auth.accessToken ? (
             <li className="relative" onClick={toggleDropdown}>
               {/* Use static user photo here */}
               <img

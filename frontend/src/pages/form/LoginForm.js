@@ -4,10 +4,13 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
 import Cookies from "js-cookie"; // Import js-cookie
+import { useUser } from "../../context/UserContext";
+import { jwtDecode, JwtPayload } from "jwt-decode";
 
 function Login() {
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
+  const { setAuth, setUser } = useUser();
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -34,12 +37,27 @@ function Login() {
       );
 
       if (response.data) {
+        const token = response.data.token;
+        const decodedToken = jwtDecode(token);
+        setAuth({
+          accessToken: token,
+        });
+        setUser({
+          id: decodedToken.id,
+          role: decodedToken.role,
+          email: decodedToken.email,
+          name: decodedToken.name,
+          phoneNumber: decodedToken.phoneNumber,
+        });
+        console.log(token, "login token");
+        console.log(decodedToken, "decoded token");
+
         if (rememberMe) {
           // Cookies.set("token", response.data.token, {
           //   expires: 1 / 24,
           //   path: "/",
           // });
-          localStorage.setItem('token', response.data.token)
+          localStorage.setItem("token", response.data.token);
         } else {
           Cookies.set("token", response.data.token, { path: "/" }); // Session cookie
         }
@@ -131,7 +149,7 @@ function Login() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="hidden lg:block w-full py-2 px-4 text-white bg-purple-600 border-2 border-transparent rounded-lg hover:bg-white hover:border-purple-500 hover:text-black"
+                className="lg:block w-full py-2 px-4 text-white bg-purple-600 border-2 border-transparent rounded-lg hover:bg-white hover:border-purple-500 hover:text-black"
               >
                 {isSubmitting ? "Logging in..." : "Login"}
               </button>

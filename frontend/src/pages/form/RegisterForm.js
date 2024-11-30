@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { RiArrowDownSLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
+import PhoneNumValidation from "../../components/PhoneNumValidation"; // Adjust the path as needed
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -13,6 +14,7 @@ const validationSchema = Yup.object().shape({
       "Invalid email address"
     )
     .required("Email is required"),
+<<<<<<< HEAD
   name: Yup.string()
     .matches(
       /^[a-z0-9]+$/,
@@ -21,6 +23,11 @@ const validationSchema = Yup.object().shape({
     .min(3, "Name must be at least 3 characters long")
     .max(50, "Name must not exceed 50 characters")
     .required("Name is required"),
+=======
+  firstName: Yup.string().required("First name is required"),
+  lastName: Yup.string().required("Last name is required"),
+  address: Yup.string().required("Address is required"),
+>>>>>>> pranisha
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
@@ -34,12 +41,16 @@ const validationSchema = Yup.object().shape({
   role: Yup.string()
     .oneOf(["tenant", "landlord", "vehicleSupplier"], "Invalid role")
     .required("Role is required"),
+<<<<<<< HEAD
   phoneNumber: Yup.string()
     .required("Phone number is required")
     .matches(
       /^\+977 ?\d{10}$/,
       "Phone number must be in the format +977XXXXXXXXXX"
     ),
+=======
+  phoneNumber: Yup.string().required("Phone number is required"),
+>>>>>>> pranisha
 });
 
 const RegisterForm = () => {
@@ -48,14 +59,12 @@ const RegisterForm = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/register",
+        "http://localhost:3002/auth/register",
         values
       );
-      // Assuming successful registration, navigate to login
       resetForm();
       navigate("/login");
     } catch (error) {
-      // Handle the error appropriately
       alert(
         "Failed to register user: " +
           (error.response?.data?.message || error.message)
@@ -66,7 +75,11 @@ const RegisterForm = () => {
   };
 
   return (
+<<<<<<< HEAD
     <div className="flex items-center justify-center h-[100vh] max-h-screen py-8 p-4 bg-gray-100">
+=======
+    <div className="flex items-center justify-center   py-8 p-4 bg-gray-100">
+>>>>>>> pranisha
       <Formik
         initialValues={{
           name: "",
@@ -80,33 +93,75 @@ const RegisterForm = () => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form className="w-full max-w-screen-md bg-white p-6 rounded-lg shadow-md">
             <h1 className="text-2xl text-center font-bold text-[#A06FFF] mb-6">
               Register
             </h1>
 
+            {/* Username */}
             <div className="mb-4">
               <label
-                htmlFor="name"
+                htmlFor="firstName"
                 className="block md:text-sm font-medium text-gray-700"
               >
-                Username{" "}
+                First Name{" "}
                 <span className="ml-1 text-red-600 text-[20px]">*</span>
               </label>
               <Field
                 type="text"
-                name="name"
+                name="firstName"
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
-                placeholder="johndoe"
+                placeholder="john"
               />
               <ErrorMessage
-                name="name"
+                name="firstName"
                 component="div"
                 className="text-red-500 text-sm mt-1"
               />
             </div>
 
+            <div className="mb-4">
+              <label
+                htmlFor="lastName"
+                className="block md:text-sm font-medium text-gray-700"
+              >
+                Last Name{" "}
+                <span className="ml-1 text-red-600 text-[20px]">*</span>
+              </label>
+              <Field
+                type="text"
+                name="lastName"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
+                placeholder="doe"
+              />
+              <ErrorMessage
+                name="lastName"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="address"
+                className="block md:text-sm font-medium text-gray-700"
+              >
+                Address <span className="ml-1 text-red-600 text-[20px]">*</span>
+              </label>
+              <Field
+                type="text"
+                name="address"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
+              />
+              <ErrorMessage
+                name="address"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+
+            {/* Email */}
             <div className="mb-4">
               <label
                 htmlFor="email"
@@ -127,6 +182,7 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Password */}
             <div className="mb-4">
               <label
                 htmlFor="password"
@@ -147,6 +203,7 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Confirm Password */}
             <div className="mb-4">
               <label
                 htmlFor="confirmPassword"
@@ -167,6 +224,27 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Phone Number */}
+            <div className="mb-4">
+              <label
+                htmlFor="phoneNumber"
+                className="block mb-1 md:text-sm font-medium text-gray-700"
+              >
+                Phone Number{" "}
+                <span className="ml-1  text-red-600 text-[20px]">*</span>
+              </label>
+              <PhoneNumValidation
+                setFieldValue={setFieldValue}
+                fieldName="phoneNumber"
+              />
+              <ErrorMessage
+                name="phoneNumber"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+
+            {/* Role */}
             <div className="mb-4">
               <label
                 htmlFor="phoneNumber"
@@ -217,6 +295,7 @@ const RegisterForm = () => {
               />
             </div>
 
+            {/* Submit Button */}
             <div>
               <button
                 type="submit"
@@ -227,6 +306,7 @@ const RegisterForm = () => {
               </button>
             </div>
 
+            {/* Login Redirect */}
             <div className="flex justify-center items-center mt-3">
               Already have an account?{" "}
               <Link
