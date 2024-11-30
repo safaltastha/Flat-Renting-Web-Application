@@ -20,7 +20,6 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const propertiesRef = useRef(null);
-<<<<<<< HEAD
 
   const res = Cookies.get("token");
 
@@ -43,28 +42,6 @@ export default function Navbar() {
       setUser(null);
     }
   }, []);
-=======
-  const { logout } = useUser();
-
-  const res = Cookies.get("token");
-
-  //TODO:  Remove this
-  // useEffect(() => {
-  //   const token = Cookies.get("token");
-  //   if (token) {
-  //     try {
-  //       const decodedToken = jwtDecode(token);
-  //       console.log(decodedToken); // Decode the token
-  //       setUser(decodedToken); // Set user state to decoded token
-  //     } catch (error) {
-  //       console.error("Invalid token:", error);
-  //       setUser(null);
-  //     }
-  //   } else {
-  //     setUser(null);
-  //   }
-  // }, []);
->>>>>>> pranisha
 
   const handleLogout = () => {
     logout();
@@ -148,15 +125,11 @@ export default function Navbar() {
           <li>
             <Link
               to="/"
-<<<<<<< HEAD
               className={`block px-4 py-2 text-purple-500 hover:text-purple-500 ${
                 location.pathname === "/"
                   ? "underline decoration-2 decoration-purple-500"
                   : ""
               }`}
-=======
-              className={`block px-4 py-2 text-purple-500 font-semibold`}
->>>>>>> pranisha
             >
               Home
             </Link>

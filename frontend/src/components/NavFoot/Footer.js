@@ -46,13 +46,7 @@ const Footer = () => {
         {/* 2nd Column - 20% Width */}
         <div className="lg:w-[20%] px-8  lg:px-4">
           <ul className="flex flex-col gap-4 lg:gap-2 ">
-<<<<<<< HEAD
             <li className="font-bold text-4xl lg:text-base ">Useful Links</li>
-=======
-            <li className="font-bold text-4xl lg:text-base text-purple-500 ">
-              Useful Links
-            </li>
->>>>>>> pranisha
             <li className="flex flex-col gap-2 text-3xl lg:text-base ">
               <li>
                 <Link
@@ -96,13 +90,7 @@ const Footer = () => {
         {/* 3rd Column - 20% Width */}
         <div className="lg:w-[20%]  px-8  lg:px-4">
           <ul className="flex flex-col gap-2">
-<<<<<<< HEAD
             <li className="font-bold text-3xl lg:text-base ">Properties</li>
-=======
-            <li className="font-bold text-3xl lg:text-base text-purple-500">
-              Properties
-            </li>
->>>>>>> pranisha
             <li className="flex flex-col gap-2 text-3xl lg:text-base">
               <li>
                 <Link
@@ -147,11 +135,7 @@ const Footer = () => {
         {/* 4th Column - 20% Width */}
         <div className="lg:w-[20%]  px-8  lg:px-4 ">
           <ul className="flex flex-col gap-2 text-3xl lg:text-base ">
-<<<<<<< HEAD
             <li className="font-bold">Contact</li>
-=======
-            <li className="font-bold text-purple-500">Contact</li>
->>>>>>> pranisha
             <li className="flex flex-col gap-2">
               <li className="flex items-center gap-2">
                 <span>
