@@ -11,7 +11,7 @@ import Cookies from "js-cookie";
 const LandlordForm = () => {
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
-  const [rooms, setRooms] = useState([]);
+
   const [formData, setFormData] = useState({
     category: "",
     locationCity: "",
@@ -35,6 +35,11 @@ const LandlordForm = () => {
     availableStart: "",
     availableEnd: "",
     availabilityTime: "",
+    dimensions: {
+      bedrooms: [],
+      kitchens: [],
+      livingrooms: [],
+    },
   });
   const navigate = useNavigate();
 
@@ -48,10 +53,63 @@ const LandlordForm = () => {
   };
 
   const handleChange = (name, value) => {
+    console.log(name, value);
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+  const handleDimensionChange = (e, index, type, dimensionType) => {
+    const { value } = e.target;
+    setFormData((prevData) => {
+      const updatedDimensions = [...prevData.dimensions[type]];
+      if (!updatedDimensions[index])
+        updatedDimensions[index] = { length: "", breadth: "" };
+      updatedDimensions[index][dimensionType] = value;
+      return {
+        ...prevData,
+        dimensions: {
+          ...prevData.dimensions,
+          [type]: updatedDimensions,
+        },
+      };
+    });
+  };
+
+  const renderDimensionFields = (count, type) => {
+    const fields = [];
+    for (let i = 0; i < count; i++) {
+      fields.push(
+        <div key={`${type}-${i}`} className="mb-2">
+          <label className=" block mb-2 font-medium text-[#9747FF]">
+            {type.charAt(0).toUpperCase() + type.slice(1)} {i + 1}{" "}
+            Dimensions(inch)
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              placeholder="Length"
+              className=" rounded-md p-2 w-1/2"
+              value={formData.dimensions[type][i]?.length || ""}
+              onChange={(e) => handleDimensionChange(e, i, type, "length")}
+            />
+            <input
+              type="number"
+              placeholder="Breadth"
+              className=" rounded-md p-2 w-1/2"
+              value={formData.dimensions[type][i]?.breadth || ""}
+              onChange={(e) => handleDimensionChange(e, i, type, "breadth")}
+            />
+          </div>
+          <div className="mt-1 text-sm text-gray-600">
+            Preview: Length = {formData.dimensions[type][i]?.length || "N/A"}{" "}
+            inch, Breadth = {formData.dimensions[type][i]?.breadth || "N/A"}{" "}
+            inch
+          </div>
+        </div>
+      );
+    }
+    return fields;
   };
 
   const handleCheckboxChange = (e) => {
@@ -65,20 +123,13 @@ const LandlordForm = () => {
     }));
   };
 
-  const handleRoomsChange = (index, roomType, field, value) => {
-    console.log();
-    setRooms((prev) => {
-      const updatedRooms = [...prev];
-      if (!updatedRooms[index]) {
-        updatedRooms[index] = { roomType, length: 0, width: 0 };
-      }
-      updatedRooms[index][field] = value;
-      return updatedRooms;
-    });
-  };
-
   const handleRoomDimensionsChange = (name, value) => {
-    console.log("Room Dimension Change from landlord form - Name:", name, "Value:", value);
+    console.log(
+      "Room Dimension Change from landlord form - Name:",
+      name,
+      "Value:",
+      value
+    );
     // You can also update your formData or room data here if necessary
   };
 
@@ -108,6 +159,22 @@ const LandlordForm = () => {
       petAllowed: formData.features.petAllowed,
     };
 
+    const dimensionsData = {
+      bedrooms: formData.dimensions.bedrooms.map((bedroom) => ({
+        length: bedroom.length,
+        breadth: bedroom.breadth,
+      })),
+      kitchens: formData.dimensions.kitchens.map((kitchen) => ({
+        length: kitchen.length,
+        breadth: kitchen.breadth,
+      })),
+      livingrooms: formData.dimensions.livingrooms.map((livingroom) => ({
+        length: livingroom.length,
+        breadth: livingroom.breadth,
+      })),
+    };
+    
+
     const propertyData = new FormData();
     propertyData.append("category", formData.category);
     propertyData.append("locationCity", formData.locationCity);
@@ -130,6 +197,21 @@ const LandlordForm = () => {
     propertyData.append("availableEnd", formData.availableEnd);
 
     propertyData.append("availabilityTime", formData.availabilityTime);
+    // Append the dimensions (bedrooms)
+    formData.dimensions.bedrooms.forEach((bedroom, index) => {
+      propertyData.append(`bedroom${index + 1}_length`, bedroom.length);
+      propertyData.append(`bedroom${index + 1}_breadth`, bedroom.breadth);
+    });
+
+    // Append the dimensions (kitchens)
+    formData.dimensions.kitchens.forEach((kitchen, index) => {
+      propertyData.append(`kitchen${index + 1}_length`, kitchen.length);
+      propertyData.append(`kitchen${index + 1}_breadth`, kitchen.breadth);
+    });
+    formData.dimensions.livingrooms.forEach((livingroom, index) => {
+      propertyData.append(`livingroom${index + 1}_length`, livingroom.length);
+      propertyData.append(`livingroom${index + 1}_breadth`, livingroom.breadth);
+    });
 
     // Append images and videos to FormData
     images.forEach((image) => {
@@ -190,9 +272,71 @@ const LandlordForm = () => {
           setFormData={setFormData}
         />
         <GeneralCategory
-          onChange={handleRoomsChange}
+          onChange={handleChange}
           onRoomDimensionsChange={handleRoomDimensionsChange}
         />
+
+        <div className="grid grid-cols-2 gap-x-4 px-4  ">
+          <div className="">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Bedrooms
+              <span className="text-red-600 text-[20px] ml-1"> *</span>
+            </label>
+            <input
+              type="number"
+              name="numOfBedrooms"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfBedrooms}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfBedrooms || 0}
+            </div>
+            {formData.numOfBedrooms > 0 &&
+              renderDimensionFields(+formData.numOfBedrooms, "bedrooms")}
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Kitchens
+              <span className="text-red-600 text-[20px] ml-1"> *</span>
+            </label>
+            <input
+              type="number"
+              name="numOfKitchens"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfKitchens}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfKitchens || 0}
+            </div>
+            {formData.numOfKitchens > 0 &&
+              renderDimensionFields(+formData.numOfKitchens, "kitchens")}
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Living Rooms
+            </label>
+            <input
+              type="number"
+              name="numOfLivingRooms"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfLivingRooms}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfLivingRooms || 0}
+            </div>
+            {formData.numOfKitchens > 0 &&
+              renderDimensionFields(+formData.numOfLivingRooms, "livingrooms")}
+          </div>
+        </div>
+
         <Rent onChange={handleChange} />
         <DescriptionAndRules
           capitalizeWords={capitalizeWords}

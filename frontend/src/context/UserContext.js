@@ -7,7 +7,9 @@ export const UserProvider = ({ children }) => {
   const initialUser = {
     id: "",
     role: "",
-    name: "",
+    firstName: "",
+    lastName: "",
+    address: "",
     email: "",
     phoneNumber: "",
   };

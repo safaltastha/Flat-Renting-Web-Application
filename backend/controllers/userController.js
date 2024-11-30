@@ -1,19 +1,22 @@
 // controllers/userController.js
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { Users, UserRating } = require("../models");
+const { Users } = require("../models");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 // Registration handler
 exports.register = async (req, res) => {
-  const { name, email, password, role, phoneNumber } = req.body;
+  const { firstName, lastName, address, email, password, role, phoneNumber } =
+    req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await Users.create({
-      name,
+      firstName,
+      lastName,
+      address,
       email,
       password: hashedPassword,
       role,
@@ -23,20 +26,22 @@ exports.register = async (req, res) => {
     const token = jwt.sign(
       {
         id: newUser.id,
-        name: newUser.name,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        address: newUser.address,
         role: newUser.role,
         email: newUser.email,
         phoneNumber: newUser.phoneNumber,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 3600000,
+      maxAge: 86400000,
     });
 
     res.json({ message: "Registration successful", user: newUser });
@@ -61,20 +66,22 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user.id,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        address: user.address,
         role: user.role,
         email: user.email,
         phoneNumber: user.phoneNumber,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("token", token, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 3600000,
+      maxAge: 86400000,
     });
 
     res.json({ message: "Login successful", token });
@@ -95,56 +102,11 @@ exports.getAllUsers = async (req, res) => {
 
 // Get user by ID
 
-// Function to calculate average rating for a user
-const calculateAverageRating = async (userId) => {
-  const ratings = await UserRating.findAll({
-    where: { rated_user_id: userId },
-  });
-
-  const totalRatings = ratings.length;
-  const sumRatings = ratings.reduce(
-    (acc, rating) => acc + rating.rating_value,
-    0
-  );
-
-  // Calculate average rating
-  const averageRating =
-    totalRatings > 0 ? (sumRatings / totalRatings).toFixed(2) : 0;
-
-  return averageRating;
-};
-
-// Get user profile along with average rating
-exports.getUserById = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // Fetch user details from the database
-    const user = await Users.findByPk(id, {
-      attributes: ["id", "name", "role"], // Selecting specific attributes
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Calculate average rating of the user
-    const averageRating = await calculateAverageRating(id);
-
-    // Return user details and average rating
-    res.json({
-      user,
-      averageRating, // Include average rating in the response
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error retrieving user", error });
-  }
-};
-
 // Update user
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { name, email, password, role, phoneNumber } = req.body;
+  const { firstName, lastName, address, email, password, role, phoneNumber } =
+    req.body;
 
   try {
     const user = await Users.findByPk(id);
@@ -153,7 +115,9 @@ exports.updateUser = async (req, res) => {
     if (password) {
       user.password = await bcrypt.hash(password, 10);
     }
-    user.name = name || user.name;
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.address = address || user.address;
     user.email = email || user.email;
     user.role = role || user.role;
     user.phoneNumber = phoneNumber || user.phoneNumber;

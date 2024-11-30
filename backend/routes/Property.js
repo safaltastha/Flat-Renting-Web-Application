@@ -5,7 +5,7 @@ const { Property, Media, Users } = require("../models");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/multerConfig");
 const { searchProperties } = require("../controllers/searchController");
-const Room = require("../models/Room");
+
 const fs = require("fs");
 
 //Post properties
@@ -40,6 +40,7 @@ router.post(
       availableStart,
       availableEnd,
       availabilityTime,
+      dimensions,
     } = req.body; // Ensure entityType is included in the request body
 
     if (!entityType || entityType !== "property") {
@@ -50,7 +51,7 @@ router.post(
     }
 
     try {
-      let parsedFeatures, parsedRooms;
+      let parsedFeatures;
       try {
         parsedFeatures = JSON.parse(features);
       } catch (parseError) {
@@ -58,6 +59,30 @@ router.post(
           message: "Invalid features format",
           error: parseError.message,
         });
+      }
+      let parsedDimensions = {};
+      if (dimensions) {
+        try {
+          parsedDimensions = {
+            bedrooms: dimensions.bedrooms?.map((room) => ({
+              length: parseFloat(room.length) || 0,
+              breadth: parseFloat(room.breadth) || 0,
+            })),
+            kitchens: dimensions.kitchens?.map((room) => ({
+              length: parseFloat(room.length) || 0,
+              breadth: parseFloat(room.breadth) || 0,
+            })),
+            livingrooms: dimensions.livingrooms?.map((room) => ({
+              length: parseFloat(room.length) || 0,
+              breadth: parseFloat(room.breadth) || 0,
+            })),
+          };
+        } catch (err) {
+          return res.status(400).json({
+            message: "Invalid dimensions format",
+            error: err.message,
+          });
+        }
       }
 
       const propertyData = {
@@ -81,22 +106,10 @@ router.post(
         availabilityTime,
         userId: req.user.id,
         entityType,
+        dimensions: parsedDimensions,
       };
 
       const newProperty = await Property.create(propertyData);
-      // Save room dimensions to the Room table
-      // if (parsedRooms && parsedRooms.length > 0) {
-      //   await Promise.all(
-      //     parsedRooms.map((room) =>
-      //       Room.create({
-      //         propertyId: newProperty.id,
-      //         roomType: room.roomType,
-      //         length: room.length,
-      //         width: room.width,
-      //       })
-      //     )
-      //   );
-      // }
 
       const imagesDirectory = path.join(__dirname, "uploads/properties/images");
       if (!fs.existsSync(imagesDirectory)) {
@@ -161,14 +174,11 @@ router.post(
 // Get all properties
 router.get("/", authenticateJWT, async (req, res) => {
   try {
-    const { category } = req.query;
-    const whereCondition = category ? { category } : {};
     const properties = await Property.findAll({
-      where: whereCondition,
       include: [
         {
           model: Users,
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "firstName", "email"],
         },
         {
           model: Media,
@@ -185,7 +195,7 @@ router.get("/", authenticateJWT, async (req, res) => {
 
     const reversedProperties = properties.reverse();
 
-    const baseUrl = "http://localhost:3002"; // Base URL for files
+    const baseUrl = "http://localhost:3001"; // Base URL for files
 
     reversedProperties.forEach((property) => {
       if (property.media) {
@@ -221,7 +231,14 @@ router.get("/:id", authenticateJWT, async (req, res) => {
       include: [
         {
           model: Users,
-          attributes: ["id", "name", "email"],
+          attributes: [
+            "id",
+            "firstName",
+            "lastName",
+            "address",
+            "phoneNumber",
+            "email",
+          ],
         },
         {
           model: Media,
@@ -237,7 +254,7 @@ router.get("/:id", authenticateJWT, async (req, res) => {
     }
 
     // Format media paths
-    const baseUrl = "http://localhost:3002"; // Base URL for files
+    const baseUrl = "http://localhost:3001"; // Base URL for files
     if (property.media) {
       property.media.forEach((mediaItem) => {
         const filePath = mediaItem.file_path.replace(/\\/g, "/"); // Ensure path formatting is consistent
@@ -245,7 +262,35 @@ router.get("/:id", authenticateJWT, async (req, res) => {
       });
     }
 
-    res.status(200).json(property);
+    res.status(200).json({
+      id: property.id,
+      description: property.description,
+      houseRule: property.houseRule,
+      category: property.category,
+      locationCity: property.locationCity,
+      locationStreetNumber: property.locationStreetNumber,
+      StreetName: property.StreetName,
+      numOfSpaces: property.numOfSpaces,
+      numOfBedrooms: property.numOfBedrooms,
+      numOfLivingrooms: property.numOfLivingrooms,
+      numOfKitchens: property.numOfKitchens,
+      numOfBathrooms: property.numOfBathrooms,
+      floor: property.floor,
+      features: property.features,
+      dimensions: property.dimensions,
+      monthlyRent: property.monthlyRent,
+      advancedRent: property.advancedRent,
+      media: property.media,
+      availabilityTime: property.availabilityTime, // Corrected to fetch from property itself
+      landlord: {
+        id: property.User.id,
+        firstName: property.User.firstName,
+        lastName: property.User.lastName,
+        address: property.User.address,
+        email: property.User.email,
+        phoneNumber: property.User.phoneNumber, // Ensure this exists in the `User` table
+      },
+    });
   } catch (error) {
     console.error("Database Error:", error); // Log the error for debugging
     res.status(500).json({ message: "Error retrieving property", error });

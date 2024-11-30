@@ -17,11 +17,13 @@ const PersistLogin = () => {
         const decodedToken = jwtDecode(token);
         setAuth({ accessToken: token });
         setUser({
-            id: decodedToken.id,
-            role: decodedToken.role,
-            email: decodedToken.email,
-            name: decodedToken.name,
-            phoneNumber: decodedToken.phoneNumber
+          id: decodedToken.id,
+          role: decodedToken.role,
+          email: decodedToken.email,
+          firstName: decodedToken.firstName,
+          lastName: decodedToken.lastName,
+          address: decodedToken.address,
+          phoneNumber: decodedToken.phoneNumber,
         });
       }
     };

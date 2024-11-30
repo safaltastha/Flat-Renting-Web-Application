@@ -39,7 +39,6 @@ exports.createBooking = async (req, res) => {
           date: vehicleBooking.date,
           time: vehicleBooking.time,
           vehicle_duration: vehicleBooking.vehicle_duration,
-          
         },
         { transaction }
       );
@@ -170,7 +169,7 @@ exports.getBookedPropertiesForLandlord = async (req, res) => {
     // Fetch properties posted by the landlord and their bookings
     const landlordBookings = await Users.findOne({
       where: { id: landlordId },
-      attributes: ["id", "name", "phoneNumber"],
+      attributes: ["id", "firstName", "phoneNumber"],
       include: [
         {
           model: Property, // Include properties posted by the landlord
@@ -182,7 +181,7 @@ exports.getBookedPropertiesForLandlord = async (req, res) => {
               include: [
                 {
                   model: Users,
-                  attributes: ["name", "email", "phoneNumber"],
+                  attributes: ["firstName", "email", "phoneNumber"],
                 },
               ],
             },
@@ -211,7 +210,7 @@ exports.getBookedVehicleForVehicleSupplier = async (req, res) => {
     // Fetch vehicles posted by the supplier and their bookings
     const supplierBookings = await Users.findOne({
       where: { id: supplierId },
-      attributes: ["id", "name"], // Add the supplier's name and any other relevant attributes
+      attributes: ["id", "firstName"], // Add the supplier's name and any other relevant attributes
       include: [
         {
           model: Vehicle, // Include vehicles posted by the supplier
@@ -223,7 +222,7 @@ exports.getBookedVehicleForVehicleSupplier = async (req, res) => {
               include: [
                 {
                   model: Users, // Include user details who booked the vehicle
-                  attributes: ["name", "email", "phoneNumber"], // Attributes to retrieve
+                  attributes: ["firstName", "email", "phoneNumber"], // Attributes to retrieve
                 },
               ],
             },

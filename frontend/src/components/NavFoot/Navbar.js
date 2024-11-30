@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
+import { RxHamburgerMenu } from "react-icons/rx";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiSettings } from "react-icons/ci";
 import { BiChevronDown } from "react-icons/bi";
@@ -52,6 +53,7 @@ export default function Navbar() {
 
   const handleProfile = () => {
     navigate("/dashboard");
+    navigate("/dashboard");
   };
 
   const toggleDropdown = () => {
@@ -71,14 +73,14 @@ export default function Navbar() {
   };
 
   return (
-    <div className="border border-spacing-3 flex items-center justify-between px-4 h-20">
+    <div className="border border-spacing-3 flex items-center justify-between px-6 h-50">
       {/* Logo */}
       <div className="py-1">
         <img
           src="/logo/logo.jpg"
           alt="Logo"
-          height="170"
-          width="200"
+          height="350"
+          width="300"
           className="flex lg:hidden"
         />
         <img
@@ -94,9 +96,9 @@ export default function Navbar() {
       <div className="block lg:hidden text-xl">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="text-purple-600 focus:outline-none text-4xl"
+          className="text-purple-600 focus:outline-none text-6xl"
         >
-          <FaBars />
+          <RxHamburgerMenu />
         </button>
       </div>
 
@@ -121,9 +123,7 @@ export default function Navbar() {
           <li>
             <Link
               to="/"
-              className={`block px-4 py-2 hover:text-purple-500 ${
-                location.pathname === "/" ? "underline" : ""
-              }`}
+              className={`block px-4 py-2 text-purple-500 font-semibold`}
             >
               Home
             </Link>
@@ -157,6 +157,7 @@ export default function Navbar() {
                   <Link to="/properties/room">Room</Link>
                 </li>
                 <li className="p-2 hover:bg-gray-200">
+                  <Link to="/properties/apartment">Apartment</Link>
                   <Link to="/properties/apartment">Apartment</Link>
                 </li>
               </ul>

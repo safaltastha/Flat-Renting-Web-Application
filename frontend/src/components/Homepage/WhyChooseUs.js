@@ -1,4 +1,5 @@
 import React from "react";
+import RoomTest from "../../components/Property/RoomTest"
 
 const WhyChooseUs = () => {
   return (
@@ -181,7 +182,10 @@ const WhyChooseUs = () => {
           </div>
         </div>
       </div>
+      <RoomTest/>
     </div>
+
+
   );
 };
 

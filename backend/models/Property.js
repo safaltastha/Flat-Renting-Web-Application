@@ -1,6 +1,4 @@
 const Users = require("./Users");
-const Room = require("./Room");
-
 module.exports = (sequelize, DataTypes) => {
   const Property = sequelize.define(
     "Property",
@@ -90,7 +88,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-
+      dimensions: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
       userId: {
         type: DataTypes.INTEGER,
         references: {
@@ -111,34 +112,21 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
+    Property.hasMany(models.Vehicle, {
+      foreignKey: "propertyId",
+      as: "vehicles", // Alias for easier querying
+      onDelete: "SET NULL", // Ensure vehicles aren't deleted when properties are deleted
+    });
+    Property.belongsToMany(models.Users, {
+      through: models.SavedProperties,
+      as: "savedBy",
+      foreignKey: "propertyId",
+      otherKey: "userId",
+    });
     Property.hasMany(models.Media, {
       foreignKey: "propertyId",
       as: "media", // Optional: can help in naming when accessing in queries
       onDelete: "CASCADE",
-    });
-    Property.hasMany(models.Room, {
-      foreignKey: "propertyId",
-      as: "rooms",
-      onDelete: "CASCADE",
-    });
-
-    Property.hasMany(models.Rating, {
-      foreignKey: "target_id",
-      as: "property",
-      constraints: false,
-
-      scope: { rating_type: "property" },
-    });
-
-    Property.hasMany(models.PropertyRating, {
-      foreignKey: "property_id",
-      as: "ratings",
-    });
-
-    // A property can have many bookings
-    Property.hasMany(models.Bookings, {
-      foreignKey: "propertyId",
-      onDelete: "SET NULL",
     });
   };
 

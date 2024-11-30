@@ -1,5 +1,3 @@
-const Users = require("./Users");
-
 module.exports = (sequelize, DataTypes) => {
   const Vehicle = sequelize.define(
     "Vehicle",
@@ -46,12 +44,20 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: Users,
+          model: "users",
+          key: "id",
+        },
+      },
+      propertyId: {
+        // Optional relationship to properties
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "properties",
           key: "id",
         },
       },
@@ -68,37 +74,11 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "CASCADE",
     });
 
-    Vehicle.hasMany(models.Media, {
-      foreignKey: "vehicleId",
-      as: "media", // Optional: can help in naming when accessing in queries
-      onDelete: "CASCADE",
+    Vehicle.belongsTo(models.Property, {
+      foreignKey: "propertyId",
+      as: "property", // Alias for easier queries
+      onDelete: "SET NULL",
     });
-
-    Vehicle.hasMany(models.BookTest, {
-      foreignKey: "vehicleId",
-      as: "booktests",
-      onDelete: "CASCADE",
-    });
-
-    Vehicle.hasMany(models.Rating, {
-      foreignKey: "target_id",
-      as: "vehicle",
-      constraints: false,
-
-      scope: { rating_type: "vehicle" },
-    });
-
-    Vehicle.hasMany(models.VehicleRating, {
-      foreignKey: "vehicle_id",
-      as: "ratings",
-    });
-    Vehicle.hasMany(models.VehicleBooking, {
-      foreignKey: 'vehicleId',
-      as: 'vehicleBookings',
-    });
-    
-
-   
   };
 
   return Vehicle;

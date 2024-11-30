@@ -82,8 +82,6 @@ exports.cancelBooking = async (req, res) => {
   }
 };
 
-
-
 // Controller Function to Get Booked Properties for Landlord
 exports.getBookedPropertiesForLandlord = async (req, res) => {
   try {
@@ -131,76 +129,76 @@ exports.getBookedPropertiesForLandlord = async (req, res) => {
 };
 
 exports.getBookedVehicleForVehicleSupplier = async (req, res) => {
-    try {
-      const supplierId = req.params.id; // Get supplier ID from the route parameters
-  
-      // Fetch vehicles posted by the supplier and their bookings
-      const supplierBookings = await Users.findOne({
-        where: { id: supplierId },
-        attributes: ["id", "name"], // Add the supplier's name and any other relevant attributes
-        include: [
-          {
-            model: Vehicle, // Include vehicles posted by the supplier
-            as: "vehicles", // Use the correct alias defined in Users model for vehicles
-            include: [
-              {
-                model: BookTest, // Include the associated Booking
-                as: "booktests", // Ensure this matches the Booking association in Vehicle
-                include: [
-                  {
-                    model: Users, // Include user details who booked the vehicle
-                    attributes: ["name", "email", "phoneNumber"], // Attributes to retrieve
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      });
-  
-      if (!supplierBookings) {
-        return res
-          .status(404)
-          .json({ message: "Supplier not found or no bookings available" });
-      }
-  
-      return res.status(200).json(supplierBookings);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Internal server error" });
+  try {
+    const supplierId = req.params.id; // Get supplier ID from the route parameters
+
+    // Fetch vehicles posted by the supplier and their bookings
+    const supplierBookings = await Users.findOne({
+      where: { id: supplierId },
+      attributes: ["id", "name"], // Add the supplier's name and any other relevant attributes
+      include: [
+        {
+          model: Vehicle, // Include vehicles posted by the supplier
+          as: "vehicles", // Use the correct alias defined in Users model for vehicles
+          include: [
+            {
+              model: BookTest, // Include the associated Booking
+              as: "booktests", // Ensure this matches the Booking association in Vehicle
+              include: [
+                {
+                  model: Users, // Include user details who booked the vehicle
+                  attributes: ["name", "email", "phoneNumber"], // Attributes to retrieve
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!supplierBookings) {
+      return res
+        .status(404)
+        .json({ message: "Supplier not found or no bookings available" });
     }
-  };
 
-
+    return res.status(200).json(supplierBookings);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 exports.getBookedPropertiesForTenant = async (req, res) => {
-    try {
-        const tenantId = req.user.id; // Assuming you have stored user info in req.user after authentication
+  try {
+    const tenantId = req.user.id; // Assuming you have stored user info in req.user after authentication
 
-        // Fetch all bookings for the tenant, including property and vehicle information
-        const tenantBookings = await BookTest.findAll({
-            where: { userId: tenantId }, // Filter bookings by tenant's user ID
-            include: [
-                {
-                    model: Test, // Include the properties booked
-                    as: 'test',
-                    attributes: ['id', 'category'], // Select only the fields you want
-                },
-                {
-                    model: Vehicle, // Include vehicle information if applicable
-                    as: 'vehicle',
-                    attributes: ['id'], // Select relevant vehicle fields
-                },
-            ],
-        });
+    // Fetch all bookings for the tenant, including property and vehicle information
+    const tenantBookings = await BookTest.findAll({
+      where: { userId: tenantId }, // Filter bookings by tenant's user ID
+      include: [
+        {
+          model: Test, // Include the properties booked
+          as: "test",
+          attributes: ["id", "category"], // Select only the fields you want
+        },
+        {
+          model: Vehicle, // Include vehicle information if applicable
+          as: "vehicle",
+          attributes: ["id"], // Select relevant vehicle fields
+        },
+      ],
+    });
 
-        if (!tenantBookings.length) {
-            return res.status(404).json({ message: 'No bookings found for this tenant' });
-        }
-
-        return res.status(200).json(tenantBookings);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Internal server error' });
+    if (!tenantBookings.length) {
+      return res
+        .status(404)
+        .json({ message: "No bookings found for this tenant" });
     }
+
+    return res.status(200).json(tenantBookings);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };

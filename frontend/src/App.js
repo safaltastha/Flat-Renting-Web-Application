@@ -27,6 +27,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized";
 import ForgotPassword from "./components/password/RequestPasswordReset";
 import PersistLogin from "./components/PersistLogin";
+import AboutUs from "./pages/AboutUs";
 
 const App = () => {
   return (
@@ -41,6 +42,7 @@ const App = () => {
           <Route path="/vehicles" element={<VehicleListing />} />
           <Route path="/vehicle/:id" element={<VehicleDetailPage />} />
           <Route path="/contactus" element={<ContactUs />} />
+          <Route path="/aboutus" element={<AboutUs />} />
           {/* <Route path="/properties" element={<PropertyListing />} /> */}
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
