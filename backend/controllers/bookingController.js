@@ -1,78 +1,73 @@
 // controllers/bookingController.js
-const { Bookings, Property, Users, VehicleBooking } = require("../models");
+const {
+  Bookings,
+  Property,
+  Users,
+  Vehicles,
+  VehicleBooking,
+} = require("../models");
 
-// Create a new booking
+// Handle booking request
 exports.createBooking = async (req, res) => {
-  const userId = req.user.id;
-
-  let transaction;
   try {
-    // Extract data from request body
     const {
-      vehicleBooking,
-      property,
-      booking, // 'yes' or 'no' to indicate if vehicle was booked
-      personnel,
+      propertyId,
+      isVehicleBooked,
+      vehicleId, // corrected to match the payload
+      pickupLocation, // corrected to match the payload
+      dropoffLocation, // corrected to match the payload
+      vehicleDate,
+      vehicleTime,
+      vehicleDuration, // corrected to match the payload
+      requiresPersonnel, // corrected to match the payload
+      numPersonnel, // corrected to match the payload
+      personnelDuration, // corrected to match the payload
     } = req.body;
+    const userId = req.user.id;
 
-    // Start a transaction to ensure both bookings are processed together
-    transaction = await Bookings.sequelize.transaction();
-    // Create a booking for the property
-    const propertyBooking = await Bookings.create(
-      {
-        propertyId: property.id,
-        userId,
+    // 1. Create Property Booking (Bookings table)
+    const propertyBooking = await Bookings.create({
+      userId,
+      propertyId,
+      status: "booked", // Mark as booked
+    });
 
-        status: "booked", // You can define this status as needed
-      },
-      { transaction }
-    );
+    // 2. If a vehicle is booked, create a VehicleBooking entry
+    let vehicleBooking = null;
+    if (isVehicleBooked) {
+      if (!pickupLocation || !dropoffLocation || !vehicleDuration) {
+        return res.status(400).json({
+          message: "Missing required fields for vehicle booking",
+        });
+      }
 
-    // If vehicle is booked, create a VehicleBooking entry
-    if (booking === "yes") {
-      const vehicleBookingData = await VehicleBooking.create(
-        {
-          vehicle_id: vehicleBooking.vehicle_id,
-          booking_Id: propertyBooking.id, // Link vehicle booking with property booking
-          pickup_location: vehicleBooking.pickup_ocation,
-          dropoff_location: vehicleBooking.dropoff_location,
-          date: vehicleBooking.date,
-          time: vehicleBooking.time,
-          vehicle_duration: vehicleBooking.vehicle_duration,
-          
-        },
-        { transaction }
-      );
+      // Create VehicleBooking
+      vehicleBooking = await VehicleBooking.create({
+        bookingId: propertyBooking.id, // Link VehicleBooking with the created property booking
+        vehicleId: vehicleId || null, // If no vehicle, leave as null
+        pickupLocation: pickupLocation,
+        dropoffLocation: dropoffLocation,
+        date: vehicleDate,
+        time: vehicleTime,
+        vehicleDuration: vehicleDuration,
+        requiresPersonnel: requiresPersonnel,
+        numPersonnel: requiresPersonnel ? numPersonnel : null, // Only pass personnel details if required
+        personnelDuration: requiresPersonnel ? personnelDuration : null, // Only pass personnel details if required
+      });
     }
 
-    // If personnel are needed, add personnel details to the booking
-    if (personnel && personnel.num_Personnel > 0) {
-      await vehicleBooking.update(
-        {
-          requires_personnel: true,
-          num_Personnel: personnel.num_Personnel,
-          personnel_duration: personnel.personnel_duration,
-        },
-        { transaction }
-      );
-    }
-
-    // Commit the transaction
-    await transaction.commit();
-
-    // Send success response
-    res.status(201).json({ message: "Booking created successfully" });
+    // Return a response
+    res.status(200).json({
+      message: "Booking created successfully",
+      propertyBooking,
+      vehicleBooking: isVehicleBooked ? vehicleBooking : null, // Send vehicle booking only if a vehicle was booked
+    });
   } catch (error) {
-    // In case of an error, rollback the transaction
-    if (transaction) {
-      await transaction.rollback();
-    }
-
-    // Log the error and send failure response
     console.error(error);
-    res
-      .status(500)
-      .json({ message: "Booking creation failed", error: error.message });
+    res.status(500).json({
+      message: "Something went wrong while creating booking",
+      error: error.message,
+    });
   }
 };
 
@@ -170,7 +165,7 @@ exports.getBookedPropertiesForLandlord = async (req, res) => {
     // Fetch properties posted by the landlord and their bookings
     const landlordBookings = await Users.findOne({
       where: { id: landlordId },
-      attributes: ["id", "name", "phoneNumber"],
+      attributes: ["id", "firstName", "phoneNumber"],
       include: [
         {
           model: Property, // Include properties posted by the landlord
@@ -182,7 +177,7 @@ exports.getBookedPropertiesForLandlord = async (req, res) => {
               include: [
                 {
                   model: Users,
-                  attributes: ["name", "email", "phoneNumber"],
+                  attributes: ["firstName", "email", "phoneNumber"],
                 },
               ],
             },
@@ -211,7 +206,7 @@ exports.getBookedVehicleForVehicleSupplier = async (req, res) => {
     // Fetch vehicles posted by the supplier and their bookings
     const supplierBookings = await Users.findOne({
       where: { id: supplierId },
-      attributes: ["id", "name"], // Add the supplier's name and any other relevant attributes
+      attributes: ["id", "firstName"], // Add the supplier's name and any other relevant attributes
       include: [
         {
           model: Vehicle, // Include vehicles posted by the supplier
@@ -223,7 +218,7 @@ exports.getBookedVehicleForVehicleSupplier = async (req, res) => {
               include: [
                 {
                   model: Users, // Include user details who booked the vehicle
-                  attributes: ["name", "email", "phoneNumber"], // Attributes to retrieve
+                  attributes: ["firstName", "email", "phoneNumber"], // Attributes to retrieve
                 },
               ],
             },

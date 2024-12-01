@@ -13,14 +13,13 @@ const VehicleListing = () => {
     if (!location.state?.vehicle) {
       const fetchVehicles = async () => {
         try {
-            const token = Cookies.get("token");
+          const token = Cookies.get("token");
           const response = await axios.get("http://localhost:3002/vehicle", {
             headers: {
               Authorization: `Bearer ${token}`,
-               
             },
             withCredentials: true,
-          }); 
+          });
           setVehicles(response.data);
         } catch (error) {
           console.error("Error fetching vehicles:", error);
@@ -30,12 +29,10 @@ const VehicleListing = () => {
     }
   }, [location.state]);
 
-  
-
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">Available Vehicles</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="px-4">
+      <h1 className="text-3xl font-bold my-4">Available Vehicles</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 my-7">
         {vehicles.length > 0 ? (
           vehicles.map((vehicle) => (
             <VehicleCard key={vehicle.id} vehicle={vehicle} />

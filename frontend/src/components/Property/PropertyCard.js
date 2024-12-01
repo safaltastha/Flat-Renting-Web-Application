@@ -5,16 +5,17 @@ import { useUser } from "../../context/UserContext";
 
 const PropertyCard = ({ property, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
-  const { user } = useUser();
+  const { user } = useUser();;
 
-
-  console.log(user,  'user for properyt' )
+  console.log(user, "user for properyt");
 
   // Extract the first image path from the media array
   const propertyImage = property.media
     ?.find((mediaItem) => mediaItem.file_type === "image")
     ?.file_path.replace(/\\/g, "/");
 
+
+  
   return (
     <div
       className={`property-card bg-[#D9D9D9] border border-gray-300 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow transform hover:scale-105 hover:transition-transform duration-300 ease-in-out cursor-pointer ${

@@ -10,7 +10,7 @@ import Cookies from "js-cookie";
 const FeaturedProperties = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); 
 
   // Custom Left Arrow Component
   const PrevArrow = ({ onClick }) => {
@@ -85,7 +85,6 @@ const FeaturedProperties = () => {
   if (loading) return <div>Loading...</div>;
   if (error)
     return <div>Error loading featured properties: {error.message}</div>;
-
 
   return (
     <div className="container max-w-[1600px] py-8 relative">

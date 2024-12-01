@@ -31,7 +31,7 @@ const searchProperties = async (req, res) => {
       include: [
         {
           model: Users,
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "firstName", "email"],
         },
         {
           model: Media,

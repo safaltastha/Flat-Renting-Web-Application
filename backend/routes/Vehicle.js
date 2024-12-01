@@ -83,6 +83,7 @@ router.post(
         vehicleFeatures,
         vehicleLocation,
         availabilityTime,
+    
         userId: req.user.id,
         entityType,
       };
@@ -156,7 +157,7 @@ router.get("/", authenticateJWT, async (req, res) => {
       include: [
         {
           model: Users,
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "firstName", "lastName", "email"],
         },
         {
           model: Media,
@@ -203,13 +204,20 @@ router.get("/:id", authenticateJWT, async (req, res) => {
       include: [
         {
           model: Users,
-          attributes: ["id", "name", "email"],
+          attributes: [
+            "id",
+            "firstName",
+            "lastName",
+            "email",
+            "phoneNumber",
+            "address",
+          ], // Include vehicle supplier details
         },
         {
           model: Media,
           as: "media",
           attributes: ["file_path", "file_type"],
-          where: { entityType: "vehicle" }, // Include only property media
+          where: { entityType: "vehicle" }, // Include only vehicle media
         },
       ],
     });
@@ -227,10 +235,32 @@ router.get("/:id", authenticateJWT, async (req, res) => {
       });
     }
 
-    res.status(200).json(vehicle);
+    // Respond with vehicle details and vehicleSupplier (vehicle owner) info
+    res.status(200).json({
+      id: vehicle.id,
+      type: vehicle.type,
+      pricingPerHour:vehicle.pricingPerHour,
+      capacity:vehicle.capacity,
+      registrationNumber: vehicle.registrationNumber,
+      description: vehicle.description,
+      vehicleLocation: vehicle.vehicleLocation,
+      features: vehicle.features,
+      media: vehicle.media,
+      availabilityTime: vehicle.availabilityTime, // Corrected to fetch from vehicle itself
+      availableStart: vehicle.availableStart,
+      availableEnd: vehicle.availableEnd,
+      vehicleSupplier: {
+        id: vehicle.User.id,
+        firstName: vehicle.User.firstName,
+        lastName: vehicle.User.lastName,
+        email: vehicle.User.email,
+        phoneNumber: vehicle.User.phoneNumber, // Assuming this exists in the `Users` table
+        address: vehicle.User.address,
+      },
+    });
   } catch (error) {
     console.error("Database Error:", error); // Log the error for debugging
-    res.status(500).json({ message: "Error retrieving property", error });
+    res.status(500).json({ message: "Error retrieving vehicle", error });
   }
 });
 

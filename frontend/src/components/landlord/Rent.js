@@ -24,7 +24,7 @@ const Rent = ({ onChange }) => {
 
   return (
     <div>
-      <div className="p-4">
+      <div className="px-4">
         <h2 className="text-lg font-medium mb-4">Rent</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

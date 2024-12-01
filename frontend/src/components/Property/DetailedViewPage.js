@@ -5,45 +5,63 @@ import { ImLocation2, ImPhone, ImMail } from "react-icons/im";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import Ratings from "../Ratings";
+import Rating from "../Ratings";
 import { useUser } from "../../context/UserContext";
+import GetRating from "../GetRating";
+import GiveRating from "../GiveRating";
 
-const DetailedViewPage = () => {
+const DetailedViewPage = ({ propertyId }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAllImages, setShowAllImages] = useState(false);
-  const {auth} = useUser()
+  const [reviews, setReviews] = useState([]);
 
+  const { auth } = useUser();
+  const { dimensions } = property || {};
+
+  const fetchProperty = async () => {
+    try {
+      const token = Cookies.get("token");
+      const response = await axios.get(
+        `http://localhost:3002/properties/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${auth.accessToken}`, // Add token to the Authorization header
+          },
+          withCredentials: true, // Send cookies with the request (if needed for session)
+        }
+      );
+
+      setProperty(response.data);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchProperty = async () => {
-      try {
-        const token = Cookies.get("token");
-        const response = await axios.get(
-          `http://localhost:3002/properties/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth.accessToken}`,  // Add token to the Authorization header
-            },
-            withCredentials: true,  // Send cookies with the request (if needed for session)
-          }
-        );
-console.log(response.data , 'asdfasdf80asd')
-        setProperty(response.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProperty();
   }, [id]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading property: {error.message}</div>;
+
+  function capitalizeFirstLetter(name) {
+    if (!name) return ""; // Handle cases where the name is undefined or null
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  }
+
+  const handleNewRating = (newReview) => {
+    setReviews((prevReviews) => [newReview, ...prevReviews]);
+  };
+
+  const formatDate = (dateStr) => {
+    const [month, day, year] = dateStr.split("/");
+    return `${year}/${month.padStart(2, "0")}/${day.padStart(2, "0")}`;
+  };
 
   return (
     <div className="container max-w-[1600px] px-36 mt-8">
@@ -60,11 +78,13 @@ console.log(response.data , 'asdfasdf80asd')
           <div className="flex-1 pr-4">
             {/* Large Image */}
             {property.media?.length > 0 && (
-              <img
-                src={property.media[0].file_path}
-                alt="Large Property Image"
-                className="w-full h-[600px] object-contain rounded-md shadow-lg"
-              />
+              <div className="w-full h-[600px] rounded-md shadow-lg overflow-hidden">
+                <img
+                  src={property.media[0].file_path}
+                  alt="Large Property Image"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             )}
 
             {/* Property Details */}
@@ -86,20 +106,47 @@ console.log(response.data , 'asdfasdf80asd')
 
               <div className="space-y-3 text-gray-700">
                 <p className="text-lg">
-                  <strong>Bedrooms:</strong> {property.numOfBedrooms}
+                  <strong>Total space:</strong>{" "}
+                  {property.numOfSpaces || "No bedroom"}
                 </p>
+
+                <div>
+                  {dimensions ? (
+                    <div>
+                      <h3>Dimensions(in inch)</h3>
+                      <div>
+                        <h4>Bedrooms:{property.numOfBedrooms}</h4>
+                        {dimensions.bedrooms?.map((room, index) => (
+                          <p key={index}>
+                            Length of Bedroom {index + 1}: {room.length},
+                            Breadth of Bedroom {index + 1}: {room.breadth}
+                          </p>
+                        ))}
+                      </div>
+                      <div>
+                        <h4>Kitchens:{property.numOfKitchens}</h4>
+                        {dimensions.kitchens?.map((room, index) => (
+                          <p key={index}>
+                            Length: {room.length}, Breadth: {room.breadth}
+                          </p>
+                        ))}
+                      </div>
+                      <div>
+                        <h4>Living Rooms:{property.numOfLivingrooms}</h4>
+                        {dimensions.livingrooms?.map((room, index) => (
+                          <p key={index}>
+                            Length: {room.length}, Breadth: {room.breadth}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p>No dimensions available</p>
+                  )}
+                </div>
+
                 <p className="text-lg">
-                  <strong>Bathrooms:</strong> {property.numOfBathrooms}
-                </p>
-                <p className="text-lg">
-                  <strong>Living Rooms:</strong>{" "}
-                  {property.numOfLivingrooms || "No Living room"}
-                </p>
-                <p className="text-lg">
-                  <strong>Kitchen:</strong> {property.numOfKitchens}
-                </p>
-                <p className="text-lg">
-                  <strong>Floor:</strong> {property.floor}
+                  <strong>Floor:</strong> {property.floor || "No Floor"}
                 </p>
                 <p className="text-lg">
                   <strong>Monthly Rent:</strong> NRs. {property.monthlyRent}
@@ -115,6 +162,7 @@ console.log(response.data , 'asdfasdf80asd')
                     .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1))
                     .join(", ") || "None"}
                 </p>
+
                 <p className="text-lg">
                   <strong>House Rules:</strong>{" "}
                   {property.houseRule || "No house rule"}
@@ -148,37 +196,58 @@ console.log(response.data , 'asdfasdf80asd')
                 loading="lazy"
               ></iframe>
             </div>
+
+            <div>
+              <GetRating
+                propertyId={id}
+                onNewRating={handleNewRating}
+                review={reviews}
+                ratingId={property.ratingId}
+              />
+            </div>
+
+            <div>
+              <GiveRating propertyId={id} />
+            </div>
           </div>
 
           {/* Right Section: Smaller Images and Contact Info */}
           <div className="w-[30%] sticky top-0">
             {/* Smaller Images */}
+            {/* Smaller Images */}
             <div className="flex flex-col space-y-2">
-              {property.media?.slice(1, 3).map((image, index) => (
-                <img
-                  key={index}
-                  src={image.file_path}
-                  alt={`Small Image ${index + 1}`}
-                  className="w-full h-[300px] object-co rounded-md shadow-lg"
-                />
-              ))}
+              {/* Display the first two smaller images, if they exist */}
+              {property.media
+                ?.slice(1, 3)
+                .filter((image) => image?.file_path) // Filter only valid images
+                .map((image, index) => (
+                  <img
+                    key={index}
+                    src={image.file_path}
+                    alt={`Small Image ${index + 1}`}
+                    className="w-full h-[300px] object-cover rounded-md shadow-lg"
+                  />
+                ))}
 
               {/* Button to show all images */}
-              <button
-                className="text-[#9747FF] mt-2 underline text-xl"
-                onClick={() => setShowAllImages(!showAllImages)}
-              >
-                {showAllImages ? "Show Less" : "Show More Images"}
-              </button>
+              {property.media?.length > 3 && ( // Show button only if there are more than 3 images
+                <button
+                  className="text-[#9747FF] mt-2 underline text-xl"
+                  onClick={() => setShowAllImages(!showAllImages)}
+                >
+                  {showAllImages ? "Show Less" : "Show More Images"}
+                </button>
+              )}
 
               {/* If showAllImages is true, display additional images */}
               {showAllImages &&
                 property.media
-                  .slice(3)
+                  ?.slice(3)
+                  .filter((image) => image?.file_path) // Filter only valid images
                   .map((image, index) => (
                     <img
                       key={index}
-                      src={image.file_path}
+                      src={image?.file_path}
                       alt={`Small Image ${index + 3}`}
                       className="w-full h-[300px] object-cover rounded-md shadow-lg"
                     />
@@ -193,24 +262,51 @@ console.log(response.data , 'asdfasdf80asd')
               <p className="text-2xl font-semibold">Contact Information</p>
               <div className="flex items-center">
                 <FaUserCircle className="mr-3 text-xl" />
-                <span className="text-lg">John Doe</span>
+                <span className="text-lg">
+                  {capitalizeFirstLetter(property.landlord.firstName)}{" "}
+                  {capitalizeFirstLetter(property.landlord.lastName)}
+                </span>
               </div>
+
               <div className="flex items-center">
                 <ImPhone className="mr-3 text-xl" />
-                <span className="text-lg">+977-9800000000</span>
+                <span className="text-lg">
+                  {property.landlord.phoneNumber || "Not Available"}
+                </span>
               </div>
               <div className="flex items-center">
                 <ImLocation2 className="mr-3 text-xl" />
                 <span className="text-lg">
-                  Street 9, Janapriya Marga, Nayabazar
+                  {property.landlord.address || "Not Available"}
                 </span>
               </div>
+
               <div className="flex items-center">
                 <ImMail className="mr-3 text-xl" />
-                <span className="text-lg">landlord@example.com</span>
+                <span className="text-lg">
+                  {property.landlord.email || "Not Available"}
+                </span>
               </div>
-              <div className="text-lg font-semibold text-red-500">
-                Available: Everyday after 5pm
+              <div className="text-2xl font-semibold ">
+                Landlord Availability
+              </div>
+              <div className="text-lg  text-red-500">
+                Available Start:{" "}
+                {property?.availableStart
+                  ? new Date(property.availableStart).toLocaleDateString()
+                  : "Not Available"}
+              </div>
+
+              <div className="text-lg  text-red-500">
+                Available End:{" "}
+                {property?.availableEnd
+                  ? new Date(property.availableEnd).toLocaleDateString()
+                  : "Not Available"}
+              </div>
+
+              <div className="text-lg  text-red-500">
+                Availability Time:{" "}
+                {property?.availabilityTime || "Not Available"}
               </div>
             </div>
           </div>
@@ -218,10 +314,6 @@ console.log(response.data , 'asdfasdf80asd')
       ) : (
         <div>No property found</div>
       )}
-
-      <div>
-        <Ratings />
-      </div>
     </div>
   );
 };

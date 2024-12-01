@@ -156,6 +156,7 @@ const VehicleForm = () => {
                 type="number"
                 name="capacity"
                 onChange={handleInputChange}
+                min={0}
                 className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
                 required
               />
@@ -191,6 +192,7 @@ const VehicleForm = () => {
                 type="number"
                 name="pricingPerHour"
                 onChange={handleInputChange}
+                min={0}
                 className="w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
                 required
               />

@@ -1,44 +1,29 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { CiSettings } from "react-icons/ci";
 import { BiChevronDown } from "react-icons/bi";
 import { AiOutlineUser, AiOutlineRight } from "react-icons/ai";
 import { IoIosLogOut } from "react-icons/io";
 import { FaPlus } from "react-icons/fa6";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
-import axios from "axios";
 import { useUser } from "../../context/UserContext";
+import { IoMdLock } from "react-icons/io";
+import axios from "axios";
 
 export default function Navbar() {
   const { user, auth } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showProperties, setShowProperties] = useState(false);
+
+  const [properties, setProperties] = useState([]);
+
   const navigate = useNavigate();
   const location = useLocation();
   const propertiesRef = useRef(null);
   const { logout } = useUser();
 
   const res = Cookies.get("token");
-
-  //TODO:  Remove this
-  // useEffect(() => {
-  //   const token = Cookies.get("token");
-  //   if (token) {
-  //     try {
-  //       const decodedToken = jwtDecode(token);
-  //       console.log(decodedToken); // Decode the token
-  //       setUser(decodedToken); // Set user state to decoded token
-  //     } catch (error) {
-  //       console.error("Invalid token:", error);
-  //       setUser(null);
-  //     }
-  //   } else {
-  //     setUser(null);
-  //   }
-  // }, []);
 
   const handleLogout = () => {
     logout();
@@ -60,14 +45,34 @@ export default function Navbar() {
 
   const handlePostPropertyClick = async (e) => {
     e.preventDefault();
-
     navigate("/postyourproperty");
   };
 
   const handlePostVehicleClick = async (e) => {
     e.preventDefault();
-
     navigate("/postyourvehicle");
+  };
+
+  const handlePropertyClick = async (type) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3002/properties/${type}`
+      );
+      navigate("/property-list", { state: { properties: response.data } });
+    } catch (error) {
+      console.error("Error fetching properties:", error);
+    }
+  };
+
+  const fetchProperties = async (type) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3002/properties/${type}`
+      );
+      setProperties(response.data); // Update the state with the fetched data
+    } catch (error) {
+      console.error("Error fetching properties:", error);
+    }
   };
 
   return (
@@ -130,11 +135,12 @@ export default function Navbar() {
           </li>
 
           {/* Properties Dropdown */}
-          <li className="relative" ref={propertiesRef}>
-            <span
-              onClick={() => setShowProperties(!showProperties)}
-              className="px-4 py-2 cursor-pointer hover:text-purple-500 flex justify-between items-center"
-            >
+          <li
+            className="relative"
+            onMouseEnter={() => setShowProperties(true)}
+            onMouseLeave={() => setShowProperties(false)}
+          >
+            <span className="px-4 py-2 cursor-pointer hover:text-purple-500 flex justify-between items-center">
               Properties
               <AiOutlineRight
                 className={`ml-2 ${
@@ -145,22 +151,40 @@ export default function Navbar() {
 
             {showProperties && (
               <ul
-                className={`bg-white text-black rounded-lg mt-2 w-full lg:w-52 z-10 shadow-lg ${
-                  isOpen ? "relative" : "absolute"
-                }`}
-                style={{ top: isOpen ? "unset" : "100%", left: 0 }}
+                className="bg-white text-black rounded-lg mt-2 w-full lg:w-52 z-50 shadow-lg absolute"
+                style={{ top: "100%", left: 0, pointerEvents: "auto" }}
               >
-                <li className="p-2 hover:bg-gray-200">
-                  <Link to="/properties/flat">Flat</Link>
+                <li
+                  className="p-2 hover:bg-gray-200 cursor-pointer"
+                  onClick={() => handlePropertyClick("flat")}
+                >
+                  Flat
                 </li>
-                <li className="p-2 hover:bg-gray-200">
-                  <Link to="/properties/room">Room</Link>
+                <li
+                  className="p-2 hover:bg-gray-200 cursor-pointer"
+                  onClick={() => handlePropertyClick("room")}
+                >
+                  Room
                 </li>
-                <li className="p-2 hover:bg-gray-200">
-                  <Link to="/properties/apartment">Apartment</Link>
+                <li
+                  className="p-2 hover:bg-gray-200 cursor-pointer"
+                  onClick={() => handlePropertyClick("apartment")}
+                >
+                  Apartment
                 </li>
               </ul>
             )}
+          </li>
+
+          <li>
+            <Link
+              to="/vehicles"
+              className={`block px-4 py-2 hover:text-purple-500 ${
+                location.pathname === "/vehicles" ? "underline" : ""
+              }`}
+            >
+              Vehicles
+            </Link>
           </li>
 
           <li>
@@ -192,7 +216,6 @@ export default function Navbar() {
           {/* User Profile Dropdown */}
           {auth.accessToken ? (
             <li className="relative" onClick={toggleDropdown}>
-              {/* Use static user photo here */}
               <img
                 src="/profile/profile.jpg"
                 alt="User"
@@ -213,8 +236,8 @@ export default function Navbar() {
                       onClick={handleSettings}
                       className="w-full text-left px-3 pb-2 flex items-center hover:bg-gray-100"
                     >
-                      <CiSettings className="mr-2" />
-                      Settings
+                      <IoMdLock className="mr-2" />
+                      Change Password
                     </button>
                     <button
                       onClick={handleLogout}

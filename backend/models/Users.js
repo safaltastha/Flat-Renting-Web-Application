@@ -8,7 +8,15 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         allowNull: false,
       },
-      name: {
+      firstName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      lastName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      address: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -33,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validate: {
           is: {
-            args: /^\+977 ?\d{10}$/,
+            args: /^(?:\+977)?(98|97)\d{11}$/,
             msg: "Phone number must be in the format +977XXXXXXXXXX",
           },
         },
@@ -43,6 +51,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true, // Optional, can be left empty initially
         defaultValue: null, // Default to null if no profile photo is provided
+      },
+      resetToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      resetTokenExpiration: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
 
       createdAt: {
@@ -82,57 +98,28 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "CASCADE",
     });
 
-    Users.hasMany(models.BookTest, {
+    Users.hasMany(models.Rating, {
+      foreignKey: "userId", // Foreign key in the Rating model
+      as: "ratings", // Alias for easier querying
+    });
+
+    Users.hasMany(models.Contact, { foreignKey: "userId" });
+
+    // A user can have many bookings
+    Users.hasMany(models.Bookings, {
       foreignKey: "userId",
-      as: "tenantBookTests", // Alias for BookTests made by this tenant
       onDelete: "CASCADE",
     });
-
-    // A user can have multiple BookTests as a landlord
-    Users.hasMany(models.Test, {
-      foreignKey: "userId", // Foreign key in Property model
-      as: "landlordBookProperties", // Alias for properties posted by this landlord
-      onDelete: "CASCADE",
+    Users.belongsToMany(models.Property, {
+      through: models.SavedProperties, // Intermediate table
+      as: "savedProperties", // Alias for easier querying
+      foreignKey: "userId", // Key in the SavedProperties table
+      otherKey: "propertyId", // The other key in the SavedProperties table
     });
-
-    // Define the association with BookTest (if a landlord wants to see their BookTests)
-    Users.hasMany(models.BookTest, {
-      foreignKey: "userId", // If a landlord is associated with BookTests
-      as: "landlordBookTests", // Alias for bookings of properties they posted
-      onDelete: "CASCADE",
-    });
-
-    // Ratings given by the user
-    Users.hasMany(models.Rating, {
-      foreignKey: "rater_id",
-      as: "givenRatings",
-    });
-
-    // Ratings received by the user (as landlord, tenant, or vehicle supplier)
-    Users.hasMany(models.Rating, {
-      foreignKey: "target_id",
-      as: "receivedRatings",
-    });
-
-    // As a "rater", a user can have many ratings they have given
-    Users.hasMany(models.UserRating, {
-      foreignKey: "rater_id",
-      as: "ratingsGiven", // Alias to represent ratings given by the user
-    });
-
-    // As a "ratedUser", a user can have many ratings they have received
-    Users.hasMany(models.UserRating, {
-      foreignKey: "rated_user_id",
-      as: "ratingsReceived", // Alias to represent ratings received by the user
-    });
-
-    Users.hasMany(models.Contact,
-       { foreignKey: "userId" });
-
-     // A user can have many bookings
-     Users.hasMany(models.Bookings, {
-      foreignKey: 'userId',
-      onDelete: 'CASCADE',
+    // A User can have many RatingReactions
+    Users.hasMany(models.RatingReactions, {
+      foreignKey: "userId",
+      as: "ratingReactions",
     });
   };
 

@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ImLocation2 } from "react-icons/im";
+import { useUser } from "../../context/UserContext";
 
-const VehicleCard
- = ({ vehicle, isSelected, onClick }) => {
+const VehicleCard = ({ vehicle, isSelected, onClick }) => {
   const [isAvailable, setIsAvailable] = useState(true);
-
-  
+  const { user } = useUser();
 
   // Extract the first image path from the media array
-  const vehicleImage =
-  vehicle.media?.find((mediaItem) => mediaItem.file_type === "image")?.file_path.replace(/\\/g, '/');
-
+  const vehicleImage = vehicle.media
+    ?.find((mediaItem) => mediaItem.file_type === "image")
+    ?.file_path.replace(/\\/g, "/");
 
   return (
     <div
@@ -53,16 +52,17 @@ const VehicleCard
               <span className="font-medium text-gray-700">Total capacity:</span>{" "}
               {vehicle.capacity}tons
             </p>
-            
           </div>
         </div>
         <div className="mt-4">
-          <Link
-            to={`/vehicle/${vehicle.id}`}
-            className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
-          >
-            View Details
-          </Link>
+          {user.role === "tenant" && (
+            <Link
+              to={`/vehicle/${vehicle.id}`}
+              className="inline-block px-5 py-1 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors duration-300"
+            >
+              View Details
+            </Link>
+          )}
         </div>
 
         <div
@@ -77,5 +77,4 @@ const VehicleCard
   );
 };
 
-export default VehicleCard
-;
+export default VehicleCard;

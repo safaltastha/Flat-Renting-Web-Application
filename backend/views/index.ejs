@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Password Reset</title>
+    <style>
+      /* General reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f7fc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+        text-align: center;
+        color: #333;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      form {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+
+      input[type="submit"] {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+
+      /* Style for confirmation message */
+      .confirmation-message {
+        background-color: #e7f9e7;
+        border: 1px solid #4caf50;
+        color: #4caf50;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 20px;
+      }
+    </style>
+    <script>
+      // Check if the status is "verified" and prompt the user
+      var status = "<%- status %>";
+
+      if (status === "verified") {
+        // Show the confirmation dialog
+        if (
+          confirm(
+            "Your password has been successfully updated,Do you want to log in?"
+          )
+        ) {
+          window.location.href = "http://localhost:3000/login"; // Redirect to the login page
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Password Reset</h1>
+
+    <form action="" method="post">
+      <input
+        type="password"
+        name="password"
+        id="password"
+        placeholder="New password"
+      /><br />
+      <input
+        type="password"
+        name="confirm-password"
+        id="confirm-password"
+        placeholder="Confirm password"
+      /><br />
+      <input type="submit" value="Submit" />
+    </form>
+  </body>
+</html>

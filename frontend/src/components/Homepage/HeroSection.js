@@ -4,11 +4,13 @@ import { RiArrowDownSLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useUser } from "../../context/UserContext";
 
 const HeroSection = () => {
   // State variables for dropdown selections
   const [category, setCategory] = useState("");
   const [priceRange, setPriceRange] = useState("");
+  const { user } = useUser();
 
   const [inputLocation, setInputLocation] = useState("");
   const navigate = useNavigate();
@@ -106,12 +108,14 @@ const HeroSection = () => {
                 </div>
               </div>
               {/* Search Button */}
-              <button
-                className="w-full md:w-auto px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-800"
-                onClick={handleSearch}
-              >
-                Search
-              </button>
+              {user.role === "tenant" && (
+                <button
+                  className="w-full md:w-auto px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-800"
+                  onClick={handleSearch}
+                >
+                  Search
+                </button>
+              )}
             </div>
           </div>
         </div>

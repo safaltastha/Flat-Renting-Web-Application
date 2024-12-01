@@ -5,24 +5,25 @@ import "react-phone-input-2/lib/style.css";
 const PhoneNumValidation = ({ setFieldValue, fieldName }) => {
   const [isValid, setIsValid] = useState(true);
 
-  // Validate phone number
   const validatePhoneNumber = (phoneNumber) => {
-    const phoneNumberPattern = /^(98|97)\d{8}$/; 
-    return phoneNumberPattern.test(phoneNumber);
+    const trimmedNumber = phoneNumber.trim(); // Trim extra spaces
+    const phoneNumberPattern = /^(?:\+977)?(98|97)\d{11}$/;
+    return phoneNumberPattern.test(trimmedNumber);
   };
+  
 
   const handleChange = (value) => {
+    console.log(value)
+    const isValidNumber = validatePhoneNumber(value);
+    setIsValid(isValidNumber);
     setFieldValue(fieldName, value);
-    console.log(value);
-
-    // Validate phone number when it changes
-    setIsValid(validatePhoneNumber(value));
   };
 
   return (
     <div>
       <label>
         <PhoneInput
+          onlyCountries={["np"]}
           country={"np"}
           onChange={handleChange}
           inputProps={{

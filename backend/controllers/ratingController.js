@@ -1,135 +1,259 @@
-// controllers/ratingController.js
-const { Rating, Users, Property, Vehicle } = require("../models");
+const { Rating, Property, Users, Vehicle } = require("../models");
 
-exports.addRating = async (req, res) => {
-  const { rating_value, review_text, rating_type, target_id, rater_id } = req.body;
+// Create a rating or review for a property or vehicle
+exports.createRating = async (req, res) => {
+  const { score, review, propertyId, vehicleId } = req.body;
+  const userId = req.user.id; // Assume user ID is extracted from the authenticated request
 
   try {
-    // Validate rating_type
-    if (!['property', 'vehicle', 'landlord', 'vehicle_supplier', 'tenant', 'test'].includes(rating_type)) {
-      return res.status(400).json({ error: 'Invalid rating type' });
+    // Ensure at least one of propertyId or vehicleId is provided
+    if (!propertyId && !vehicleId) {
+      return res.status(400).json({
+        error: "You must provide either a propertyId or a vehicleId.",
+      });
     }
 
-    // Verify target_id exists in the correct table based on rating_type
-    let targetExists = false;
-    switch (rating_type) {
-      case 'property':
-        targetExists = await Property.findByPk(target_id); // Check if Property exists
-        break;
-      case 'vehicle':
-        targetExists = await Vehicle.findByPk(target_id); // Check if Vehicle exists
-        break;
-      case 'test':
-        targetExists = await Test.findByPk(target_id); // Check if Test exists
-        break;
-        
-      // Add more cases for landlord, tenant, and vehicle_supplier if necessary
-    }
-
-    if (!targetExists) {
-      return res.status(400).json({ error: `No ${rating_type} found with ID ${target_id}` });
-    }
-
-    // Create the new rating
     const newRating = await Rating.create({
-      rating_value,
-      review_text,
-      rating_type,
-      target_id,
-      rater_id,
+      score,
+      review,
+      propertyId: propertyId || null,
+      vehicleId: vehicleId || null,
+      userId,
     });
 
-    res.status(201).json(newRating);
+    res.status(201).json({
+      message: "Rating created successfully.",
+      data: newRating,
+    });
   } catch (error) {
-    console.error('Error details:', error);
-    res.status(500).json({ error: error.message });
+    console.error("Error creating rating:", error.message);
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the rating." });
   }
 };
 
+// Get ratings for either a property or a vehicle
+exports.getRatingById = async (req, res) => {
+  try {
+    const { propertyId, vehicleId } = req.query;
 
-exports.getUserRatings = async (req, res) => {
-  const { userId } = req.params;
+    // Validate input: Ensure only one ID type is being queried at a time
+    if (!propertyId && !vehicleId) {
+      return res
+        .status(400)
+        .json({ message: "Please provide either propertyId or vehicleId." });
+    }
+    if (propertyId && vehicleId) {
+      return res.status(400).json({
+        message:
+          "Please provide only one identifier: propertyId or vehicleId, not both.",
+      });
+    }
 
+    let ratings;
+
+    if (propertyId) {
+      // Fetch ratings for a property
+      ratings = await Rating.findAll({
+        where: { propertyId },
+        include: [
+          {
+            model: Users,
+            as: "user",
+            attributes: ["id", "firstName", "lastName", "email"],
+          },
+          {
+            model: Property,
+            as: "property",
+            attributes: ["id", "category"],
+          },
+        ],
+      });
+    } else if (vehicleId) {
+      // Fetch ratings for a vehicle
+      ratings = await Rating.findAll({
+        where: { vehicleId },
+        include: [
+          {
+            model: Users,
+            as: "user",
+            attributes: ["id", "firstName", "lastName", "email"],
+          },
+          {
+            model: Vehicle,
+            as: "vehicle",
+            attributes: ["id", "type", "registrationNumber"],
+          },
+        ],
+      });
+    }
+
+    // Check if ratings exist
+    if (!ratings || ratings.length === 0) {
+      const message = propertyId
+        ? "No ratings found for the given property."
+        : "No ratings found for the given vehicle.";
+      return res.status(404).json({ message });
+    }
+
+    return res.status(200).json(ratings);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error." });
+  }
+};
+
+// Get all ratings
+
+exports.getAllRatings = async (req, res) => {
   try {
     const ratings = await Rating.findAll({
-      where: {
-        target_id: userId,
-        rating_type: ["tenant", "landlord", "vehicle_supplier"],
+      include: {
+        model: Users,
+        as: "user", // Alias defined in the association
+        attributes: ["id"], // Fetch only required fields
       },
-      include: [
-        { model: Users, as: "rater", attributes: ["name", "profileImage"] },
-      ],
     });
 
-    const averageRating =
-      ratings.reduce((sum, rating) => sum + rating.rating_value, 0) /
-        ratings.length || 0;
-
-    res.status(200).json({ ratings, averageRating });
+    res.status(200).json(ratings);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch user ratings" });
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch ratings and reviews" });
   }
 };
 
-exports.getPropertyRatings = async (req, res) => {
-  const { propertyId } = req.params;
-
+exports.editReview = async (req, res) => {
   try {
-    const ratings = await Rating.findAll({
-      where: { target_id: propertyId, rating_type: "property" },
-      include: [
-        { model: Users, as: "rater", attributes: ["name", "profileImage"] },
-      ],
+    const ratingId = req.params.id; // Rating ID from URL params
+    const { review, propertyId, vehicleId } = req.body; // Review text and propertyId/vehicleId from body
+    const userId = req.user.id; // The user performing the action (from JWT)
+
+    // Validate input
+    if (!review || (!propertyId && !vehicleId)) {
+      return res.status(400).json({
+        message: "Review text and either propertyId or vehicleId are required.",
+      });
+    }
+
+    // Determine if it's a property review or vehicle review
+    let rating;
+    if (propertyId) {
+      // It's a property review
+      rating = await Rating.findOne({
+        where: { id: ratingId },
+        include: [
+          {
+            model: Property,
+            as: "property",
+            where: { id: propertyId }, // Ensure the review is for the given propertyId
+          },
+        ],
+      });
+    } else if (vehicleId) {
+      // It's a vehicle review
+      rating = await Rating.findOne({
+        where: { id: ratingId },
+        include: [
+          {
+            model: Vehicle,
+            as: "vehicle",
+            where: { id: vehicleId }, // Ensure the review is for the given vehicleId
+          },
+        ],
+      });
+    }
+
+    // Check if the rating exists
+    if (!rating) {
+      return res.status(404).json({
+        message: "Review not found for the given property or vehicle.",
+      });
+    }
+
+    // Ensure the user can only edit their own review
+    if (rating.userId !== userId) {
+      return res
+        .status(403)
+        .json({ message: "You can only edit your own review." });
+    }
+
+    // Update the review text
+    rating.review = review;
+    await rating.save();
+
+    // Respond with the updated review
+    return res.status(200).json({
+      message: "Review updated successfully.",
+      rating,
     });
-
-    const averageRating =
-      ratings.reduce((sum, rating) => sum + rating.rating_value, 0) /
-        ratings.length || 0;
-
-    res.status(200).json({ ratings, averageRating });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch property ratings" });
+    console.error(error);
+    return res.status(500).json({ message: "Server error." });
   }
 };
 
-exports.getVehicleRatings = async (req, res) => {
-  const { vehicleId } = req.params;
-
+exports.deleteReview = async (req, res) => {
   try {
-    const ratings = await Rating.findAll({
-      where: { target_id: vehicleId, rating_type: "vehicle" },
-      include: [
-        { model: Users, as: "rater", attributes: ["name", "profileImage"] },
-      ],
-    });
+    const ratingId = req.params.id; // Rating ID from URL params
+    const { propertyId, vehicleId } = req.body; // Property or Vehicle ID from request body
+    const userId = req.user.id; // User performing the deletion (from JWT)
 
-    const averageRating =
-      ratings.reduce((sum, rating) => sum + rating.rating_value, 0) /
-        ratings.length || 0;
+    // Validate input
+    if (!propertyId && !vehicleId) {
+      return res
+        .status(400)
+        .json({ message: "Please provide either propertyId or vehicleId." });
+    }
 
-    res.status(200).json({ ratings, averageRating });
+    // Find the review by ID
+    let rating;
+    if (propertyId) {
+      // It's a property review
+      rating = await Rating.findOne({
+        where: { id: ratingId },
+        include: [
+          {
+            model: Property,
+            as: "property",
+            where: { id: propertyId }, // Ensure the review is for the given propertyId
+          },
+        ],
+      });
+    } else if (vehicleId) {
+      // It's a vehicle review
+      rating = await Rating.findOne({
+        where: { id: ratingId },
+        include: [
+          {
+            model: Vehicle,
+            as: "vehicle",
+            where: { id: vehicleId }, // Ensure the review is for the given vehicleId
+          },
+        ],
+      });
+    }
+
+    // Check if the rating exists
+    if (!rating) {
+      return res.status(404).json({
+        message: "Review not found for the given property or vehicle.",
+      });
+    }
+
+    // Ensure the user can only delete their own review
+    if (rating.userId !== userId) {
+      return res
+        .status(403)
+        .json({ message: "You can only delete your own review." });
+    }
+
+    // Delete the review
+    await rating.destroy();
+
+    return res.status(200).json({ message: "Review deleted successfully." });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch vehicle ratings" });
-  }
-};
-
-exports.getTestRatings = async (req, res) => {
-  const { testId } = req.params;
-
-  try {
-    const ratings = await Rating.findAll({
-      where: { target_id: testId, rating_type: "test" },
-      include: [
-        { model: Users, as: "rater", attributes: ["name", "profileImage"] },
-      ],
-    });
-
-    const averageRating =
-      ratings.reduce((sum, rating) => sum + rating.rating_value, 0) /
-        ratings.length || 0;
-
-    res.status(200).json({ ratings, averageRating });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch property ratings" });
+    console.error(error);
+    return res.status(500).json({ message: "Server error." });
   }
 };

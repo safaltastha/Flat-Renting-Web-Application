@@ -5,7 +5,7 @@ const { Property, Media, Users } = require("../models");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/multerConfig");
 const { searchProperties } = require("../controllers/searchController");
-const Room = require("../models/Room");
+
 const fs = require("fs");
 
 //Post properties
@@ -40,6 +40,7 @@ router.post(
       availableStart,
       availableEnd,
       availabilityTime,
+      dimensions,
     } = req.body; // Ensure entityType is included in the request body
 
     if (!entityType || entityType !== "property") {
@@ -50,13 +51,68 @@ router.post(
     }
 
     try {
-      let parsedFeatures, parsedRooms;
+      let parsedFeatures;
       try {
         parsedFeatures = JSON.parse(features);
       } catch (parseError) {
         return res.status(400).json({
           message: "Invalid features format",
           error: parseError.message,
+        });
+      }
+      let parsedDimensions = {};
+      if (dimensions) {
+        try {
+          parsedDimensions = {
+            bedrooms: dimensions.bedrooms?.map((room) => ({
+              length: parseFloat(room.length) || 0,
+              breadth: parseFloat(room.breadth) || 0,
+            })),
+            kitchens: dimensions.kitchens?.map((room) => ({
+              length: parseFloat(room.length) || 0,
+              breadth: parseFloat(room.breadth) || 0,
+            })),
+            livingrooms: dimensions.livingrooms?.map((room) => ({
+              length: parseFloat(room.length) || 0,
+              breadth: parseFloat(room.breadth) || 0,
+            })),
+          };
+        } catch (err) {
+          return res.status(400).json({
+            message: "Invalid dimensions format",
+            error: err.message,
+          });
+        }
+      }
+
+      if (!availableStart || !availableEnd) {
+        return res
+          .status(400)
+          .json({ message: "Both start and end dates are required." });
+      }
+
+      const startDate = new Date(availableStart);
+      const endDate = new Date(availableEnd);
+
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return res.status(400).json({ message: "Invalid date format." });
+      }
+
+      if (endDate <= startDate) {
+        return res.status(400).json({
+          message: "Availability End must be after Availability Start.",
+        });
+      }
+
+      // Updated Regex for multiple formats
+      const timeFormatRegex =
+        /^(1[0-2]|0?[1-9])(am|pm)-(1[0-2]|0?[1-9])(am|pm)$|^between\s(1[0-2]|0?[1-9])(am|pm)-(1[0-2]|0?[1-9])(am|pm)$|^after\s(1[0-2]|0?[1-9])(am|pm)$/;
+
+      // Validate availabilityTime (ensure it matches the expected format)
+      if (!timeFormatRegex.test(availabilityTime)) {
+        return res.status(400).json({
+          message:
+            "Invalid availability time format. Use formats like '1pm-2pm', 'between 1pm-2pm', or 'after 2pm'.",
         });
       }
 
@@ -76,11 +132,12 @@ router.post(
         houseRule,
         floor,
         StreetName,
-        availableStart,
-        availableEnd,
+        availableStart: startDate, // Convert to Date object
+        availableEnd: endDate,
         availabilityTime,
         userId: req.user.id,
         entityType,
+        dimensions: parsedDimensions,
       };
 
       const newProperty = await Property.create(propertyData);
@@ -161,14 +218,11 @@ router.post(
 // Get all properties
 router.get("/", authenticateJWT, async (req, res) => {
   try {
-    const { category } = req.query;
-    const whereCondition = category ? { category } : {};
     const properties = await Property.findAll({
-      where: whereCondition,
       include: [
         {
           model: Users,
-          attributes: ["id", "name", "email"],
+          attributes: ["id", "firstName", "email"],
         },
         {
           model: Media,
@@ -221,7 +275,14 @@ router.get("/:id", authenticateJWT, async (req, res) => {
       include: [
         {
           model: Users,
-          attributes: ["id", "name", "email"],
+          attributes: [
+            "id",
+            "firstName",
+            "lastName",
+            "address",
+            "phoneNumber",
+            "email",
+          ],
         },
         {
           model: Media,
@@ -245,10 +306,57 @@ router.get("/:id", authenticateJWT, async (req, res) => {
       });
     }
 
-    res.status(200).json(property);
+    res.status(200).json({
+      id: property.id,
+      description: property.description,
+      houseRule: property.houseRule,
+      category: property.category,
+      locationCity: property.locationCity,
+      locationStreetNumber: property.locationStreetNumber,
+      StreetName: property.StreetName,
+      numOfSpaces: property.numOfSpaces,
+      numOfBedrooms: property.numOfBedrooms,
+      numOfLivingrooms: property.numOfLivingrooms,
+      numOfKitchens: property.numOfKitchens,
+      numOfBathrooms: property.numOfBathrooms,
+      floor: property.floor,
+      features: property.features,
+      dimensions: property.dimensions,
+      monthlyRent: property.monthlyRent,
+      advancedRent: property.advancedRent,
+      media: property.media,
+      availabilityTime: property.availabilityTime, // Corrected to fetch from property itself
+      availableStart: property.availableStart,
+      availableEnd: property.availableEnd,
+      landlord: {
+        id: property.User.id,
+        firstName: property.User.firstName,
+        lastName: property.User.lastName,
+        address: property.User.address,
+        email: property.User.email,
+        phoneNumber: property.User.phoneNumber, // Ensure this exists in the `User` table
+      },
+    });
   } catch (error) {
     console.error("Database Error:", error); // Log the error for debugging
     res.status(500).json({ message: "Error retrieving property", error });
+  }
+});
+
+router.get("/:type", async (req, res) => {
+  const { type } = req.params;
+  const validTypes = ["flat", "room", "apartment"];
+
+  if (!validTypes.includes(type)) {
+    return res.status(400).json({ error: "Invalid property type." });
+  }
+
+  try {
+    const properties = await Property.findAll({ where: { type } });
+    res.json(properties);
+  } catch (error) {
+    console.error("Error fetching properties:", error);
+    res.status(500).json({ error: "Internal server error." });
   }
 });
 

@@ -230,14 +230,33 @@ const BookNowWithVehicleForm = () => {
     }
 
     // Log the payload data before sending it
-    console.log("Payload being sent to the backend:", payload);
+    console.log("Payload being sent to the backend:", formData);
+
+    const formattedData = {
+      propertyId: formData.selectedProperty.id,
+      isVehicleBooked: formData.booking === "yes" ? true : false,
+      vehicleId: formData.vehicleDetails.id,
+      pickupLocation: formData.pickup_location,
+      dropoffLocation: formData.dropoff_location,
+      vehicleDate: formData.date,
+      vehicleTime: formData.time,
+      vehicleDuration: +formData.vehicle_duration,
+      requiresPersonnel: formData.requires_personnel === "yes" ? true : false,
+      numPersonnel: +formData.num_Personnel,
+      personnelDuration: +formData.personnel_duration,
+    };
 
     try {
       const response = await axios.post(
-        "http://localhost:3002/booking",
-        payload
+        `http://localhost:3002/booking`,
+        formattedData,
+        {
+          withCredentials: true,
+        }
       );
       console.log("Booking Successful:", response.data);
+      localStorage.removeItem("selectedVehicle");
+      localStorage.removeItem("selectedProperty");
       navigate("/");
     } catch (error) {
       console.error("Error booking:", error);

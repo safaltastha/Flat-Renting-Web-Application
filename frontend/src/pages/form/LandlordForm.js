@@ -11,7 +11,7 @@ import Cookies from "js-cookie";
 const LandlordForm = () => {
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
-  const [rooms, setRooms] = useState([]);
+
   const [formData, setFormData] = useState({
     category: "",
     locationCity: "",
@@ -35,6 +35,11 @@ const LandlordForm = () => {
     availableStart: "",
     availableEnd: "",
     availabilityTime: "",
+    dimensions: {
+      bedrooms: [],
+      kitchens: [],
+      livingrooms: [],
+    },
   });
   const navigate = useNavigate();
 
@@ -48,10 +53,89 @@ const LandlordForm = () => {
   };
 
   const handleChange = (name, value) => {
+    console.log(name, value);
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+  // const handleDimensionChange = (e, index, type, dimensionType) => {
+  //   const { value } = e.target;
+  //   setFormData((prevData) => {
+  //     const updatedDimensions = [...prevData.dimensions[type]];
+  //     if (!updatedDimensions[index])
+  //       updatedDimensions[index] = { length: "", breadth: "" };
+  //     updatedDimensions[index][dimensionType] = value;
+  //     console.log("Updated dimensions:", updatedDimensions);
+  //     return {
+  //       ...prevData,
+  //       dimensions: {
+  //         ...prevData.dimensions,
+  //         [type]: updatedDimensions,
+  //       },
+  //     };
+  //   });
+  // };
+
+  const handleDimensionChange = (e, index, type, dimensionType) => {
+    const { value } = e.target;
+    setFormData((prevData) => {
+      const updatedDimensions = [...prevData.dimensions[type]]; // Make a copy of the current dimensions array for the specified room type
+      
+      // Ensure the index exists in the array, otherwise initialize it
+      if (!updatedDimensions[index]) {
+        updatedDimensions[index] = { length: "", breadth: "" };
+      }
+  
+      // Update the appropriate dimension (length or breadth)
+      updatedDimensions[index][dimensionType] = value;
+  
+      console.log("Updated dimensions:", updatedDimensions);
+      return {
+        ...prevData,
+        dimensions: {
+          ...prevData.dimensions,
+          [type]: updatedDimensions, // Update the state with the modified room dimensions
+        },
+      };
+    });
+  };
+  
+
+  const renderDimensionFields = (count, type) => {
+    const fields = [];
+    for (let i = 0; i < count; i++) {
+      fields.push(
+        <div key={`${type}-${i}`} className="mb-2">
+          <label className=" block mb-2 font-medium text-[#9747FF]">
+            {type.charAt(0).toUpperCase() + type.slice(1)} {i + 1}{" "}
+            Dimensions(inch)
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              placeholder="Length"
+              className=" rounded-md p-2 w-1/2"
+              value={formData.dimensions[type][i]?.length || ""}
+              onChange={(e) => handleDimensionChange(e, i, type, "length")}
+            />
+            <input
+              type="number"
+              placeholder="Breadth"
+              className=" rounded-md p-2 w-1/2"
+              value={formData.dimensions[type][i]?.breadth || ""}
+              onChange={(e) => handleDimensionChange(e, i, type, "breadth")}
+            />
+          </div>
+          <div className="mt-1 text-sm text-gray-600">
+            Preview: Length = {formData.dimensions[type][i]?.length || "N/A"}{" "}
+            inch, Breadth = {formData.dimensions[type][i]?.breadth || "N/A"}{" "}
+            inch
+          </div>
+        </div>
+      );
+    }
+    return fields;
   };
 
   const handleCheckboxChange = (e) => {
@@ -65,24 +149,18 @@ const LandlordForm = () => {
     }));
   };
 
-  const handleRoomsChange = (index, roomType, field, value) => {
-    console.log();
-    setRooms((prev) => {
-      const updatedRooms = [...prev];
-      if (!updatedRooms[index]) {
-        updatedRooms[index] = { roomType, length: 0, width: 0 };
-      }
-      updatedRooms[index][field] = value;
-      return updatedRooms;
-    });
-  };
-
   const handleRoomDimensionsChange = (name, value) => {
-    console.log("Room Dimension Change from landlord form - Name:", name, "Value:", value);
+    console.log(
+      "Room Dimension Change from landlord form - Name:",
+      name,
+      "Value:",
+      value
+    );
     // You can also update your formData or room data here if necessary
   };
 
   const handleSubmit = async (event) => {
+    console.log("formData", formData);
     event.preventDefault();
     const startDate = new Date(formData.availableStart);
     const endDate = new Date(formData.availableEnd);
@@ -108,6 +186,27 @@ const LandlordForm = () => {
       petAllowed: formData.features.petAllowed,
     };
 
+    const dimensionsData = {
+      bedrooms: formData.dimensions.bedrooms.map((bedroom) => ({
+        length: +bedroom.length,
+        breadth: +bedroom.breadth,
+      })),
+      kitchens: formData.dimensions.kitchens.map((kitchen) => ({
+        length:+kitchen.length,
+        breadth:+kitchen.breadth,
+      })),
+      livingrooms: formData.dimensions.livingrooms.map((livingroom) => ({
+        length: +livingroom.length,
+        breadth: +livingroom.breadth,
+      })),
+    };
+
+    // Add dimensionsData to FormData
+    console.log("formData.dimensions", formData.dimensions);
+    console.log("dimensionsData", dimensionsData);
+    
+    console.log(dimensionsData, 'dimensions Data')
+
     const propertyData = new FormData();
     propertyData.append("category", formData.category);
     propertyData.append("locationCity", formData.locationCity);
@@ -121,6 +220,7 @@ const LandlordForm = () => {
     propertyData.append("description", formData.description);
     propertyData.append("houseRule", formData.houseRule);
     propertyData.append("features", JSON.stringify(featuresData));
+    propertyData.append("dimensions", JSON.stringify(dimensionsData));
     propertyData.append("floor", formData.floor);
     propertyData.append("StreetName", formData.StreetName);
     propertyData.append("entityType", "property");
@@ -130,7 +230,8 @@ const LandlordForm = () => {
     propertyData.append("availableEnd", formData.availableEnd);
 
     propertyData.append("availabilityTime", formData.availabilityTime);
-
+ 
+console.log(propertyData, 'asdfadaaaa ')
     // Append images and videos to FormData
     images.forEach((image) => {
       propertyData.append("propertyImage", image);
@@ -146,7 +247,9 @@ const LandlordForm = () => {
     propertyData.forEach((value, key) => {
       console.log(`${key}: ${value}`);
     });
+  
 
+    console.log(propertyData, 'fasdfas928347938')
     try {
       const response = await axios.post(
         "http://localhost:3002/properties",
@@ -161,7 +264,7 @@ const LandlordForm = () => {
         }
       );
       if (response.status === 201) {
-        navigate("/");
+        // navigate("/");
         alert("Property posted successfully!");
       }
     } catch (error) {
@@ -190,9 +293,71 @@ const LandlordForm = () => {
           setFormData={setFormData}
         />
         <GeneralCategory
-          onChange={handleRoomsChange}
+          onChange={handleChange}
           onRoomDimensionsChange={handleRoomDimensionsChange}
         />
+
+        <div className="grid grid-cols-2 gap-x-4 px-4  ">
+          <div className="">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Bedrooms
+              <span className="text-red-600 text-[20px] ml-1"> *</span>
+            </label>
+            <input
+              type="number"
+              name="numOfBedrooms"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfBedrooms}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfBedrooms || 0}
+            </div>
+            {formData.numOfBedrooms > 0 &&
+              renderDimensionFields(+formData.numOfBedrooms, "bedrooms")}
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Kitchens
+              <span className="text-red-600 text-[20px] ml-1"> *</span>
+            </label>
+            <input
+              type="number"
+              name="numOfKitchens"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfKitchens}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfKitchens || 0}
+            </div>
+            {formData.numOfKitchens > 0 &&
+              renderDimensionFields(+formData.numOfKitchens, "kitchens")}
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Living Rooms
+            </label>
+            <input
+              type="number"
+              name="numOfLivingRooms"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfLivingRooms}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfLivingRooms || 0}
+            </div>
+            {formData.numOfKitchens > 0 &&
+              renderDimensionFields(+formData.numOfLivingRooms, "livingrooms")}
+          </div>
+        </div>
+
         <Rent onChange={handleChange} />
         <DescriptionAndRules
           capitalizeWords={capitalizeWords}

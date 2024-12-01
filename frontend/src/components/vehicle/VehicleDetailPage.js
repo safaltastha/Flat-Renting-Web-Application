@@ -6,20 +6,29 @@ import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useVehicle } from "../../context/VehicleContext";
+import GetRating from "../GetRating";
+import GiveRating from "../GiveRating";
+import { useUser } from "../../context/UserContext";
 
-const VehicleDetailPage = () => {
+const VehicleDetailPage = ({ vehicleId }) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [vehicle, setVehicle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAllImages, setShowAllImages] = useState(false);
+  const { auth } = useUser();
+  const [reviews, setReviews] = useState([]);
 
   const { setSelectedVehicle } = useVehicle(); // Access context
 
   const handleBookNow = () => {
     localStorage.setItem("selectedVehicle", JSON.stringify(vehicle));
-    navigate("/bookproperty"); // Navigate to booking formcd 
+    navigate("/bookproperty"); // Navigate to booking formcd
+  };
+
+  const handleNewRating = (newReview) => {
+    setReviews((prevReviews) => [newReview, ...prevReviews]);
   };
 
   useEffect(() => {
@@ -28,7 +37,12 @@ const VehicleDetailPage = () => {
         const token = Cookies.get("token");
         const response = await axios.get(
           `http://localhost:3002/vehicle/${id}`,
-          { withCredentials: true }
+          {
+            headers: {
+              Authorization: `Bearer ${auth.accessToken}`, // Add token to the Authorization header
+            },
+            withCredentials: true, // Send cookies with the request (if needed for session)
+          }
         );
 
         setVehicle(response.data);
@@ -45,10 +59,15 @@ const VehicleDetailPage = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading vehicle: {error.message}</div>;
 
+  function capitalizeFirstLetter(name) {
+    if (!name) return ""; // Handle cases where the name is undefined or null
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  }
   return (
     <div className="container max-w-[1600px] px-36 mt-8">
-      <p className="text-3xl font-semibold text-[#9747FF] ">
-        {vehicle.type} for rent in {vehicle.vehicleLocation}
+      <p className="text-3xl font-semibold text-[#9747FF]">
+        {capitalizeFirstLetter(vehicle.type)} for rent in{" "}
+        {capitalizeFirstLetter(vehicle.vehicleLocation)}
       </p>
 
       {vehicle ? (
@@ -78,10 +97,13 @@ const VehicleDetailPage = () => {
                   <strong>Pricing:</strong> Nrs {vehicle.pricingPerHour}/hour
                 </p>
                 <p className="text-lg">
-                  <strong>Location:</strong> {vehicle.vehicleLocation}
+                  <strong>Location:</strong>{" "}
+                  {capitalizeFirstLetter(vehicle.vehicleLocation)}
                 </p>
+
                 <p className="text-lg">
-                  <strong>Vehicle Features:</strong> {vehicle.vehicleFeatures}
+                  <strong>Vehicle Features:</strong>{" "}
+                  {vehicle.vehicleFeatures || "No features provided"}
                 </p>
               </div>
 
@@ -105,6 +127,18 @@ const VehicleDetailPage = () => {
                 allowFullScreen
                 loading="lazy"
               ></iframe>
+            </div>
+
+            <div>
+              <GetRating
+                vehicleId={id}
+                onNewRating={handleNewRating}
+                ratingId={vehicle.ratingId}
+              />
+            </div>
+
+            <div>
+              <GiveRating vehicleId={id} />
             </div>
           </div>
 
@@ -151,24 +185,51 @@ const VehicleDetailPage = () => {
               <p className="text-2xl font-semibold">Contact Information</p>
               <div className="flex items-center">
                 <FaUserCircle className="mr-3 text-xl" />
-                <span className="text-lg">John Doe</span>
+                <span className="text-lg">
+                  {capitalizeFirstLetter(vehicle.vehicleSupplier.firstName)}{" "}
+                  {capitalizeFirstLetter(vehicle.vehicleSupplier.lastName)}
+                </span>
               </div>
+
               <div className="flex items-center">
                 <ImPhone className="mr-3 text-xl" />
-                <span className="text-lg">+977-9800000000</span>
+                <span className="text-lg">
+                  {vehicle.vehicleSupplier.phoneNumber || "Not Available"}
+                </span>
               </div>
               <div className="flex items-center">
                 <ImLocation2 className="mr-3 text-xl" />
                 <span className="text-lg">
-                  Street 9, Janapriya Marga, Nayabazar
+                  {vehicle.vehicleSupplier.address || "Not Available"}
                 </span>
               </div>
+
               <div className="flex items-center">
                 <ImMail className="mr-3 text-xl" />
-                <span className="text-lg">landlord@example.com</span>
+                <span className="text-lg">
+                  {vehicle.vehicleSupplier.email || "Not Available"}
+                </span>
               </div>
-              <div className="text-lg font-semibold text-red-500">
-                Availability Time: {vehicle.availabilityTime}
+              <div className="text-2xl font-semibold ">
+                Landlord Availability
+              </div>
+              <div className="text-lg  text-red-500">
+                Available Start:{" "}
+                {vehicle?.availableStart
+                  ? new Date(vehicle.availableStart).toLocaleDateString()
+                  : "Not Available"}
+              </div>
+
+              <div className="text-lg  text-red-500">
+                Available End:{" "}
+                {vehicle?.availableEnd
+                  ? new Date(vehicle.availableEnd).toLocaleDateString()
+                  : "Not Available"}
+              </div>
+
+              <div className="text-lg  text-red-500">
+                Availability Time:{" "}
+                {vehicle?.availabilityTime || "Not Available"}
               </div>
             </div>
           </div>

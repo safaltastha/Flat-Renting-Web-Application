@@ -1,80 +1,94 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const VehicleBooking = sequelize.define('VehicleBooking', {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    bookingId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Bookings', // Name of the Booking table
-        key: 'id',
+  const VehicleBooking = sequelize.define(
+    "VehicleBooking",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
       },
-      onDelete: 'CASCADE',
-    },
-    vehicleId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'Vehicles',
-        key: 'id',
+      bookingId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Bookings", // Name of the Booking table
+          key: "id",
+        },
+        onDelete: "CASCADE",
+        field: "booking_id", // Map to the column name in the DB
       },
-      onDelete: 'SET NULL',
-    },
-    pickupLocation: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    dropoffLocation: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    date: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-    time: {
-      type: DataTypes.TIME,
-      allowNull: false,
-    },
-    vehicleDuration: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    requiresPersonnel: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-    numPersonnel: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        isInt: true,
-        min: 1,
+      vehicleId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "Vehicles",
+          key: "id",
+        },
+        onDelete: "SET NULL",
+        field: "vehicle_id", // Map to the column name in the DB
+      },
+      pickupLocation: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        field: "pickup_location", // Map to the column name in the DB
+      },
+      dropoffLocation: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        field: "dropoff_location", // Map to the column name in the DB
+      },
+      date: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+        field: "date", // Map to the column name in the DB
+      },
+      time: {
+        type: DataTypes.TIME,
+        allowNull: false,
+        field: "time", // Map to the column name in the DB
+      },
+      vehicleDuration: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: "vehicle_duration", // Map to the column name in the DB
+      },
+      requiresPersonnel: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        field: "requires_personnel", // Map to the column name in the DB
+      },
+      numPersonnel: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: {
+          isInt: true,
+          min: 1,
+        },
+        field: "num_personnel", // Map to the column name in the DB
+      },
+      personnelDuration: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: {
+          isInt: true,
+          min: 1,
+        },
+        field: "personnel_duration", // Map to the column name in the DB
       },
     },
-    personnelDuration: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        isInt: true,
-        min: 1,
-      },
-    },
-  }, {
-    timestamps: true,
-    tableName: 'VehicleBookings',
-    underscored: true,
-  });
+    {
+      timestamps: true,
+      tableName: "VehicleBookings",
+      underscored: true,
+    }
+  );
 
   VehicleBooking.associate = (models) => {
-    VehicleBooking.belongsTo(models.Bookings, { foreignKey: 'bookingId' });
-    VehicleBooking.belongsTo(models.Vehicle, { foreignKey: 'vehicleId' });
+    VehicleBooking.belongsTo(models.Bookings, { foreignKey: "bookingId" });
+    VehicleBooking.belongsTo(models.Vehicle, { foreignKey: "vehicleId" });
   };
 
   return VehicleBooking;

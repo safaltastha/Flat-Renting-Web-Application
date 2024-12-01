@@ -14,14 +14,9 @@ const validationSchema = Yup.object().shape({
       "Invalid email address"
     )
     .required("Email is required"),
-  name: Yup.string()
-    .matches(
-      /^[a-z0-9]+$/,
-      "Name must be lowercase letters and numbers only, with no spaces"
-    )
-    .min(3, "Name must be at least 3 characters long")
-    .max(50, "Name must not exceed 50 characters")
-    .required("Name is required"),
+  firstName: Yup.string().required("First name is required"),
+  lastName: Yup.string().required("Last name is required"),
+  address: Yup.string().required("Address is required"),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
@@ -35,8 +30,7 @@ const validationSchema = Yup.object().shape({
   role: Yup.string()
     .oneOf(["tenant", "landlord", "vehicleSupplier"], "Invalid role")
     .required("Role is required"),
-  phoneNumber: Yup.string()
-  .required("Phone number is required"),
+  phoneNumber: Yup.string().required("Phone number is required"),
 });
 
 const RegisterForm = () => {
@@ -61,7 +55,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-[100vh] max-h-screen py-8 p-4 bg-gray-100">
+    <div className="flex items-center justify-center   py-8 p-4 bg-gray-100">
       <Formik
         initialValues={{
           name: "",
@@ -84,20 +78,60 @@ const RegisterForm = () => {
             {/* Username */}
             <div className="mb-4">
               <label
-                htmlFor="name"
+                htmlFor="firstName"
                 className="block md:text-sm font-medium text-gray-700"
               >
-                Username{" "}
+                First Name{" "}
                 <span className="ml-1 text-red-600 text-[20px]">*</span>
               </label>
               <Field
                 type="text"
-                name="name"
+                name="firstName"
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
-                placeholder="johndoe"
+                placeholder="john"
               />
               <ErrorMessage
-                name="name"
+                name="firstName"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="lastName"
+                className="block md:text-sm font-medium text-gray-700"
+              >
+                Last Name{" "}
+                <span className="ml-1 text-red-600 text-[20px]">*</span>
+              </label>
+              <Field
+                type="text"
+                name="lastName"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
+                placeholder="doe"
+              />
+              <ErrorMessage
+                name="lastName"
+                component="div"
+                className="text-red-500 text-sm mt-1"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="address"
+                className="block md:text-sm font-medium text-gray-700"
+              >
+                Address <span className="ml-1 text-red-600 text-[20px]">*</span>
+              </label>
+              <Field
+                type="text"
+                name="address"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none"
+              />
+              <ErrorMessage
+                name="address"
                 component="div"
                 className="text-red-500 text-sm mt-1"
               />

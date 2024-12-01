@@ -4,7 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import DetailedViewPage from "./components/Property/DetailedViewPage";
 import HomePage from "./pages/HomePage";
 import LoginForm from "./pages/form/LoginForm";
-import PropertyListing from "./pages/PropertyListing";
+import PropertyListing from "./components/Property/PropertyListing";
 import RegistrationForm from "./pages/form/RegisterForm";
 import LandlordForm from "./pages/form/LandlordForm";
 import ChangePassword from "./components/password/ChangePassword";
@@ -27,6 +27,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized";
 import ForgotPassword from "./components/password/RequestPasswordReset";
 import PersistLogin from "./components/PersistLogin";
+import GiveRating from "./components/GiveRating";
+import PropertyList from "./components/Property/PropertyList";
 
 const App = () => {
   return (
@@ -38,10 +40,9 @@ const App = () => {
           <Route path="/login" element={<LoginForm />} />
           {/* <Route path="/properties/:id" element={<DetailedViewPage />} /> */}
           {/* <Route path="/bookproperty" element={<BookNowWithVehicleForm />} /> */}
-          <Route path="/vehicles" element={<VehicleListing />} />
-          <Route path="/vehicle/:id" element={<VehicleDetailPage />} />
+
           <Route path="/contactus" element={<ContactUs />} />
-          {/* <Route path="/properties" element={<PropertyListing />} /> */}
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/*any logged in user can access*/}
@@ -49,16 +50,21 @@ const App = () => {
           <Route path="/changepassword" element={<ChangePassword />} />
 
           <Route path="/properties/flat" element={<Flat />} />
+          <Route path="/give-review" element={<GiveRating />} />
 
           {/* Unauthorized Page */}
           <Route path="/unauthorized" element={<Unauthorized />} />
 
           <Route element={<ProtectedRoute allowedRoles={["tenant"]} />}>
             <Route path="/properties" element={<PropertyListing />} />
+            {<Route path="/properties-list" element={<PropertyList />} />}
             <Route path="/properties/:id" element={<DetailedViewPage />} />
             <Route path="/vehicles" element={<VehicleListing />} />
             <Route path="/vehicle/:id" element={<VehicleDetailPage />} />
             <Route path="/bookproperty" element={<BookNowWithVehicleForm />} />
+            <Route path="/vehicles" element={<VehicleListing />} />
+
+            <Route path="/vehicle/:id" element={<VehicleDetailPage />} />
           </Route>
 
           {/* Landlord-only routes */}

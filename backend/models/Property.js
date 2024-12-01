@@ -1,5 +1,4 @@
 const Users = require("./Users");
-const Room = require("./Room");
 
 module.exports = (sequelize, DataTypes) => {
   const Property = sequelize.define(
@@ -90,6 +89,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      dimensions: {
+        type: DataTypes.JSON,
+        allowNull: true, // or false depending on whether this field is required
+      },
 
       userId: {
         type: DataTypes.INTEGER,
@@ -116,29 +119,22 @@ module.exports = (sequelize, DataTypes) => {
       as: "media", // Optional: can help in naming when accessing in queries
       onDelete: "CASCADE",
     });
-    Property.hasMany(models.Room, {
-      foreignKey: "propertyId",
-      as: "rooms",
-      onDelete: "CASCADE",
-    });
 
     Property.hasMany(models.Rating, {
-      foreignKey: "target_id",
-      as: "property",
-      constraints: false,
-
-      scope: { rating_type: "property" },
-    });
-
-    Property.hasMany(models.PropertyRating, {
-      foreignKey: "property_id",
-      as: "ratings",
+      foreignKey: "propertyId", // Foreign key in the Rating model
+      as: "ratings", // Alias for easier querying
     });
 
     // A property can have many bookings
     Property.hasMany(models.Bookings, {
       foreignKey: "propertyId",
       onDelete: "SET NULL",
+    });
+    Property.belongsToMany(models.Users, {
+      through: models.SavedProperties,
+      as: "savedBy",
+      foreignKey: "propertyId",
+      otherKey: "userId",
     });
   };
 

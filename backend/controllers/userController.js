@@ -1,19 +1,23 @@
 // controllers/userController.js
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { Users, UserRating } = require("../models");
+const { Users } = require("../models");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+
 require("dotenv").config();
 
 // Registration handler
 exports.register = async (req, res) => {
-  const { name, email, password, role, phoneNumber } = req.body;
+  const { firstName, lastName, address, email, password, role, phoneNumber } =
+    req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await Users.create({
-      name,
+      firstName,
+      lastName,
+      address,
       email,
       password: hashedPassword,
       role,
@@ -23,20 +27,22 @@ exports.register = async (req, res) => {
     const token = jwt.sign(
       {
         id: newUser.id,
-        name: newUser.name,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        address: newUser.address,
         role: newUser.role,
         email: newUser.email,
         phoneNumber: newUser.phoneNumber,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 3600000,
+      maxAge: 86400000,
     });
 
     res.json({ message: "Registration successful", user: newUser });
@@ -61,20 +67,22 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       {
         id: user.id,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        address: user.address,
         role: user.role,
         email: user.email,
         phoneNumber: user.phoneNumber,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("token", token, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 3600000,
+      maxAge: 86400000,
     });
 
     res.json({ message: "Login successful", token });
@@ -95,56 +103,11 @@ exports.getAllUsers = async (req, res) => {
 
 // Get user by ID
 
-// Function to calculate average rating for a user
-const calculateAverageRating = async (userId) => {
-  const ratings = await UserRating.findAll({
-    where: { rated_user_id: userId },
-  });
-
-  const totalRatings = ratings.length;
-  const sumRatings = ratings.reduce(
-    (acc, rating) => acc + rating.rating_value,
-    0
-  );
-
-  // Calculate average rating
-  const averageRating =
-    totalRatings > 0 ? (sumRatings / totalRatings).toFixed(2) : 0;
-
-  return averageRating;
-};
-
-// Get user profile along with average rating
-exports.getUserById = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // Fetch user details from the database
-    const user = await Users.findByPk(id, {
-      attributes: ["id", "name", "role"], // Selecting specific attributes
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Calculate average rating of the user
-    const averageRating = await calculateAverageRating(id);
-
-    // Return user details and average rating
-    res.json({
-      user,
-      averageRating, // Include average rating in the response
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error retrieving user", error });
-  }
-};
-
 // Update user
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { name, email, password, role, phoneNumber } = req.body;
+  const { firstName, lastName, address, email, password, role, phoneNumber } =
+    req.body;
 
   try {
     const user = await Users.findByPk(id);
@@ -153,7 +116,9 @@ exports.updateUser = async (req, res) => {
     if (password) {
       user.password = await bcrypt.hash(password, 10);
     }
-    user.name = name || user.name;
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.address = address || user.address;
     user.email = email || user.email;
     user.role = role || user.role;
     user.phoneNumber = phoneNumber || user.phoneNumber;
@@ -180,81 +145,111 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+const JWT_SECRET = "Laravel1$";
+
 exports.requestPasswordReset = async (req, res) => {
   const { email } = req.body;
 
   try {
     // Find user by email
-    const user = await Users.findOne({ where: { email } });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const oldUser = await Users.findOne({ where: { email } });
+    if (!oldUser) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
     }
 
-    // Generate reset token (using crypto to generate a random token)
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenExpiration = Date.now() + 3600000; // Token valid for 1 hour
+    // Create a unique token secret using the user's password
+    const secret = JWT_SECRET + oldUser.password;
+    const token = jwt.sign(
+      { email: oldUser.email, id: oldUser.id }, // Payload
+      secret, // Unique secret for added security
+      { expiresIn: "1h" }
+    );
 
-    // Save the token and expiration date to the user
-    user.resetToken = resetToken;
-    user.resetTokenExpiration = resetTokenExpiration;
-    await user.save();
-
-    // Send reset email
-    const transporter = nodemailer.createTransport({
-      service: "gmail", // Or your email service provider
+    // Generate reset password link
+    const link = `http://localhost:3002/auth/reset-password/${oldUser.id}/${token}`;
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: "pranisha.joshi11@gmail.com",
+        pass: "kire evax novg gfuy",
       },
     });
 
-    const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
+    var mailOptions = {
+      from: `"Basai Sarai" <pranisha.joshi11@gmail.com>`, // Display name with your email
+      to: oldUser.email, // Landlord's email fetched from the database
       subject: "Password Reset Request",
-      text: `You requested a password reset. Click the link to reset your password: ${resetURL}`,
+      text: `Hello ${oldUser.firstName},\n\nClick the link below to reset your password:\n\n${link}\n\nThanks,\nBasai Sarai Team`,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
+    transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        return res.status(500).json({ message: "Error sending email", error });
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
       }
-      res.json({ message: "Password reset email sent" });
     });
+
+    console.log("Password reset link:", link);
+
+    // Send response
+    return res.status(200).json({ message: "Password reset link sent", link });
   } catch (error) {
-    res.status(500).json({ message: "Error processing password reset", error });
+    console.error("Error requesting password reset:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 // Reset password using token
 exports.resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
-
-  try {
-    // Find user by reset token
-    const user = await Users.findOne({
-      where: {
-        resetToken: token,
-        resetTokenExpiration: { [Sequelize.Op.gt]: Date.now() },
-      },
+  const { token, id } = req.params;
+  console.log(req.params);
+  const oldUser = await Users.findOne({ where: { id } });
+  if (!oldUser) {
+    return res.status(404).json({
+      status: "error",
+      message: "User not found",
     });
+  }
 
-    if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
-    }
-
-    // Hash the new password and update it
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    user.resetToken = null; // Clear the reset token
-    user.resetTokenExpiration = null; // Clear the expiration time
-    await user.save();
-
-    res.json({ message: "Password reset successful" });
+  const secret = JWT_SECRET + oldUser.password;
+  try {
+    const verify = jwt.verify(token, secret);
+    res.render("index", { email: verify.email, status: "Not Verified" });
   } catch (error) {
-    res.status(500).json({ message: "Error resetting password", error });
+    console.log(error);
+    res.send("Not verified");
+  }
+};
+
+exports.resetPasswordd = async (req, res) => {
+  const { token, id } = req.params;
+  const { password } = req.body;
+
+  const oldUser = await Users.findOne({ where: { id } });
+  if (!oldUser) {
+    return res.status(404).json({
+      status: "error",
+      message: "User not found",
+    });
+  }
+
+  const secret = JWT_SECRET + oldUser.password;
+  try {
+    const verify = jwt.verify(token, secret);
+    const encryptedPassword = await bcrypt.hash(password, 10);
+    await Users.update(
+      { password: encryptedPassword }, // Update the password field
+      { where: { id } } // Condition to find the user by id
+    );
+    
+    res.render("index", { email: verify.email, status: "verified" });
+  } catch (error) {
+    console.log(error);
+    res.json({ status: "Something went wrong" });
   }
 };
 
