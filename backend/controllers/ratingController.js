@@ -1,4 +1,5 @@
 const { Rating, Property, Users, Vehicle } = require("../models");
+const { Rating, Property, Users, Vehicle } = require("../models");
 
 // Create a rating or review for a property or vehicle
 exports.createRating = async (req, res) => {
@@ -25,7 +26,15 @@ exports.createRating = async (req, res) => {
       message: "Rating created successfully.",
       data: newRating,
     });
+    res.status(201).json({
+      message: "Rating created successfully.",
+      data: newRating,
+    });
   } catch (error) {
+    console.error("Error creating rating:", error.message);
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the rating." });
     console.error("Error creating rating:", error.message);
     res
       .status(500)

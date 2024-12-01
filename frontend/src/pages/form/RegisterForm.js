@@ -39,7 +39,7 @@ const RegisterForm = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const response = await axios.post(
-        "http://localhost:3002/auth/register",
+        "http://localhost:5001auth/register",
         values
       );
       resetForm();

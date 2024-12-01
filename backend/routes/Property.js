@@ -6,6 +6,7 @@ const { authenticateJWT } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/multerConfig");
 const { searchProperties } = require("../controllers/searchController");
 
+
 const fs = require("fs");
 
 //Post properties
@@ -41,6 +42,7 @@ router.post(
       availableEnd,
       availabilityTime,
       dimensions,
+      dimensions,
     } = req.body; // Ensure entityType is included in the request body
 
     if (!entityType || entityType !== "property") {
@@ -51,6 +53,7 @@ router.post(
     }
 
     try {
+      let parsedFeatures;
       let parsedFeatures;
       try {
         parsedFeatures = JSON.parse(features);
@@ -138,22 +141,10 @@ router.post(
         userId: req.user.id,
         entityType,
         dimensions: parsedDimensions,
+        dimensions: parsedDimensions,
       };
 
       const newProperty = await Property.create(propertyData);
-      // Save room dimensions to the Room table
-      // if (parsedRooms && parsedRooms.length > 0) {
-      //   await Promise.all(
-      //     parsedRooms.map((room) =>
-      //       Room.create({
-      //         propertyId: newProperty.id,
-      //         roomType: room.roomType,
-      //         length: room.length,
-      //         width: room.width,
-      //       })
-      //     )
-      //   );
-      // }
 
       const imagesDirectory = path.join(__dirname, "uploads/properties/images");
       if (!fs.existsSync(imagesDirectory)) {
@@ -223,6 +214,7 @@ router.get("/", authenticateJWT, async (req, res) => {
         {
           model: Users,
           attributes: ["id", "firstName", "email"],
+          attributes: ["id", "firstName", "email"],
         },
         {
           model: Media,
@@ -239,7 +231,7 @@ router.get("/", authenticateJWT, async (req, res) => {
 
     const reversedProperties = properties.reverse();
 
-    const baseUrl = "http://localhost:3002"; // Base URL for files
+    const baseUrl = "http://localhost:5001"; // Base URL for files
 
     reversedProperties.forEach((property) => {
       if (property.media) {
@@ -283,6 +275,14 @@ router.get("/:id", authenticateJWT, async (req, res) => {
             "phoneNumber",
             "email",
           ],
+          attributes: [
+            "id",
+            "firstName",
+            "lastName",
+            "address",
+            "phoneNumber",
+            "email",
+          ],
         },
         {
           model: Media,
@@ -298,7 +298,7 @@ router.get("/:id", authenticateJWT, async (req, res) => {
     }
 
     // Format media paths
-    const baseUrl = "http://localhost:3002"; // Base URL for files
+    const baseUrl = "http://localhost:5001"; // Base URL for files
     if (property.media) {
       property.media.forEach((mediaItem) => {
         const filePath = mediaItem.file_path.replace(/\\/g, "/"); // Ensure path formatting is consistent

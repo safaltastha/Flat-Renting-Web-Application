@@ -237,6 +237,7 @@ const WhyChooseUs = () => {
           </div>
         </div>
       </div>
+      <RoomTest />
     </div>
   );
 };

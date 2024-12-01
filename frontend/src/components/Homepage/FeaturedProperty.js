@@ -41,7 +41,7 @@ const FeaturedProperties = () => {
     const loadFeaturedProperties = async () => {
       try {
         const token = Cookies.get("token");
-        const response = await axios.get("http://localhost:3002/properties", {
+        const response = await axios.get("http://localhost:5001/properties", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

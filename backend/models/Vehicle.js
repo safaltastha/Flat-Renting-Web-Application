@@ -1,5 +1,3 @@
-const Users = require("./Users");
-
 module.exports = (sequelize, DataTypes) => {
   const Vehicle = sequelize.define(
     "Vehicle",
@@ -46,12 +44,20 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: Users,
+          model: "users",
+          key: "id",
+        },
+      },
+      propertyId: {
+        // Optional relationship to properties
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "properties",
           key: "id",
         },
       },

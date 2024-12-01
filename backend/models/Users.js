@@ -17,6 +17,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       address: {
+      firstName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      lastName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      address: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -60,6 +69,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: true,
       },
+      resetToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      resetTokenExpiration: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
 
       createdAt: {
         type: DataTypes.DATE,
@@ -76,14 +93,12 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
     }
   );
-
   Users.associate = (models) => {
     // A user can have multiple properties
     Users.hasMany(models.Property, {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
-
     // A user can have multiple vehicles
     Users.hasMany(models.Vehicle, {
       foreignKey: "userId", // Foreign key in Vehicle model

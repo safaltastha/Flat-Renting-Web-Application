@@ -114,6 +114,17 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       onDelete: "CASCADE",
     });
+    Property.hasMany(models.Vehicle, {
+      foreignKey: "propertyId",
+      as: "vehicles", // Alias for easier querying
+      onDelete: "SET NULL", // Ensure vehicles aren't deleted when properties are deleted
+    });
+    Property.belongsToMany(models.Users, {
+      through: models.SavedProperties,
+      as: "savedBy",
+      foreignKey: "propertyId",
+      otherKey: "userId",
+    });
     Property.hasMany(models.Media, {
       foreignKey: "propertyId",
       as: "media", // Optional: can help in naming when accessing in queries

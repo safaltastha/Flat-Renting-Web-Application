@@ -84,7 +84,7 @@ const VehicleForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3002/vehicle",
+        "http://localhost:3001/vehicle",
         vehicleData,
         {
           headers: {

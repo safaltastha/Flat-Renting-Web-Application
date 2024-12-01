@@ -171,7 +171,7 @@ router.get("/", authenticateJWT, async (req, res) => {
 
     const reversedVehicles = vehicles.reverse();
 
-    const baseUrl = "http://localhost:3002"; // Base URL for files
+    const baseUrl = "http://localhost:3001"; // Base URL for files
 
     reversedVehicles.forEach((vehicle) => {
       if (vehicle.media) {
@@ -227,7 +227,7 @@ router.get("/:id", authenticateJWT, async (req, res) => {
     }
 
     // Format media paths
-    const baseUrl = "http://localhost:3002"; // Base URL for files
+    const baseUrl = "http://localhost:3001"; // Base URL for files
     if (vehicle.media) {
       vehicle.media.forEach((mediaItem) => {
         const filePath = mediaItem.file_path.replace(/\\/g, "/"); // Ensure path formatting is consistent

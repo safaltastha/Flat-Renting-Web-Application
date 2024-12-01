@@ -17,25 +17,32 @@ const router = express.Router();
 
 // Registration route
 router.post("/register", register);
+router.post("/register", register);
 
 // Login route
+router.post("/login", login);
 router.post("/login", login);
 
 // get role
 router.get("/role", authenticateJWT, (req, res) => {
   res.json({ role: req.user.role });
+  res.json({ role: req.user.role });
 });
 
 // Get all users route
 router.get("/", authenticateJWT, getAllUsers);
+router.get("/", authenticateJWT, getAllUsers);
 
 // Update user route
+router.put("/update/:id", authenticateJWT, updateUser);
 router.put("/update/:id", authenticateJWT, updateUser);
 
 // Delete user route
 router.delete("/delete/:id", authenticateJWT, deleteUser);
+router.delete("/delete/:id", authenticateJWT, deleteUser);
 
 //logout route
+router.post("/logout", authenticateJWT, logout);
 router.post("/logout", authenticateJWT, logout);
 
 router.post("/forgot-password", requestPasswordReset);

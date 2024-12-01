@@ -166,6 +166,7 @@ exports.getBookedPropertiesForLandlord = async (req, res) => {
     const landlordBookings = await Users.findOne({
       where: { id: landlordId },
       attributes: ["id", "firstName", "phoneNumber"],
+      attributes: ["id", "firstName", "phoneNumber"],
       include: [
         {
           model: Property, // Include properties posted by the landlord
@@ -177,6 +178,7 @@ exports.getBookedPropertiesForLandlord = async (req, res) => {
               include: [
                 {
                   model: Users,
+                  attributes: ["firstName", "email", "phoneNumber"],
                   attributes: ["firstName", "email", "phoneNumber"],
                 },
               ],
@@ -207,6 +209,7 @@ exports.getBookedVehicleForVehicleSupplier = async (req, res) => {
     const supplierBookings = await Users.findOne({
       where: { id: supplierId },
       attributes: ["id", "firstName"], // Add the supplier's name and any other relevant attributes
+      attributes: ["id", "firstName"], // Add the supplier's name and any other relevant attributes
       include: [
         {
           model: Vehicle, // Include vehicles posted by the supplier
@@ -218,6 +221,7 @@ exports.getBookedVehicleForVehicleSupplier = async (req, res) => {
               include: [
                 {
                   model: Users, // Include user details who booked the vehicle
+                  attributes: ["firstName", "email", "phoneNumber"], // Attributes to retrieve
                   attributes: ["firstName", "email", "phoneNumber"], // Attributes to retrieve
                 },
               ],

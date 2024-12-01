@@ -12,6 +12,7 @@ const LandlordForm = () => {
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
 
+
   const [formData, setFormData] = useState({
     category: "",
     locationCity: "",
@@ -40,6 +41,11 @@ const LandlordForm = () => {
       kitchens: [],
       livingrooms: [],
     },
+    dimensions: {
+      bedrooms: [],
+      kitchens: [],
+      livingrooms: [],
+    },
   });
   const navigate = useNavigate();
 
@@ -53,6 +59,7 @@ const LandlordForm = () => {
   };
 
   const handleChange = (name, value) => {
+    console.log(name, value);
     console.log(name, value);
     setFormData((prev) => ({
       ...prev,
@@ -156,6 +163,12 @@ const LandlordForm = () => {
       "Value:",
       value
     );
+    console.log(
+      "Room Dimension Change from landlord form - Name:",
+      name,
+      "Value:",
+      value
+    );
     // You can also update your formData or room data here if necessary
   };
 
@@ -252,7 +265,7 @@ console.log(propertyData, 'asdfadaaaa ')
     console.log(propertyData, 'fasdfas928347938')
     try {
       const response = await axios.post(
-        "http://localhost:3002/properties",
+        "http://localhost:5001/properties",
         propertyData,
         {
           headers: {
@@ -294,8 +307,71 @@ console.log(propertyData, 'asdfadaaaa ')
         />
         <GeneralCategory
           onChange={handleChange}
+          onChange={handleChange}
           onRoomDimensionsChange={handleRoomDimensionsChange}
         />
+
+        <div className="grid grid-cols-2 gap-x-4 px-4  ">
+          <div className="">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Bedrooms
+              <span className="text-red-600 text-[20px] ml-1"> *</span>
+            </label>
+            <input
+              type="number"
+              name="numOfBedrooms"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfBedrooms}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfBedrooms || 0}
+            </div>
+            {formData.numOfBedrooms > 0 &&
+              renderDimensionFields(+formData.numOfBedrooms, "bedrooms")}
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Kitchens
+              <span className="text-red-600 text-[20px] ml-1"> *</span>
+            </label>
+            <input
+              type="number"
+              name="numOfKitchens"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfKitchens}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfKitchens || 0}
+            </div>
+            {formData.numOfKitchens > 0 &&
+              renderDimensionFields(+formData.numOfKitchens, "kitchens")}
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-medium text-[#9747FF]">
+              Number of Living Rooms
+            </label>
+            <input
+              type="number"
+              name="numOfLivingRooms"
+              min={0}
+              className=" w-full px-3 py-2 border-0 rounded-md focus:outline-none focus:ring focus:border-blue-500"
+              value={formData.numOfLivingRooms}
+              onChange={handleInputChange}
+            />
+            <div className="mt-1 text-sm text-gray-600">
+              Preview: {formData.numOfLivingRooms || 0}
+            </div>
+            {formData.numOfKitchens > 0 &&
+              renderDimensionFields(+formData.numOfLivingRooms, "livingrooms")}
+          </div>
+        </div>
+
 
         <div className="grid grid-cols-2 gap-x-4 px-4  ">
           <div className="">

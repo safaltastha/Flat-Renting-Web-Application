@@ -6,12 +6,14 @@ const PropertyRouter = require("./routes/Property");
 const UserRouter = require("./routes/Users");
 const vehicleRouter = require("./routes/Vehicle");
 const path = require("path");
+const bodyParser = require("body-parser");
 
 const bookingRouter = require("./routes/Booking");
 
 const RatingRouter = require("./routes/Rating");
 
 const contactRouter = require("./routes/Contact");
+const SavePropertyRouter = require("./routes/SavedProperties");
 const ChangePasswordRouter = require("./routes/ChangePassword");
 const savePropertyRouter = require("./routes/saveProperties");
 const ReactionRouter = require("./routes/reactRating");
@@ -21,7 +23,6 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET;
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -77,7 +78,7 @@ app.use("/changepassword", ChangePasswordRouter);
 app.use("/save", savePropertyRouter);
 app.use("/reaction", ReactionRouter);
 db.sequelize.sync().then(() => {
-  app.listen(3002, () => {
-    console.log("Server Running on port 3002");
+  app.listen(5001, () => {
+    console.log("Server Running on port 5001");
   });
 });

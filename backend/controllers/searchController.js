@@ -43,7 +43,7 @@ const searchProperties = async (req, res) => {
       ],
     });
 
-    const baseUrl = "http://localhost:3002"; // Base URL for files
+    const baseUrl = "http://localhost:3001"; // Base URL for files
 
     // Format media file paths for response
     properties.forEach((property) => {
