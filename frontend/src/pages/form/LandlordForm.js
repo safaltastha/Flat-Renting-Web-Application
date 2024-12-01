@@ -173,7 +173,6 @@ const LandlordForm = () => {
         breadth: livingroom.breadth,
       })),
     };
-    
 
     const propertyData = new FormData();
     propertyData.append("category", formData.category);
@@ -231,7 +230,7 @@ const LandlordForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3002/properties",
+        "http://localhost:5001/properties",
         propertyData,
         {
           headers: {

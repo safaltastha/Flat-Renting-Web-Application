@@ -41,7 +41,7 @@ const FeaturedProperties = () => {
     const loadFeaturedProperties = async () => {
       try {
         const token = Cookies.get("token");
-        const response = await axios.get("http://localhost:3001/properties", {
+        const response = await axios.get("http://localhost:5001/properties", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -87,8 +87,8 @@ const FeaturedProperties = () => {
     return <div>Error loading featured properties: {error.message}</div>;
 
   return (
-    <div className="container h-50  max-w-[1600px] p-12 relative">
-      <h2 className="text-5xl md:text-2xl font-bold mb-6 text-center">
+    <div className="container max-w-[1600px] py-8 relative">
+      <h2 className="text-2xl font-bold mb-6 text-center">
         Featured Properties
       </h2>
       {properties.length > 0 ? (

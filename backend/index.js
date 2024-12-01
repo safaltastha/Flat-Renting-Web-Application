@@ -67,7 +67,7 @@ app.use("/contact", contactRouter);
 app.use("/changepassword", ChangePasswordRouter);
 app.use("/save-property", SavePropertyRouter);
 db.sequelize.sync().then(() => {
-  app.listen(3001, () => {
-    console.log("Server Running on port 3001");
+  app.listen(5001, () => {
+    console.log("Server Running on port 5001");
   });
 });

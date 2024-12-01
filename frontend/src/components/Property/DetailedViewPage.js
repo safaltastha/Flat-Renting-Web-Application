@@ -39,7 +39,7 @@ const DetailedViewPage = () => {
       try {
         const token = Cookies.get("token");
         const response = await axios.get(
-          `http://localhost:3001/properties/${id}`,
+          `http://localhost:5001/properties/${id}`,
           {
             headers: {
               Authorization: `Bearer ${auth.accessToken}`, // Add token to the Authorization header

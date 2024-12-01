@@ -195,7 +195,7 @@ router.get("/", authenticateJWT, async (req, res) => {
 
     const reversedProperties = properties.reverse();
 
-    const baseUrl = "http://localhost:3001"; // Base URL for files
+    const baseUrl = "http://localhost:5001"; // Base URL for files
 
     reversedProperties.forEach((property) => {
       if (property.media) {
@@ -254,7 +254,7 @@ router.get("/:id", authenticateJWT, async (req, res) => {
     }
 
     // Format media paths
-    const baseUrl = "http://localhost:3001"; // Base URL for files
+    const baseUrl = "http://localhost:5001"; // Base URL for files
     if (property.media) {
       property.media.forEach((mediaItem) => {
         const filePath = mediaItem.file_path.replace(/\\/g, "/"); // Ensure path formatting is consistent
