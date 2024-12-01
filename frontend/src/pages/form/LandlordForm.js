@@ -34,9 +34,9 @@ const LandlordForm = () => {
       petAllowed: false,
     },
     floor: "",
-<<<<<<< HEAD
+
     StreetName: "",
-=======
+
     availableStart: "",
     availableEnd: "",
     availabilityTime: "",
@@ -45,7 +45,7 @@ const LandlordForm = () => {
       kitchens: [],
       livingrooms: [],
     },
->>>>>>> pranisha
+
   });
   const navigate = useNavigate();
 
@@ -141,14 +141,14 @@ const LandlordForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-<<<<<<< HEAD
+
 
     if (images.length === 0) {
       alert("Please upload at least one image .");
       return;
     }
 
-=======
+
     const startDate = new Date(formData.availableStart);
     const endDate = new Date(formData.availableEnd);
     if (endDate < startDate) {
@@ -166,7 +166,7 @@ const LandlordForm = () => {
       return;
     }
 
->>>>>>> pranisha
+
     const featuresData = {
       wifi: formData.features.wifi,
       parking: formData.features.parking,
@@ -174,8 +174,7 @@ const LandlordForm = () => {
       petAllowed: formData.features.petAllowed,
     };
 
-<<<<<<< HEAD
-=======
+
     const dimensionsData = {
       bedrooms: formData.dimensions.bedrooms.map((bedroom) => ({
         length: bedroom.length,
@@ -192,7 +191,7 @@ const LandlordForm = () => {
     };
     
 
->>>>>>> pranisha
+
     const propertyData = new FormData();
     propertyData.append("category", formData.category);
     propertyData.append("locationCity", formData.locationCity);
@@ -210,8 +209,7 @@ const LandlordForm = () => {
     propertyData.append("StreetName", formData.StreetName);
     propertyData.append("entityType", "property");
     propertyData.append("numOfBathrooms", formData.numOfBathrooms);
-<<<<<<< HEAD
-=======
+
 
     propertyData.append("availableStart", formData.availableStart);
     propertyData.append("availableEnd", formData.availableEnd);
@@ -232,7 +230,7 @@ const LandlordForm = () => {
       propertyData.append(`livingroom${index + 1}_length`, livingroom.length);
       propertyData.append(`livingroom${index + 1}_breadth`, livingroom.breadth);
     });
->>>>>>> pranisha
+
 
     // Append images and videos to FormData
     images.forEach((image) => {
@@ -252,11 +250,9 @@ const LandlordForm = () => {
 
     try {
       const response = await axios.post(
-<<<<<<< HEAD
-        "http://localhost:3001/properties",
-=======
-        "http://localhost:3002/properties",
->>>>>>> pranisha
+
+        "http://localhost:5001/properties",
+
         propertyData,
         {
           headers: {

@@ -14,7 +14,7 @@ const validationSchema = Yup.object().shape({
       "Invalid email address"
     )
     .required("Email is required"),
-<<<<<<< HEAD
+
   name: Yup.string()
     .matches(
       /^[a-z0-9]+$/,
@@ -23,11 +23,11 @@ const validationSchema = Yup.object().shape({
     .min(3, "Name must be at least 3 characters long")
     .max(50, "Name must not exceed 50 characters")
     .required("Name is required"),
-=======
+
   firstName: Yup.string().required("First name is required"),
   lastName: Yup.string().required("Last name is required"),
   address: Yup.string().required("Address is required"),
->>>>>>> pranisha
+
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
@@ -41,16 +41,16 @@ const validationSchema = Yup.object().shape({
   role: Yup.string()
     .oneOf(["tenant", "landlord", "vehicleSupplier"], "Invalid role")
     .required("Role is required"),
-<<<<<<< HEAD
+
   phoneNumber: Yup.string()
     .required("Phone number is required")
     .matches(
       /^\+977 ?\d{10}$/,
       "Phone number must be in the format +977XXXXXXXXXX"
     ),
-=======
+
   phoneNumber: Yup.string().required("Phone number is required"),
->>>>>>> pranisha
+
 });
 
 const RegisterForm = () => {
@@ -59,7 +59,7 @@ const RegisterForm = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const response = await axios.post(
-        "http://localhost:3002/auth/register",
+        "http://localhost:5001/auth/register",
         values
       );
       resetForm();
@@ -75,11 +75,11 @@ const RegisterForm = () => {
   };
 
   return (
-<<<<<<< HEAD
+
     <div className="flex items-center justify-center h-[100vh] max-h-screen py-8 p-4 bg-gray-100">
-=======
+
     <div className="flex items-center justify-center   py-8 p-4 bg-gray-100">
->>>>>>> pranisha
+
       <Formik
         initialValues={{
           name: "",
@@ -319,6 +319,7 @@ const RegisterForm = () => {
           </Form>
         )}
       </Formik>
+    </div>
     </div>
   );
 };
